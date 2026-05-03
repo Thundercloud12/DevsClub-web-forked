@@ -1,75 +1,240 @@
-# Nuxt Minimal Starter
+# DevsClub Web — Nuxt Migration
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This repository contains the migration of the DevsClub website from Next.js to Nuxt 3.
 
-## Setup
+Built using:
+- Vue 3
+- Nuxt 3
+- TypeScript
+- pnpm
+- Husky
+- Commitlint
+- Prettier
 
-Make sure to install dependencies:
+---
+
+# Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Nuxt 3 | Full-stack Vue framework |
+| Vue 3 | Frontend framework |
+| TypeScript | Type safety |
+| pnpm | Package manager |
+| Husky | Git hooks |
+| Commitlint | Commit message enforcement |
+| Prettier | Code formatting |
+| lint-staged | Staged file formatting |
+
+---
+
+# Project Setup
+
+## Clone Repository
 
 ```bash
-# npm
-npm install
+git clone <repo-url>
+cd vue-migration
+```
 
-# pnpm
+---
+
+# Install Dependencies
+
+Using pnpm:
+
+```bash
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+During installation, pnpm may ask to approve build scripts.
 
-Start the development server on `http://localhost:3000`:
+Run:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
+pnpm approve-builds
 ```
 
-## Production
+Approve:
+- `esbuild`
+- `@parcel/watcher`
+
+---
+
+# Development Server
+
+Start the local development server:
+
+```bash
+pnpm dev
+```
+
+Application runs on:
+
+```text
+http://localhost:3000
+```
+
+---
+
+# Production Build
 
 Build the application for production:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
 pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+Preview production build locally:
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
 pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+---
+
+# Code Quality & Git Hooks
+
+This project uses:
+- Husky
+- Commitlint
+- Prettier
+- lint-staged
+
+to maintain clean commits and consistent formatting.
+
+---
+
+# Commit Message Convention
+
+All commits must follow the Conventional Commits format:
+
+```text
+type: message
+```
+
+Examples:
+
+```bash
+git commit -m "feat: add authentication flow"
+git commit -m "fix: resolve navbar overflow"
+git commit -m "chore: configure husky"
+```
+
+Allowed commit types:
+
+- feat
+- fix
+- chore
+- docs
+- style
+- refactor
+- perf
+- test
+- build
+- ci
+- revert
+
+---
+
+# Branch Naming Convention
+
+Branch names must follow:
+
+```text
+type/branch-name
+```
+
+Examples:
+
+```text
+feature/auth-system
+fix/mobile-navbar
+chore/husky-setup
+refactor/api-cleanup
+```
+
+Allowed branch prefixes:
+
+- feature
+- fix
+- chore
+- docs
+- refactor
+- style
+- test
+
+---
+
+# Protected Branch Rules
+
+Direct pushes to `main` are blocked locally using Husky hooks.
+
+Please create feature branches and open Pull Requests instead.
+
+Example workflow:
+
+```bash
+git checkout -b feature/login-page
+git commit -m "feat: add login page"
+git push origin feature/login-page
+```
+
+---
+
+# Formatting
+
+Format the project manually:
+
+```bash
+pnpm format
+```
+
+Prettier automatically formats staged files during commits.
+
+---
+
+# Linting
+
+Run lint checks:
+
+```bash
+pnpm lint
+```
+
+---
+
+# Recommended VS Code Extensions
+
+- Vue - Official
+- Prettier
+- ESLint
+- Tailwind CSS IntelliSense
+
+---
+
+# Deployment
+
+Nuxt supports deployment on:
+- VPS
+- Docker
+- Vercel
+- Netlify
+- Cloudflare
+- Node servers
+
+Build output is generated inside:
+
+```text
+.output/
+```
+
+---
+
+# Learn More
+
+- Nuxt Documentation: https://nuxt.com/docs
+- Vue Documentation: https://vuejs.org
+- pnpm Documentation: https://pnpm.io
+- Husky Documentation: https://typicode.github.io/husky
+- Commitlint Documentation: https://commitlint.js.org
