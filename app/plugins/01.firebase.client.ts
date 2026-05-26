@@ -1,22 +1,36 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { getAuth, connectAuthEmulator } from 'firebase/auth'
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
 
 export default defineNuxtPlugin(async () => {
   const config = useRuntimeConfig()
 
   const app = initializeApp({
-    apiKey: config.public.FIREBASE_API_KEY,
-    authDomain: config.public.FIREBASE_AUTH_DOMAIN,
-    databaseURL: config.public.FIREBASE_DATABASE_URL,
-    projectId: config.public.FIREBASE_PROJECT_ID,
-    storageBucket: config.public.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: config.public.FIREBASE_MESSAGING_SENDER_ID,
-    appId: config.public.FIREBASE_APP_ID,
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'demo-api-key',
+    authDomain:
+      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+      'demo-project.firebaseapp.com',
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'demo-project',
+    storageBucket:
+      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+      'demo-project.appspot.com',
+    messagingSenderId:
+      process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1234567890',
+    appId:
+      process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1234567890:web:1234567890',
   })
 
   const auth = getAuth(app)
   const db = getFirestore(app)
+
+  if (process.env.NODE_ENV === 'development') {
+    connectAuthEmulator(auth, 'http://127.0.0.1:9098', {
+      disableWarnings: true,
+    })
+    connectFirestoreEmulator(db, '127.0.0.1', 8080)
+
+    console.log('🔥 Connected to Firebase Emulators')
+  }
 
   return {
     provide: {
