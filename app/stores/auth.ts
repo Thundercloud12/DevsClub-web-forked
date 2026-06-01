@@ -11,11 +11,13 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null as any,
     profile: null as any,
+    role: null as string | null,
     isReady: false,
   }),
 
   getters: {
     isLoggedIn: (state) => !!state.user,
+    isAdmin: (state) => state.role === 'admin',
   },
 
   actions: {
@@ -29,25 +31,38 @@ export const useAuthStore = defineStore('auth', {
             this.user = firebaseUser
 
             try {
-              const docRef = doc(db, 'Students ', firebaseUser.uid)
-              const docSnap = await getDoc(docRef)
+              // Check Student collection first
+              const studentRef = doc(db, 'Students ', firebaseUser.uid)
+              const studentSnap = await getDoc(studentRef)
 
-              if (docSnap.exists()) {
-                this.profile = docSnap.data()
+              if (studentSnap.exists()) {
+                this.profile = studentSnap.data()
+                this.role = 'student'
               } else {
-                await signOut(auth)
-                this.user = null
-                this.profile = null
+                const adminRef = doc(db, 'OfficialLogin', firebaseUser.uid)
+                const adminSnap = await getDoc(adminRef)
+
+                if (adminSnap.exists()) {
+                  this.profile = adminSnap.data()
+                  this.role = 'admin'
+                } else {
+                  await signOut(auth)
+                  this.user = null
+                  this.profile = null
+                  this.role = null
+                }
               }
             } catch (error) {
-              console.error('Error fetching student profile:', error)
+              console.error('Error fetching user profile:', error)
               await signOut(auth)
               this.user = null
               this.profile = null
+              this.role = null
             }
           } else {
             this.user = null
             this.profile = null
+            this.role = null
           }
 
           this.isReady = true
@@ -64,6 +79,7 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       const auth = getAuth()
       await signOut(auth)
+      this.role = null
       navigateTo('/auth/signin')
     },
   },

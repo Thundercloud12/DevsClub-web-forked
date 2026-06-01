@@ -1,20 +1,20 @@
-<!-- pages/auth/signin.vue -->
+<!-- pages/auth/admin-login.vue -->
 <template>
   <div
     class="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 bg-slate-50 dark:bg-slate-950"
   >
     <UiCard
       class="w-full max-w-md"
-      title="Student Sign In"
-      description="Enter your email and password to access your dashboard"
+      title="Admin Sign In"
+      description="Enter your official credentials to access the admin dashboard"
     >
       <div class="space-y-2">
-        <UiLabel for="email">Email</UiLabel>
+        <UiLabel for="email">Official Email</UiLabel>
         <UiInput
           id="email"
           v-model="email"
           type="email"
-          placeholder="student@example.com"
+          placeholder="admin@example.com"
         />
       </div>
 
@@ -91,12 +91,21 @@ const handleLogin = async () => {
   try {
     loading.value = true
     await authStore.login(email.value, password.value)
-    // The store automatically updates its own state via onAuthStateChanged
-    // We just need to redirect them!
-    navigateTo('/dashboard')
+
+    // Check if the role was properly resolved to admin during onAuthStateChanged
+    // Wait slightly to ensure state is populated
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    if (authStore.isAdmin) {
+      navigateTo('/admin/dashboard')
+    } else {
+      // If they signed in but they are not admin (e.g. they are a student)
+      alert('You do not have administrative privileges.')
+      await authStore.logout()
+    }
   } catch (error) {
-    console.error('Login failed:', error)
-    alert('Invalid credentials or you are not a registered student.')
+    console.error('Admin login failed:', error)
+    alert('Invalid credentials or you are not a registered official.')
   } finally {
     loading.value = false
   }
