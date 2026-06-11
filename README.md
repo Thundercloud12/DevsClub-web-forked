@@ -3,6 +3,7 @@
 This repository contains the migration of the DevsClub website from Next.js to Nuxt 3.
 
 Built using:
+
 - Vue 3
 - Nuxt 3
 - TypeScript
@@ -15,16 +16,16 @@ Built using:
 
 # Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| Nuxt 3 | Full-stack Vue framework |
-| Vue 3 | Frontend framework |
-| TypeScript | Type safety |
-| pnpm | Package manager |
-| Husky | Git hooks |
-| Commitlint | Commit message enforcement |
-| Prettier | Code formatting |
-| lint-staged | Staged file formatting |
+| Technology  | Purpose                    |
+| ----------- | -------------------------- |
+| Nuxt 3      | Full-stack Vue framework   |
+| Vue 3       | Frontend framework         |
+| TypeScript  | Type safety                |
+| pnpm        | Package manager            |
+| Husky       | Git hooks                  |
+| Commitlint  | Commit message enforcement |
+| Prettier    | Code formatting            |
+| lint-staged | Staged file formatting     |
 
 ---
 
@@ -56,6 +57,7 @@ pnpm approve-builds
 ```
 
 Approve:
+
 - `esbuild`
 - `@parcel/watcher`
 
@@ -96,6 +98,7 @@ pnpm preview
 # Code Quality & Git Hooks
 
 This project uses:
+
 - Husky
 - Commitlint
 - Prettier
@@ -216,6 +219,7 @@ pnpm lint
 # Deployment
 
 Nuxt supports deployment on:
+
 - VPS
 - Docker
 - Vercel
