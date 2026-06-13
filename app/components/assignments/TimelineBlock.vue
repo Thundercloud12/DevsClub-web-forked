@@ -16,6 +16,15 @@ const props = defineProps<{
 
 const isEven = computed(() => props.index % 2 === 0)
 
+// Derived from real timestamp — not from the static `status` field
+const isSubmittable = computed(() => {
+  const now = Date.now()
+  return (
+    now >= props.assignment.submissionsOpenAt.getTime() &&
+    now < props.assignment.submissionsCloseAt.getTime()
+  )
+})
+
 const statusColors = {
   upcoming: 'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-gray-400',
   open: 'bg-brand-cyan/20 text-brand-blue dark:bg-brand-blue/20 dark:text-brand-cyan',
@@ -55,13 +64,13 @@ const formatDate = (date: Date) => {
         }"
         class="bg-white dark:bg-[#151f32] border rounded-3xl p-6 md:p-8 hover:shadow-xl transition-shadow duration-300 relative group overflow-hidden"
         :class="[
-          assignment.status === 'open'
+          isSubmittable
             ? 'border-brand-blue/30 shadow-md dark:border-brand-blue/50'
             : 'border-gray-100 shadow-sm dark:border-slate-800',
         ]"
       >
         <div
-          v-if="assignment.status === 'open'"
+          v-if="isSubmittable"
           class="absolute -top-12 -right-12 w-32 h-32 bg-brand-cyan/20 dark:bg-brand-cyan/10 rounded-full blur-2xl group-hover:scale-110 transition-transform"
         ></div>
 
@@ -91,7 +100,7 @@ const formatDate = (date: Date) => {
           </p>
 
           <NuxtLink
-            v-if="assignment.status === 'open'"
+            v-if="isSubmittable"
             :to="`/assignments/${assignment.id}`"
             class="mt-2 inline-flex items-center justify-center bg-brand-blue text-white font-medium px-6 py-2.5 rounded-xl hover:bg-blue-600 transition-colors w-full sm:w-auto shadow-[0_0_15px_rgba(49,113,219,0.2)]"
           >

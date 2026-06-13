@@ -43,5 +43,5 @@ export default defineNuxtConfig({
     },
   },
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', '@nuxt/image', 'motion-v/nuxt'],
+  modules: ['@pinia/nuxt', '@nuxt/image', 'motion-v/nuxt', '@nuxt/ui'],
 })

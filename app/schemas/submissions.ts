@@ -16,6 +16,8 @@ export const submissionSchema = z.object({
     .url('Must be a valid URL')
     .includes('github.com', { message: 'Must be a GitHub repository' }),
   videoLink: z.string().url('Must be a valid URL').optional(),
+  liveUrl: z.string().url('Must be a valid URL').optional(),
+  notes: z.string().max(1000, 'Notes must be under 1000 characters').optional(),
   submittedAt: z.date(),
 
   // The snapshot of the rubric criteria + the evaluator's actual scores
