@@ -72,8 +72,16 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <NuxtLayout v-else>
-      <NuxtPage />
-    </NuxtLayout>
+    <div v-else-if="!isChecking && !isUnderMaintenance">
+      <UiNavbar />
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </div>
   </div>
 </template>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zalando+Sans+Expanded:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+</style>

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const assignmentSchema = z.object({
-  id: z.string().optional(), // Optional on creation, populated after saving to Firestore
+  id: z.string().optional(),
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   rubricId: z.string().min(1, 'A grading rubric must be selected'),
@@ -15,6 +15,8 @@ export const assignmentSchema = z.object({
       message: 'Close date must be after open date',
       path: ['submissionsCloseAt'],
     }),
+  // Denormalized for efficient Firestore querying — mirrors timeline.submissionsCloseAt
+  submissionsCloseAt: z.date(),
 })
 
 export type Assignment = z.infer<typeof assignmentSchema>

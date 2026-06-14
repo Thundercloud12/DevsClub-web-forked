@@ -1,1 +1,47 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --bg-surface: #f4f7fb;
+  --bg-card: #ffffff;
+}
+
+.dark {
+  --bg-surface: #0b1120;
+  --bg-card: #111a2f;
+}
+
+@theme {
+  --color-brand-blue: #3171db;
+  --color-brand-cyan: #9feffe;
+
+  --color-surface-bg: var(--bg-surface);
+  --color-surface-card: var(--bg-card);
+
+  --font-zalando: 'Zalando Sans Expanded', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: var(--bg-surface);
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.dark body {
+  color: #f8fafc;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-zalando);
+}

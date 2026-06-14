@@ -3,6 +3,7 @@ import {
   collection,
   doc,
   setDoc,
+  getDoc,
   getDocs,
   query,
   where,
@@ -19,20 +20,36 @@ export const useSubmissions = () => {
       throw new Error('Unauthorized: You must be logged in to submit.')
     }
 
-    // Automatically generate the composite ID if it's missing but we have assignmentId and studentId
     if (!data.id && data.assignmentId && data.studentId) {
       data.id = `${data.assignmentId}_${data.studentId}`
     }
 
-    // Default status to 'pending' if missing
     if (!data.status) {
       data.status = 'pending'
     }
 
-    // Validate data against schema
+    // Re-verify the deadline from Firestore before writing — prevents any client-side bypass
+    const assignmentRef = doc(db, 'assignments', data.assignmentId)
+    const assignmentSnap = await getDoc(assignmentRef)
+
+    if (!assignmentSnap.exists()) {
+      throw new Error('Assignment not found.')
+    }
+
+    const assignmentData = assignmentSnap.data()
+    const deadline: Date =
+      assignmentData.submissionsCloseAt?.toDate?.() ??
+      assignmentData.timeline?.submissionsCloseAt?.toDate?.() ??
+      null
+
+    if (!deadline || Date.now() > deadline.getTime()) {
+      throw new Error(
+        'Submission deadline has passed. No submissions are accepted.'
+      )
+    }
+
     const validatedData = submissionSchema.parse(data)
 
-    // Enforce the composite ID requirement exactly as requested
     const expectedId = `${validatedData.assignmentId}_${validatedData.studentId}`
     if (validatedData.id !== expectedId) {
       throw new Error(
@@ -40,7 +57,6 @@ export const useSubmissions = () => {
       )
     }
 
-    // Save to Firestore
     const submissionRef = doc(db, 'submissions', validatedData.id)
     await setDoc(submissionRef, validatedData)
 
@@ -66,8 +82,21 @@ export const useSubmissions = () => {
     return snapshot.docs.map((doc) => doc.data() as Submission)
   }
 
+  const getSubmissionByUser = async (
+    assignmentId: string,
+    studentId: string
+  ): Promise<Submission | null> => {
+    const id = `${assignmentId}_${studentId}`
+    const submissionRef = doc(db, 'submissions', id)
+    const snapshot = await getDoc(submissionRef)
+
+    if (!snapshot.exists()) return null
+    return snapshot.data() as Submission
+  }
+
   return {
     createSubmission,
     getSubmissions,
+    getSubmissionByUser,
   }
 }
