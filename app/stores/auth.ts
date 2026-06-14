@@ -21,44 +21,55 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
+    async fetchUserProfile(firebaseUser: any) {
+      if (!firebaseUser) {
+        this.profile = null
+        this.role = null
+        return
+      }
+
+      const db = getFirestore()
+      try {
+        // Check Student collection first
+        const studentRef = doc(db, 'Students ', firebaseUser.uid)
+        const studentSnap = await getDoc(studentRef)
+
+        if (studentSnap.exists()) {
+          this.profile = studentSnap.data()
+          this.role = 'student'
+        } else {
+          const adminRef = doc(db, 'OfficialLogin', firebaseUser.uid)
+          const adminSnap = await getDoc(adminRef)
+
+          if (adminSnap.exists()) {
+            this.profile = adminSnap.data()
+            this.role = 'admin'
+          } else {
+            const auth = getAuth()
+            await signOut(auth)
+            this.user = null
+            this.profile = null
+            this.role = null
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error)
+        const auth = getAuth()
+        await signOut(auth)
+        this.user = null
+        this.profile = null
+        this.role = null
+      }
+    },
+
     initAuth() {
       return new Promise<void>((resolve) => {
         const auth = getAuth()
-        const db = getFirestore()
 
         onAuthStateChanged(auth, async (firebaseUser) => {
           if (firebaseUser) {
             this.user = firebaseUser
-
-            try {
-              // Check Student collection first
-              const studentRef = doc(db, 'Students ', firebaseUser.uid)
-              const studentSnap = await getDoc(studentRef)
-
-              if (studentSnap.exists()) {
-                this.profile = studentSnap.data()
-                this.role = 'student'
-              } else {
-                const adminRef = doc(db, 'OfficialLogin', firebaseUser.uid)
-                const adminSnap = await getDoc(adminRef)
-
-                if (adminSnap.exists()) {
-                  this.profile = adminSnap.data()
-                  this.role = 'admin'
-                } else {
-                  await signOut(auth)
-                  this.user = null
-                  this.profile = null
-                  this.role = null
-                }
-              }
-            } catch (error) {
-              console.error('Error fetching user profile:', error)
-              await signOut(auth)
-              this.user = null
-              this.profile = null
-              this.role = null
-            }
+            await this.fetchUserProfile(firebaseUser)
           } else {
             this.user = null
             this.profile = null
@@ -73,14 +84,20 @@ export const useAuthStore = defineStore('auth', {
 
     async login(email: string, password: string) {
       const auth = getAuth()
-      await signInWithEmailAndPassword(auth, email, password)
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      )
+      this.user = userCredential.user
+      await this.fetchUserProfile(userCredential.user)
     },
 
-    async logout() {
+    async logout(redirectTo: string = '/auth/signin') {
       const auth = getAuth()
       await signOut(auth)
       this.role = null
-      navigateTo('/auth/signin')
+      navigateTo(redirectTo)
     },
   },
 })

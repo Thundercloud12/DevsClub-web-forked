@@ -1,10 +1,4 @@
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-} from 'firebase/firestore'
+import { getFirestore, collection, getDocs } from 'firebase/firestore'
 import { ref } from 'vue'
 import type { Submission } from '~/schemas/submissions'
 
@@ -21,87 +15,89 @@ export const useLeaderboard = () => {
   const error = ref<string | null>(null)
 
   const getTopStudents = async (
+    trackId: string = 'all',
+    assignmentId: string = 'aggregate',
     limitCount: number = 20
   ): Promise<LeaderboardEntry[]> => {
     isLoading.value = true
     error.value = null
 
     try {
-      // 1. Fetch all submissions
-      const submissionsRef = collection(db, 'submissions')
-      const submissionsSnap = await getDocs(submissionsRef)
+      // 1. Fetch Students, Assignments, and Submissions in parallel
+      const [studentsSnap, assignmentsSnap, submissionsSnap] =
+        await Promise.all([
+          getDocs(collection(db, 'Students ')),
+          getDocs(collection(db, 'Assignments')),
+          getDocs(collection(db, 'Submissions')),
+        ])
 
-      if (submissionsSnap.empty) {
-        return []
-      }
+      // 2. Map student names for instant O(1) client-side lookup
+      const studentMap = new Map<string, string>()
+      studentsSnap.forEach((doc) => {
+        studentMap.set(doc.id, doc.data().name || 'Unknown Student')
+      })
 
-      const submissions = submissionsSnap.docs.map(
-        (doc) => doc.data() as Submission
-      )
+      // 3. Filter assignments belonging to the selected track
+      const trackAssignmentIds = new Set<string>()
+      assignmentsSnap.forEach((doc) => {
+        const data = doc.data()
+        const tracks = data.tracks || []
+        if (trackId === 'all' || tracks.includes(trackId)) {
+          trackAssignmentIds.add(doc.id)
+        }
+      })
 
-      // 2. Aggregate scores by student
+      // 4. Aggregate evaluated submissions
       const studentStats: Record<
         string,
         { totalScore: number; count: number }
       > = {}
 
-      submissions.forEach((sub) => {
-        // Only count evaluated submissions that have scores
-        if (sub.status !== 'evaluated' || !sub.scores) return
+      submissionsSnap.forEach((docSnapshot) => {
+        const sub = docSnapshot.data() as Submission
+        if (sub.status !== 'evaluated') return
 
-        const scoreSum = sub.scores!.reduce(
-          (sum, criterion) => sum + (criterion.actualScore || 0),
-          0
-        )
+        // Filter based on selected mode
+        if (assignmentId === 'aggregate') {
+          // Must belong to an assignment in the active track
+          if (!trackAssignmentIds.has(sub.assignmentId)) return
+        } else {
+          // Must match the selected single assignment ID
+          if (sub.assignmentId !== assignmentId) return
+        }
+
+        // Determine score using the denormalized totalScore, falling back to criteria sum if null
+        let score = 0
+        if (typeof sub.totalScore === 'number') {
+          score = sub.totalScore
+        } else if (sub.scores) {
+          score = sub.scores.reduce(
+            (sum, criterion) => sum + (criterion.actualScore || 0),
+            0
+          )
+        }
 
         if (!studentStats[sub.studentId]) {
           studentStats[sub.studentId] = { totalScore: 0, count: 0 }
         }
 
-        studentStats[sub.studentId]!.totalScore += scoreSum
+        studentStats[sub.studentId]!.totalScore += score
         studentStats[sub.studentId]!.count += 1
       })
 
-      // 3. Convert to array, sort by totalScore descending, and take the top limitCount
-      const sortedStudents = Object.entries(studentStats)
+      // 5. Convert stats map to sorted list and assign student names
+      const leaderboard: LeaderboardEntry[] = Object.entries(studentStats)
         .map(([studentId, stats]) => ({
           studentId,
+          name: studentMap.get(studentId) || 'Unknown Student',
           totalScore: stats.totalScore,
           submissionsCount: stats.count,
         }))
         .sort((a, b) => b.totalScore - a.totalScore)
         .slice(0, limitCount)
 
-      // 4. Fetch student names in parallel
-      const leaderboard = await Promise.all(
-        sortedStudents.map(async (entry) => {
-          let name = 'Unknown Student'
-
-          try {
-            const studentRef = doc(db, 'Students ', entry.studentId)
-            const studentSnap = await getDoc(studentRef)
-
-            if (studentSnap.exists()) {
-              const data = studentSnap.data()
-              name = data.name || 'Unknown Student'
-            }
-          } catch (err) {
-            console.warn(
-              `Could not fetch details for student ${entry.studentId}`,
-              err
-            )
-          }
-
-          return {
-            ...entry,
-            name,
-          }
-        })
-      )
-
       return leaderboard
     } catch (err: any) {
-      console.error('Error fetching leaderboard:', err)
       error.value = err.message || 'Failed to fetch leaderboard'
       return []
     } finally {

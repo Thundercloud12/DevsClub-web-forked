@@ -92,11 +92,7 @@ const handleLogin = async () => {
     loading.value = true
     await authStore.login(email.value, password.value)
 
-    // Check if the role was properly resolved to admin during onAuthStateChanged
-    // Wait slightly to ensure state is populated
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
-    if (authStore.isAdmin) {
+    if (authStore.role === 'admin') {
       navigateTo('/admin/dashboard')
     } else {
       // If they signed in but they are not admin (e.g. they are a student)

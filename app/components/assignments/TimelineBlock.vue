@@ -20,8 +20,8 @@ const isEven = computed(() => props.index % 2 === 0)
 const isSubmittable = computed(() => {
   const now = Date.now()
   return (
-    now >= props.assignment.submissionsOpenAt.getTime() &&
-    now < props.assignment.submissionsCloseAt.getTime()
+    now >= props.assignment.timeline.submissionsOpenAt.getTime() &&
+    now < props.assignment.timeline.submissionsCloseAt.getTime()
   )
 })
 
@@ -101,7 +101,7 @@ const formatDate = (date: Date) => {
 
           <NuxtLink
             v-if="isSubmittable"
-            :to="`/assignments/${assignment.id}`"
+            :to="`/dashboard/assignments/${assignment.id}`"
             class="mt-2 inline-flex items-center justify-center bg-brand-blue text-white font-medium px-6 py-2.5 rounded-xl hover:bg-blue-600 transition-colors w-full sm:w-auto shadow-[0_0_15px_rgba(49,113,219,0.2)]"
           >
             Submit Assignment

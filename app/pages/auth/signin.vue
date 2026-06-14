@@ -91,9 +91,11 @@ const handleLogin = async () => {
   try {
     loading.value = true
     await authStore.login(email.value, password.value)
-    // The store automatically updates its own state via onAuthStateChanged
-    // We just need to redirect them!
-    navigateTo('/dashboard')
+    if (authStore.role === 'admin') {
+      navigateTo('/admin/dashboard')
+    } else {
+      navigateTo('/dashboard')
+    }
   } catch (error) {
     console.error('Login failed:', error)
     alert('Invalid credentials or you are not a registered student.')

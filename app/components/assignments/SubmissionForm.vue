@@ -52,16 +52,18 @@ async function onSubmit(event: FormSubmitEvent<FormSchema>) {
   submitError.value = null
 
   try {
-    // Falls back to a dev placeholder when no user is signed in (UI testing only)
-    const studentId = authStore.user?.uid ?? 'dev-preview-user'
+    const studentId = authStore.user?.uid
+    if (!studentId) {
+      throw new Error('You must be logged in to submit.')
+    }
 
     await createSubmission({
       assignmentId: props.assignmentId,
       studentId,
       githubLink: event.data.githubLink,
-      videoLink: event.data.videoLink || undefined,
-      liveUrl: event.data.liveUrl || undefined,
-      notes: event.data.notes || undefined,
+      videoLink: event.data.videoLink || null,
+      liveUrl: event.data.liveUrl || null,
+      notes: event.data.notes || null,
       submittedAt: new Date(),
     })
 

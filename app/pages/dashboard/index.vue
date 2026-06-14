@@ -1,11 +1,18 @@
-<script setup>
-import { useAuthStore } from '~/stores/auth'
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { navigateTo } from '#app'
+
 definePageMeta({ middleware: ['auth'] })
-const authStore = useAuthStore()
+
+onMounted(async () => {
+  await navigateTo('/dashboard/assignments')
+})
 </script>
+
 <template>
-  <div v-if="authStore.isReady">
-    <h1>Welcome, {{ authStore.profile?.name }}</h1>
-    <button @click="authStore.logout()">Logout</button>
+  <div class="min-h-screen flex items-center justify-center bg-transparent">
+    <div class="animate-pulse text-gray-500 font-inter">
+      Loading your dashboard...
+    </div>
   </div>
 </template>

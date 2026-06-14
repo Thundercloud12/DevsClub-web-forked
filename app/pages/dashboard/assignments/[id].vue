@@ -7,10 +7,7 @@ import { useAuthStore } from '~/stores/auth'
 import type { Assignment } from '~/schemas/assignments'
 import type { Submission } from '~/schemas/submissions'
 
-// Auth middleware removed temporarily for UI testing
-// Re-add once user schema is finalized: definePageMeta({ middleware: 'auth' })
-
-// definePageMeta({ middleware: 'auth' })
+definePageMeta({ middleware: ['auth'] })
 
 const route = useRoute()
 const assignmentId = route.params.id as string
@@ -59,21 +56,7 @@ onMounted(async () => {
     ])
 
     if (!fetchedAssignment) {
-      // Dev fallback: inject a mock so the form is visible without a real Firestore record
-      assignment.value = {
-        id: assignmentId,
-        title: `[Preview] Assignment ${assignmentId}`,
-        description:
-          'This is a preview assignment for UI testing. No real Firestore record found.',
-        rubricId: 'preview',
-        submissionsCloseAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
-        timeline: {
-          publishedAt: new Date(),
-          submissionsOpenAt: new Date(),
-          submissionsCloseAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        },
-      }
-      isLoading.value = false
+      loadError.value = 'Assignment not found.'
       return
     }
 
@@ -144,7 +127,7 @@ useHead({
           {{ loadError }}
         </h2>
         <NuxtLink
-          to="/assignments"
+          to="/dashboard/assignments"
           class="inline-flex items-center text-brand-blue hover:underline text-sm font-medium"
         >
           ← Back to Assignments
@@ -158,7 +141,7 @@ useHead({
           :animate="{ opacity: 1, x: 0, transition: { duration: 0.3 } }"
         >
           <NuxtLink
-            to="/assignments"
+            to="/dashboard/assignments"
             class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-brand-blue dark:hover:text-brand-blue transition-colors mb-8 group"
           >
             <svg

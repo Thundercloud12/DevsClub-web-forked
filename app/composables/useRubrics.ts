@@ -21,14 +21,14 @@ export const useRubrics = () => {
     const validatedData = rubricSchema.parse(data)
 
     // Save to Firestore using the provided ID
-    const rubricRef = doc(db, 'rubrics', validatedData.id)
+    const rubricRef = doc(db, 'Rubrics', validatedData.id)
     await setDoc(rubricRef, validatedData)
 
     return validatedData
   }
 
   const getRubrics = async (): Promise<Rubric[]> => {
-    const rubricsRef = collection(db, 'rubrics')
+    const rubricsRef = collection(db, 'Rubrics')
     const snapshot = await getDocs(rubricsRef)
 
     if (snapshot.empty) {

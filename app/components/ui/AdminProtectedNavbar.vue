@@ -17,6 +17,10 @@ const navShadow = useTransform(
     '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
   ]
 )
+
+const handleLogout = async () => {
+  await authStore.logout('/auth/admin-login')
+}
 </script>
 
 <template>
@@ -42,62 +46,43 @@ const navShadow = useTransform(
       <div
         class="relative z-10 flex items-center justify-between w-full border-none"
       >
-        <NuxtLink to="/" class="flex items-center gap-2">
+        <NuxtLink to="/admin/dashboard" class="flex items-center gap-2">
           <span
             class="font-zalando font-bold text-xl text-brand-blue tracking-tight"
-            >TSEC DevsClub</span
           >
+            TSEC DevsClub
+            <span
+              class="text-xs font-semibold px-2 py-0.5 rounded-md bg-brand-blue/10 text-brand-blue ml-1 uppercase"
+              >Admin</span
+            >
+          </span>
         </NuxtLink>
 
         <div
           class="hidden md:flex items-center gap-8 font-inter font-medium text-sm text-gray-700 dark:text-gray-300"
         >
           <NuxtLink
-            to="/"
+            to="/admin/dashboard"
             class="hover:text-brand-blue transition-colors duration-200"
-            >Home</NuxtLink
           >
-          <template v-if="authStore.isLoggedIn">
-            <NuxtLink
-              to="/dashboard/assignments"
-              class="hover:text-brand-blue transition-colors duration-200"
-              >Assignments</NuxtLink
-            >
-            <NuxtLink
-              to="/dashboard/leaderboard"
-              class="hover:text-brand-blue transition-colors duration-200"
-              >Leaderboard</NuxtLink
-            >
-            <NuxtLink
-              to="/dashboard"
-              class="hover:text-brand-blue transition-colors duration-200"
-              >Dashboard</NuxtLink
-            >
-          </template>
+            Dashboard
+          </NuxtLink>
 
           <UiThemeToggle />
 
           <button
-            v-if="authStore.isLoggedIn"
-            @click="authStore.logout()"
+            @click="handleLogout"
             class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl transition-colors duration-200 font-semibold shadow-[0_0_15px_rgba(239,68,68,0.2)]"
           >
             Sign Out
           </button>
-          <NuxtLink
-            v-else
-            to="/auth/signin"
-            class="bg-brand-blue text-white px-5 py-2.5 rounded-xl hover:bg-blue-600 transition-colors duration-200 font-semibold shadow-[0_0_15px_rgba(49,113,219,0.3)]"
-          >
-            Sign In
-          </NuxtLink>
         </div>
 
         <div class="md:hidden flex items-center gap-2">
           <UiThemeToggle />
           <button class="text-gray-700 dark:text-gray-300">
             <svg
-              xmlns="http://www.w3.org/O/svg"
+              xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
               viewBox="0 0 24 24"

@@ -29,7 +29,7 @@ export const useSubmissions = () => {
     }
 
     // Re-verify the deadline from Firestore before writing — prevents any client-side bypass
-    const assignmentRef = doc(db, 'assignments', data.assignmentId)
+    const assignmentRef = doc(db, 'Assignments', data.assignmentId)
     const assignmentSnap = await getDoc(assignmentRef)
 
     if (!assignmentSnap.exists()) {
@@ -57,7 +57,7 @@ export const useSubmissions = () => {
       )
     }
 
-    const submissionRef = doc(db, 'submissions', validatedData.id)
+    const submissionRef = doc(db, 'Submissions', validatedData.id)
     await setDoc(submissionRef, validatedData)
 
     return validatedData
@@ -66,7 +66,7 @@ export const useSubmissions = () => {
   const getSubmissions = async (
     assignmentId?: string
   ): Promise<Submission[]> => {
-    const submissionsRef = collection(db, 'submissions')
+    const submissionsRef = collection(db, 'Submissions')
 
     let q: any = query(submissionsRef)
     if (assignmentId) {
@@ -87,7 +87,7 @@ export const useSubmissions = () => {
     studentId: string
   ): Promise<Submission | null> => {
     const id = `${assignmentId}_${studentId}`
-    const submissionRef = doc(db, 'submissions', id)
+    const submissionRef = doc(db, 'Submissions', id)
     const snapshot = await getDoc(submissionRef)
 
     if (!snapshot.exists()) return null

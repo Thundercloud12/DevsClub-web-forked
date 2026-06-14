@@ -15,15 +15,20 @@ export const submissionSchema = z.object({
     .string()
     .url('Must be a valid URL')
     .includes('github.com', { message: 'Must be a GitHub repository' }),
-  videoLink: z.string().url('Must be a valid URL').optional(),
-  liveUrl: z.string().url('Must be a valid URL').optional(),
-  notes: z.string().max(1000, 'Notes must be under 1000 characters').optional(),
+  videoLink: z.string().url('Must be a valid URL').nullable().optional(),
+  liveUrl: z.string().url('Must be a valid URL').nullable().optional(),
+  notes: z
+    .string()
+    .max(1000, 'Notes must be under 1000 characters')
+    .nullable()
+    .optional(),
   submittedAt: z.date(),
 
   // The snapshot of the rubric criteria + the evaluator's actual scores
   scores: z.array(gradedCriterionSchema).optional(),
 
   status: z.enum(['pending', 'evaluated']),
+  totalScore: z.number().nonnegative().nullable().optional(),
 })
 
 // 2. Inferred TypeScript Types

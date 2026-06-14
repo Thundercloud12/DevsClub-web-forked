@@ -17,6 +17,7 @@ export const assignmentSchema = z.object({
     }),
   // Denormalized for efficient Firestore querying — mirrors timeline.submissionsCloseAt
   submissionsCloseAt: z.date(),
+  tracks: z.array(z.string()).default([]),
 })
 
 export type Assignment = z.infer<typeof assignmentSchema>

@@ -1,11 +1,15 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRoute } from '#app'
 import {
   getFirestore,
   doc,
   onSnapshot,
   connectFirestoreEmulator,
 } from 'firebase/firestore'
+
+const route = useRoute()
+const isAdminPage = computed(() => route.path.startsWith('/admin'))
 
 const isUnderMaintenance = ref(false)
 const isChecking = ref(true)
@@ -73,7 +77,8 @@ onUnmounted(() => {
     </div>
 
     <div v-else-if="!isChecking && !isUnderMaintenance">
-      <UiNavbar />
+      <UiAdminProtectedNavbar v-if="isAdminPage" />
+      <UiNavbar v-else />
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
