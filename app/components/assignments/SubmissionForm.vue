@@ -2,7 +2,7 @@
 import { ref, reactive } from 'vue'
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { useSubmissions } from '~/composables/useSubmissions'
+import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAuthStore } from '~/stores/auth'
 
 const props = defineProps<{
@@ -88,134 +88,81 @@ const formatDate = (date: Date) =>
 </script>
 
 <template>
-  <!-- Already submitted state -->
-  <div
-    v-if="existingSubmission"
-    class="rounded-2xl border border-brand-blue/30 bg-brand-blue/5 dark:bg-brand-blue/10 p-6 space-y-4"
-  >
-    <div class="flex items-center gap-3">
-      <div
-        class="w-10 h-10 rounded-xl bg-brand-blue/20 flex items-center justify-center shrink-0"
-      >
-        <svg
-          class="w-5 h-5 text-brand-blue"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
-      <div>
-        <p class="font-semibold text-gray-900 dark:text-white font-zalando">
-          Already Submitted
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          Submitted on {{ formatDate(existingSubmission.submittedAt) }}
-        </p>
-      </div>
-    </div>
-
-    <div class="grid gap-3 pt-2">
-      <div class="flex flex-col gap-1">
-        <span
-          class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-          >GitHub Repository</span
-        >
-        <a
-          :href="existingSubmission.githubLink"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-brand-blue hover:underline text-sm truncate"
-        >
-          {{ existingSubmission.githubLink }}
-        </a>
-      </div>
-      <div v-if="existingSubmission.videoLink" class="flex flex-col gap-1">
-        <span
-          class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-          >Video Demo</span
-        >
-        <a
-          :href="existingSubmission.videoLink"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-brand-blue hover:underline text-sm truncate"
-        >
-          {{ existingSubmission.videoLink }}
-        </a>
-      </div>
-      <div v-if="existingSubmission.liveUrl" class="flex flex-col gap-1">
-        <span
-          class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-          >Live URL</span
-        >
-        <a
-          :href="existingSubmission.liveUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-brand-blue hover:underline text-sm truncate"
-        >
-          {{ existingSubmission.liveUrl }}
-        </a>
-      </div>
-      <div v-if="existingSubmission.notes" class="flex flex-col gap-1">
-        <span
-          class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-          >Notes</span
-        >
-        <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
-          {{ existingSubmission.notes }}
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Success state -->
-  <div
-    v-else-if="isSuccess"
-    class="rounded-2xl border border-green-500/30 bg-green-500/5 dark:bg-green-500/10 p-8 text-center space-y-3"
-  >
-    <div
-      class="w-14 h-14 rounded-2xl bg-green-500/20 flex items-center justify-center mx-auto"
+  <UForm :schema="formSchema" :state="state" @submit="onSubmit">
+    <FormLayout
+      :is-read-only="!!existingSubmission"
+      read-only-title="Already Submitted"
+      :read-only-subtitle="
+        existingSubmission
+          ? `Submitted on ${formatDate(existingSubmission.submittedAt)}`
+          : undefined
+      "
+      :is-success="isSuccess"
+      success-title="Submission Received!"
+      success-message="Your assignment has been submitted successfully. You'll be notified once it's evaluated."
+      :submit-error="submitError"
+      :is-submitting="isSubmitting"
+      submit-text="Submit Assignment"
+      submitting-text="Submitting..."
     >
-      <svg
-        class="w-7 h-7 text-green-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 13l4 4L19 7"
-        />
-      </svg>
-    </div>
-    <h3 class="font-zalando font-bold text-xl text-gray-900 dark:text-white">
-      Submission Received!
-    </h3>
-    <p class="text-gray-500 dark:text-gray-400 text-sm max-w-sm mx-auto">
-      Your assignment has been submitted successfully. You'll be notified once
-      it's evaluated.
-    </p>
-  </div>
+      <!-- Read-only state slots -->
+      <template #read-only v-if="existingSubmission">
+        <div class="flex flex-col gap-1">
+          <span
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            >GitHub Repository</span
+          >
+          <a
+            :href="existingSubmission.githubLink"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-brand-blue hover:underline text-sm truncate"
+          >
+            {{ existingSubmission.githubLink }}
+          </a>
+        </div>
+        <div v-if="existingSubmission.videoLink" class="flex flex-col gap-1">
+          <span
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            >Video Demo</span
+          >
+          <a
+            :href="existingSubmission.videoLink"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-brand-blue hover:underline text-sm truncate"
+          >
+            {{ existingSubmission.videoLink }}
+          </a>
+        </div>
+        <div v-if="existingSubmission.liveUrl" class="flex flex-col gap-1">
+          <span
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            >Live URL</span
+          >
+          <a
+            :href="existingSubmission.liveUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-brand-blue hover:underline text-sm truncate"
+          >
+            {{ existingSubmission.liveUrl }}
+          </a>
+        </div>
+        <div v-if="existingSubmission.notes" class="flex flex-col gap-1">
+          <span
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            >Notes</span
+          >
+          <p
+            class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"
+          >
+            {{ existingSubmission.notes }}
+          </p>
+        </div>
+      </template>
 
-  <!-- Form -->
-  <div v-else>
-    <UForm
-      :schema="formSchema"
-      :state="state"
-      class="space-y-5"
-      @submit="onSubmit"
-    >
-      <!-- GitHub Repository -->
+      <!-- Form Fields -->
       <UFormField
         label="GitHub Repository"
         name="githubLink"
@@ -340,72 +287,6 @@ const formatDate = (date: Date) =>
           class="w-full mt-3 [&_textarea]:bg-[#eef2f8] [&_textarea]:dark:bg-[#0b1120] [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-gray-200 [&_textarea]:dark:border-slate-700 [&_textarea]:focus:border-brand-blue [&_textarea]:dark:focus:border-brand-blue [&_textarea]:transition-colors [&_textarea]:outline-none [&_textarea]:px-4 [&_textarea]:py-2.5 [&_textarea]:resize-none"
         />
       </UFormField>
-
-      <!-- Error -->
-      <div
-        v-if="submitError"
-        class="rounded-xl border border-red-500/30 bg-red-500/5 dark:bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400 flex items-start gap-2"
-      >
-        <svg
-          class="w-4 h-4 shrink-0 mt-0.5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
-          />
-        </svg>
-        {{ submitError }}
-      </div>
-
-      <!-- Submit -->
-      <div class="pt-2">
-        <button
-          type="submit"
-          :disabled="isSubmitting"
-          class="w-full flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-600 active:scale-[0.98] transition-all duration-150 shadow-[0_0_20px_rgba(49,113,219,0.3)] disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          <svg
-            v-if="isSubmitting"
-            class="w-4 h-4 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-            />
-          </svg>
-          <svg
-            v-else
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-            />
-          </svg>
-          {{ isSubmitting ? 'Submitting...' : 'Submit Assignment' }}
-        </button>
-      </div>
-    </UForm>
-  </div>
+    </FormLayout>
+  </UForm>
 </template>

@@ -3,9 +3,9 @@ import { ref, onMounted, computed, watch } from 'vue'
 import {
   useLeaderboard,
   type LeaderboardEntry,
-} from '~/composables/useLeaderboard'
-import { useTracks } from '~/composables/useTracks'
-import { useAssignments } from '~/composables/useAssignments'
+} from '~/composables/student/useLeaderboard'
+import { useTracks } from '~/composables/student/useTracks'
+import { useAssignments } from '~/composables/student/useAssignments'
 import type { Track } from '~/schemas/tracks'
 import type { Assignment } from '~/schemas/assignments'
 

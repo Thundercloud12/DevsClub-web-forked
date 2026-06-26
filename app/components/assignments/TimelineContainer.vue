@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { Assignment } from '~/schemas/assignments'
 
 const props = defineProps<{
-  assignments: Array<{
-    id: string
-    title: string
-    description: string
-    publishedAt: Date
-    submissionsOpenAt: Date
-    submissionsCloseAt: Date
-    status: 'upcoming' | 'open' | 'closed'
-  }>
+  assignments: Array<Assignment & { status: 'upcoming' | 'open' | 'closed' }>
 }>()
 </script>
 

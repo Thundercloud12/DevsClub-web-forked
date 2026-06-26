@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { useAssignments } from '~/composables/useAssignments'
-import { useTracks } from '~/composables/useTracks'
+import { useAssignments } from '~/composables/student/useAssignments'
+import { useTracks } from '~/composables/student/useTracks'
 import type { Assignment } from '~/schemas/assignments'
 import type { Track } from '~/schemas/tracks'
 

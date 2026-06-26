@@ -1,28 +1,14 @@
 import {
   getFirestore,
   collection,
-  addDoc,
   getDocs,
   doc,
   getDoc,
 } from 'firebase/firestore'
 import { assignmentSchema, type Assignment } from '~/schemas/assignments'
-import { useAuthStore } from '~/stores/auth'
 
 export const useAssignments = () => {
   const db = getFirestore()
-  const authStore = useAuthStore()
-
-  const createAssignment = async (data: any) => {
-    if (!authStore.isAdmin) {
-      throw new Error('Unauthorized: Only admins can create assignments.')
-    }
-    const validatedData = assignmentSchema.parse(data)
-    const assignmentsRef = collection(db, 'Assignments')
-    const docRef = await addDoc(assignmentsRef, validatedData)
-
-    return { ...validatedData, id: docRef.id }
-  }
 
   const getAssignments = async (): Promise<Assignment[]> => {
     const assignmentsRef = collection(db, 'Assignments')
@@ -89,7 +75,6 @@ export const useAssignments = () => {
   }
 
   return {
-    createAssignment,
     getAssignments,
     getAssignmentById,
   }

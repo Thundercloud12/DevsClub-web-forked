@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, navigateTo } from '#app'
-import { useAssignments } from '~/composables/useAssignments'
-import { useSubmissions } from '~/composables/useSubmissions'
+import { useAssignments } from '~/composables/student/useAssignments'
+import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAuthStore } from '~/stores/auth'
 import type { Assignment } from '~/schemas/assignments'
 import type { Submission } from '~/schemas/submissions'

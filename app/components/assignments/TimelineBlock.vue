@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { Assignment } from '~/schemas/assignments'
 
 const props = defineProps<{
-  assignment: {
-    id: string
-    title: string
-    description: string
-    publishedAt: Date
-    submissionsOpenAt: Date
-    submissionsCloseAt: Date
-    status: 'upcoming' | 'open' | 'closed'
-  }
+  assignment: Assignment & { status: 'upcoming' | 'open' | 'closed' }
   index: number
 }>()
 
