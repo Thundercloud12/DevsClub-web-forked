@@ -3,9 +3,18 @@ import { criterionSchema } from './rubrics'
 
 // 1. Zod Schemas
 // Snapshot Pattern: We extend the original criterion to include the actual score
-export const gradedCriterionSchema = criterionSchema.extend({
-  actualScore: z.number().nonnegative('Score cannot be negative'),
-})
+export const gradedCriterionSchema = criterionSchema
+  .extend({
+    actualScore: z.number().nonnegative('Score cannot be negative'),
+  })
+  .refine((data) => data.actualScore <= data.maxScore, {
+    message: 'Score cannot exceed the maximum score',
+    path: ['actualScore'],
+  })
+  .refine((data) => data.actualScore >= data.minScore, {
+    message: 'Score cannot be less than the minimum score',
+    path: ['actualScore'],
+  })
 
 export const submissionSchema = z.object({
   id: z.string().min(1, 'Submission ID is required'), // Usually assignmentId_studentId

@@ -80,6 +80,13 @@ export const useAdminSubmissions = () => {
       throw new Error(`Submission with ID ${submissionId} does not exist.`)
     }
 
+    const currentData = submissionSnap.data()
+    if (currentData?.status === 'evaluated') {
+      throw new Error(
+        'This submission has already been evaluated and cannot be modified.'
+      )
+    }
+
     await updateDoc(docRef, {
       scores: validatedScores,
       totalScore,

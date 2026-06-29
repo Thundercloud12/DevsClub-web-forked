@@ -161,10 +161,13 @@ import UiLabel from '~/components/ui/Label.vue'
 import UiSelect from '~/components/ui/Select.vue'
 import UiTextarea from '~/components/ui/Textarea.vue'
 import UiCheckbox from '~/components/ui/Checkbox.vue'
+import { useToastStore } from '~/stores/toast'
+import { formatErrorMessage } from '~/utils/errors'
 
 const { createAssignment } = useAdminAssignments()
 const { getAdminRubrics } = useAdminRubrics()
 const { getAdminTracks } = useAdminTracks()
+const toastStore = useToastStore()
 
 const isSubmitting = ref(false)
 const isLoadingRubrics = ref(true)
@@ -230,13 +233,16 @@ const handleSubmit = async () => {
 
     await createAssignment(payload)
 
+    toastStore.success('Assignment created successfully!')
     successMessage.value = 'Assignment created successfully!'
 
     setTimeout(() => {
       navigateTo('/admin/dashboard')
     }, 1500)
   } catch (error) {
-    errorMessage.value = error.message || 'Failed to create assignment.'
+    const formatted = formatErrorMessage(error)
+    toastStore.error(formatted)
+    errorMessage.value = formatted
     console.error(error)
   } finally {
     isSubmitting.value = false

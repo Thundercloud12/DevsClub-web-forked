@@ -272,7 +272,7 @@
             </UiButton>
           </div>
 
-          <!-- Read-only notice for non-admins -->
+          <!-- Read-only notice -->
           <div
             v-else
             class="pt-4 border-t border-hairline/80 dark:border-slate-800"
@@ -280,10 +280,14 @@
             <p
               class="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-3 rounded-xl flex items-center gap-2"
             >
-              <span
-                >⚠️ You are viewing this submission in read-only mode. Only
-                Admins can edit scores.</span
-              >
+              <span v-if="submission.status === 'evaluated'">
+                ✓ This submission has already been evaluated. Scores cannot be
+                modified.
+              </span>
+              <span v-else>
+                ⚠️ You are viewing this submission in read-only mode. Only
+                Admins can edit scores.
+              </span>
             </p>
           </div>
 
@@ -304,6 +308,8 @@ import { useAdminSubmissions } from '~/composables/admin/useAdminSubmissions'
 import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
 import { useAdminRubrics } from '~/composables/admin/useAdminRubrics'
 import UiButton from '~/components/ui/Button.vue'
+import { useToastStore } from '~/stores/toast'
+import { formatErrorMessage } from '~/utils/errors'
 
 const route = useRoute()
 // The page param is the submission id in format: {assignmentId}_{studentId}
@@ -313,6 +319,7 @@ const authStore = useAuthStore()
 const { getSubmissionById, evaluateSubmission } = useAdminSubmissions()
 const { getAssignmentById } = useAdminAssignments()
 const { getRubricById } = useAdminRubrics()
+const toastStore = useToastStore()
 
 const submission = ref(null)
 const rubric = ref(null)
@@ -327,7 +334,7 @@ const saveSuccess = ref('')
 
 // ── Role Guard ─────────────────────────────────────────────────────────────────
 const canGrade = computed(() => {
-  return authStore.role === 'admin'
+  return authStore.role === 'admin' && submission.value?.status !== 'evaluated'
 })
 
 // ── Scoring Totals ─────────────────────────────────────────────────────────────
@@ -390,6 +397,19 @@ const saveGrades = async () => {
     saveError.value = ''
     saveSuccess.value = ''
 
+    // Frontend validation: enforce limits
+    for (const c of scoringForm.value) {
+      const score = Number(c.actualScore) || 0
+      if (score < 0) {
+        throw new Error(`Score for "${c.label}" cannot be negative.`)
+      }
+      if (score > c.maxScore) {
+        throw new Error(
+          `Score for "${c.label}" cannot exceed the maximum score of ${c.maxScore}.`
+        )
+      }
+    }
+
     const scoresPayload = scoringForm.value.map((c) => ({
       id: c.id,
       label: c.label,
@@ -410,10 +430,13 @@ const saveGrades = async () => {
       totalScore: res.totalScore,
     }
 
+    toastStore.success('Grades saved successfully!')
     saveSuccess.value =
       'Grades saved successfully! Submission is now marked as Evaluated.'
   } catch (err) {
-    saveError.value = err.message || 'Failed to save grades. Try again.'
+    const formatted = formatErrorMessage(err)
+    toastStore.error(formatted)
+    saveError.value = formatted
     console.error(err)
   } finally {
     isSaving.value = false

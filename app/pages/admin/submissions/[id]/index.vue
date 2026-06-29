@@ -177,9 +177,7 @@
                       "
                       class="text-xs font-semibold uppercase tracking-wider text-primary hover:text-primary-deep dark:text-primary-soft transition-colors duration-150"
                     >
-                      {{
-                        sub.status === 'evaluated' ? 'View / Edit' : 'Grade →'
-                      }}
+                      {{ sub.status === 'evaluated' ? 'View' : 'Grade →' }}
                     </button>
                   </td>
                 </tr>

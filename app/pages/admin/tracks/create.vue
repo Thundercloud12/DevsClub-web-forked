@@ -58,8 +58,11 @@ import UiCard from '~/components/ui/Card.vue'
 import UiButton from '~/components/ui/Button.vue'
 import UiInput from '~/components/ui/Input.vue'
 import UiLabel from '~/components/ui/Label.vue'
+import { useToastStore } from '~/stores/toast'
+import { formatErrorMessage } from '~/utils/errors'
 
 const { createTrack } = useAdminTracks()
+const toastStore = useToastStore()
 
 const isSubmitting = ref(false)
 const errorMessage = ref('')
@@ -94,13 +97,16 @@ const handleSubmit = async () => {
       name: trackForm.name,
     })
 
+    toastStore.success('Track created successfully!')
     successMessage.value = 'Track created successfully!'
 
     setTimeout(() => {
       navigateTo('/admin/dashboard')
     }, 1500)
   } catch (error) {
-    errorMessage.value = error.message || 'Failed to create track.'
+    const formatted = formatErrorMessage(error)
+    toastStore.error(formatted)
+    errorMessage.value = formatted
     console.error(error)
   } finally {
     isSubmitting.value = false

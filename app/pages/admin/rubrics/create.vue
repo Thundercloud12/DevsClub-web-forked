@@ -147,8 +147,11 @@ import UiButton from '~/components/ui/Button.vue'
 import UiInput from '~/components/ui/Input.vue'
 import UiLabel from '~/components/ui/Label.vue'
 import UiSelect from '~/components/ui/Select.vue'
+import { useToastStore } from '~/stores/toast'
+import { formatErrorMessage } from '~/utils/errors'
 
 const { createRubric } = useAdminRubrics()
+const toastStore = useToastStore()
 
 const criteriaTypes = [
   { value: 'number', label: 'Number Score' },
@@ -206,6 +209,7 @@ const handleSubmit = async () => {
       criteria: cleanCriteria,
     })
 
+    toastStore.success('Rubric created successfully!')
     successMessage.value = 'Rubric created successfully!'
 
     // Reset form after 1.5 seconds and redirect
@@ -213,8 +217,9 @@ const handleSubmit = async () => {
       navigateTo('/admin/dashboard')
     }, 1500)
   } catch (error) {
-    errorMessage.value =
-      error.message || 'Failed to create rubric. Check your inputs.'
+    const formatted = formatErrorMessage(error)
+    toastStore.error(formatted)
+    errorMessage.value = formatted
     console.error(error)
   } finally {
     isSubmitting.value = false
