@@ -94,8 +94,25 @@ export const useAdminSubmissions = () => {
     }
   }
 
+  const getSubmissionById = async (id: string): Promise<Submission | null> => {
+    if (authStore.role !== 'admin') {
+      throw new Error('Unauthorized: Only admins can view submissions.')
+    }
+    const docRef = doc(db, 'Submissions', id)
+    const snapshot = await getDoc(docRef)
+    if (!snapshot.exists()) return null
+
+    const data = snapshot.data()
+    return {
+      ...data,
+      id: snapshot.id,
+      submittedAt: data.submittedAt?.toDate?.() ?? data.submittedAt,
+    } as Submission
+  }
+
   return {
     getAdminSubmissions,
+    getSubmissionById,
     evaluateSubmission,
   }
 }

@@ -94,9 +94,28 @@ export const useSubmissions = () => {
     return snapshot.data() as Submission
   }
 
+  const getSubmissionsByStudent = async (
+    studentId: string
+  ): Promise<Submission[]> => {
+    const submissionsRef = collection(db, 'Submissions')
+    const q = query(submissionsRef, where('studentId', '==', studentId))
+    const snapshot = await getDocs(q)
+
+    if (snapshot.empty) return []
+    return snapshot.docs.map((doc) => {
+      const data = doc.data()
+      // Firestore Timestamp to JS Date mapping
+      return {
+        ...data,
+        submittedAt: data.submittedAt?.toDate?.() ?? new Date(data.submittedAt),
+      } as Submission
+    })
+  }
+
   return {
     createSubmission,
     getSubmissions,
     getSubmissionByUser,
+    getSubmissionsByStudent,
   }
 }

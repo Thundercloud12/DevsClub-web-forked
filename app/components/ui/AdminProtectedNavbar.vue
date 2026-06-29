@@ -48,22 +48,22 @@ const handleLogout = async () => {
       >
         <NuxtLink to="/admin/dashboard" class="flex items-center gap-2">
           <span
-            class="font-zalando font-bold text-xl text-brand-blue tracking-tight"
+            class="font-inter font-light tracking-[-0.64px] text-xl text-primary"
           >
             TSEC DevsClub
             <span
-              class="text-xs font-semibold px-2 py-0.5 rounded-md bg-brand-blue/10 text-brand-blue ml-1 uppercase"
+              class="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-primary-bg-subdued-hover/30 text-primary-deep ml-1 uppercase dark:bg-primary-soft/10 dark:text-primary-soft"
               >Admin</span
             >
           </span>
         </NuxtLink>
 
         <div
-          class="hidden md:flex items-center gap-8 font-inter font-medium text-sm text-gray-700 dark:text-gray-300"
+          class="hidden md:flex items-center gap-8 font-inter font-medium text-sm text-ink-secondary dark:text-slate-300"
         >
           <NuxtLink
             to="/admin/dashboard"
-            class="hover:text-brand-blue transition-colors duration-200"
+            class="hover:text-primary transition-colors duration-200"
           >
             Dashboard
           </NuxtLink>
@@ -72,7 +72,7 @@ const handleLogout = async () => {
 
           <button
             @click="handleLogout"
-            class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl transition-colors duration-200 font-semibold shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+            class="inline-flex items-center justify-center rounded-full text-xs font-medium h-9 px-4 border border-rose-500 text-rose-600 hover:bg-rose-500/5 active:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/50 transition-all duration-200"
           >
             Sign Out
           </button>

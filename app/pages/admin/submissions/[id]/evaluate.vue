@@ -1,15 +1,25 @@
 <template>
-  <div class="min-h-screen p-8 bg-slate-50 dark:bg-slate-950">
-    <div class="max-w-4xl mx-auto space-y-8">
+  <div
+    class="min-h-screen pt-24 pb-12 px-4 sm:px-8 bg-canvas dark:bg-[#0b1120] gradient-mesh"
+  >
+    <div class="max-w-4xl mx-auto space-y-8 relative z-10">
       <!-- Header -->
-      <div>
+      <div class="pb-4 border-b border-hairline/80 dark:border-slate-800">
         <button
-          @click="navigateTo('/admin/submissions')"
-          class="text-sm text-slate-500 hover:text-blue-600 flex items-center gap-1 mb-2 transition-colors"
+          @click="
+            navigateTo(
+              submission?.assignmentId
+                ? `/admin/submissions/${submission.assignmentId}`
+                : '/admin/submissions'
+            )
+          "
+          class="text-xs font-semibold uppercase tracking-wider text-ink-mute hover:text-primary flex items-center gap-1.5 mb-3 transition-colors duration-150"
         >
           ← Back to Submissions
         </button>
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">
+        <h1
+          class="text-3xl font-light tracking-[-0.64px] text-ink dark:text-slate-50"
+        >
           Evaluate Submission
         </h1>
       </div>
@@ -17,10 +27,10 @@
       <!-- Loading -->
       <div v-if="isLoading" class="space-y-4">
         <div
-          class="h-32 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-xl"
+          class="h-32 bg-slate-100 dark:bg-slate-800/40 animate-pulse rounded-xl"
         />
         <div
-          class="h-48 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-xl"
+          class="h-48 bg-slate-100 dark:bg-slate-800/40 animate-pulse rounded-xl"
         />
       </div>
 
@@ -35,21 +45,23 @@
       <template v-else-if="submission">
         <!-- Submission Info Card -->
         <div
-          class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 space-y-4"
+          class="bg-surface-card border border-hairline dark:border-slate-800 rounded-xl p-6 space-y-4 shadow-[0_4px_12px_rgba(0,55,112,0.02),0_1px_3px_rgba(0,55,112,0.01)]"
         >
           <div class="flex items-start justify-between">
             <div>
               <p
-                class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1"
+                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
               >
                 Student ID
               </p>
-              <p class="font-mono text-sm text-slate-800 dark:text-slate-200">
+              <p
+                class="font-mono text-sm text-ink-secondary dark:text-slate-200"
+              >
                 {{ submission.studentId }}
               </p>
             </div>
             <span
-              class="text-xs px-3 py-1 rounded-full font-semibold"
+              class="text-[10px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider"
               :class="
                 submission.status === 'evaluated'
                   ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
@@ -63,63 +75,63 @@
           </div>
 
           <div
-            class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800"
+            class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-hairline/60 dark:border-slate-800/60"
           >
             <div>
               <p
-                class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1"
+                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
               >
                 GitHub Repo
               </p>
               <a
                 :href="submission.githubLink"
                 target="_blank"
-                class="text-blue-600 hover:underline text-sm truncate block"
+                class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
               >
-                {{ submission.githubLink }}
+                {{ submission.githubLink.replace('https://github.com/', '') }}
               </a>
             </div>
             <div v-if="submission.liveUrl">
               <p
-                class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1"
+                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
               >
                 Live URL
               </p>
               <a
                 :href="submission.liveUrl"
                 target="_blank"
-                class="text-blue-600 hover:underline text-sm truncate block"
+                class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
               >
-                {{ submission.liveUrl }}
+                {{ submission.liveUrl.replace(/^https?:\/\//, '') }}
               </a>
             </div>
             <div v-if="submission.videoLink">
               <p
-                class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1"
+                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
               >
                 Video Demo
               </p>
               <a
                 :href="submission.videoLink"
                 target="_blank"
-                class="text-blue-600 hover:underline text-sm truncate block"
+                class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
               >
-                {{ submission.videoLink }}
+                Watch Video Demo
               </a>
             </div>
           </div>
 
           <div
             v-if="submission.notes"
-            class="pt-2 border-t border-slate-100 dark:border-slate-800"
+            class="pt-4 border-t border-hairline/60 dark:border-slate-800/60"
           >
             <p
-              class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1"
+              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1.5"
             >
               Student Notes
             </p>
             <p
-              class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap"
+              class="text-sm text-ink-secondary dark:text-slate-300 whitespace-pre-wrap leading-relaxed"
             >
               {{ submission.notes }}
             </p>
@@ -129,7 +141,7 @@
         <!-- No Rubric found -->
         <div
           v-if="!rubric && !isLoadingRubric"
-          class="p-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl text-amber-700 dark:text-amber-300"
+          class="p-4 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-xl text-sm"
         >
           Could not load the rubric for this assignment. Cannot evaluate without
           it.
@@ -138,26 +150,34 @@
         <!-- Rubric Loading -->
         <div
           v-else-if="isLoadingRubric"
-          class="h-40 bg-slate-200 dark:bg-slate-800 animate-pulse rounded-xl"
+          class="h-40 bg-slate-100 dark:bg-slate-800/40 animate-pulse rounded-xl"
         />
 
-        <!-- ══════════════════════════════════════════════════════════════
-             GRADING SECTION — only CP/VCP can see the inputs
-             Everyone else sees read-only scores
-        ════════════════════════════════════════════════════════════════ -->
+        <!-- GRADING SECTION -->
         <div
           v-else-if="rubric"
-          class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 space-y-6"
+          class="bg-surface-card border border-hairline dark:border-slate-800 rounded-xl p-6 space-y-6 shadow-[0_4px_12px_rgba(0,55,112,0.02),0_1px_3px_rgba(0,55,112,0.01)]"
         >
-          <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-slate-50">
-              Grading: <span class="text-blue-600">{{ rubric.name }}</span>
+          <div
+            class="flex items-center justify-between pb-4 border-b border-hairline/60 dark:border-slate-800/60"
+          >
+            <h2
+              class="text-xl font-light tracking-[-0.22px] text-ink dark:text-slate-50"
+            >
+              Grading:
+              <span class="text-primary dark:text-primary-soft font-normal">{{
+                rubric.name
+              }}</span>
             </h2>
             <div class="text-right">
-              <p class="text-2xl font-bold text-slate-900 dark:text-slate-50">
+              <p
+                class="text-3xl font-light font-mono text-ink dark:text-slate-50 tracking-tight"
+              >
                 {{ totalScore }}
               </p>
-              <p class="text-xs text-slate-400">
+              <p
+                class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute"
+              >
                 out of {{ maxPossibleScore }}
               </p>
             </div>
@@ -168,26 +188,27 @@
             <div
               v-for="(criterion, index) in scoringForm"
               :key="criterion.id"
-              class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700"
+              class="p-6 bg-canvas-soft/50 dark:bg-slate-900/30 rounded-xl border border-hairline dark:border-slate-800"
             >
               <div class="flex items-start justify-between gap-4">
                 <div class="flex-1">
-                  <p class="font-semibold text-slate-900 dark:text-slate-50">
+                  <p class="font-medium text-ink dark:text-slate-50">
                     {{ criterion.label }}
                   </p>
                   <p
                     v-if="criterion.description"
-                    class="text-xs text-slate-500 mt-0.5"
+                    class="text-xs text-ink-mute dark:text-slate-400 mt-1.5 leading-relaxed"
                   >
                     {{ criterion.description }}
                   </p>
-                  <p class="text-xs text-slate-400 mt-1">
+                  <p
+                    class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute/80 dark:text-slate-500 mt-2"
+                  >
                     Max: {{ criterion.maxScore }} pts | Type:
                     {{ criterion.type }}
                   </p>
                 </div>
 
-                <!-- CP/VCP can score — everyone else sees read-only -->
                 <div class="text-right shrink-0">
                   <template v-if="canGrade">
                     <input
@@ -195,19 +216,23 @@
                       v-model.number="scoringForm[index].actualScore"
                       :min="criterion.minScore"
                       :max="criterion.maxScore"
-                      class="w-20 text-center rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                      class="w-20 text-center rounded-lg border border-hairline-input bg-canvas px-2.5 py-1.5 text-sm font-semibold focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-900/50 dark:text-white transition-all duration-150"
                     />
-                    <p class="text-xs text-slate-400 mt-1">
+                    <p
+                      class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute mt-1.5"
+                    >
                       / {{ criterion.maxScore }}
                     </p>
                   </template>
                   <template v-else>
                     <p
-                      class="text-xl font-bold text-slate-900 dark:text-slate-50"
+                      class="text-2xl font-light font-mono text-ink dark:text-slate-50"
                     >
                       {{ criterion.actualScore ?? '—' }}
                     </p>
-                    <p class="text-xs text-slate-400">
+                    <p
+                      class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute mt-1"
+                    >
                       / {{ criterion.maxScore }}
                     </p>
                   </template>
@@ -219,28 +244,46 @@
           <!-- Grader-Only Save Section -->
           <div
             v-if="canGrade"
-            class="pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4"
+            class="pt-6 border-t border-hairline/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
           >
-            <p class="text-sm text-slate-500">
-              Saving will mark this submission as
-              <strong class="text-green-600">Evaluated</strong> and lock the
-              scores.
+            <p
+              class="text-xs text-ink-mute dark:text-slate-400 flex items-center gap-1.5"
+            >
+              <svg
+                class="w-4 h-4 text-emerald-500 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              <span
+                >Saving grades marks this submission as evaluated and updates
+                the leaderboard.</span
+              >
             </p>
             <UiButton @click="saveGrades" :disabled="isSaving">
               {{ isSaving ? 'Saving...' : 'Save Grades' }}
             </UiButton>
           </div>
 
-          <!-- Read-only notice for non-CP/VCP -->
+          <!-- Read-only notice for non-admins -->
           <div
             v-else
-            class="pt-4 border-t border-slate-200 dark:border-slate-700"
+            class="pt-4 border-t border-hairline/80 dark:border-slate-800"
           >
             <p
-              class="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-4 py-3 rounded-lg"
+              class="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-3 rounded-xl flex items-center gap-2"
             >
-              ⚠️ You are viewing this submission in read-only mode. Only
-              <strong>CP or VCP</strong> can enter and save scores.
+              <span
+                >⚠️ You are viewing this submission in read-only mode. Only
+                Admins can edit scores.</span
+              >
             </p>
           </div>
 
@@ -256,8 +299,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'
 import { useAuthStore } from '~/stores/auth'
+import { useAdminSubmissions } from '~/composables/admin/useAdminSubmissions'
+import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
+import { useAdminRubrics } from '~/composables/admin/useAdminRubrics'
 import UiButton from '~/components/ui/Button.vue'
 
 const route = useRoute()
@@ -265,7 +310,9 @@ const route = useRoute()
 const submissionId = route.params.id
 
 const authStore = useAuthStore()
-const db = getFirestore()
+const { getSubmissionById, evaluateSubmission } = useAdminSubmissions()
+const { getAssignmentById } = useAdminAssignments()
+const { getRubricById } = useAdminRubrics()
 
 const submission = ref(null)
 const rubric = ref(null)
@@ -279,11 +326,8 @@ const saveError = ref('')
 const saveSuccess = ref('')
 
 // ── Role Guard ─────────────────────────────────────────────────────────────────
-// Read from authStore.profile.type — the field stored in OfficialLogin collection
-// The team uses 'CP' and 'VCP' as the values in Firestore
 const canGrade = computed(() => {
-  const userType = authStore.profile?.type
-  return userType === 'CP' || userType === 'VCP'
+  return authStore.role === 'admin'
 })
 
 // ── Scoring Totals ─────────────────────────────────────────────────────────────
@@ -298,32 +342,24 @@ const maxPossibleScore = computed(() =>
 onMounted(async () => {
   try {
     // 1. Fetch the submission document
-    const subRef = doc(db, 'submissions', submissionId)
-    const subSnap = await getDoc(subRef)
+    const subData = await getSubmissionById(submissionId)
 
-    if (!subSnap.exists()) {
+    if (!subData) {
       loadError.value = `Submission "${submissionId}" not found.`
       return
     }
 
-    const subData = subSnap.data()
-    // Convert Firestore timestamp to JS Date if needed
-    if (subData.submittedAt?.toDate) {
-      subData.submittedAt = subData.submittedAt.toDate()
-    }
     submission.value = subData
 
     // 2. Fetch the rubric for the assignment
     isLoadingRubric.value = true
-    const assignmentRef = doc(db, 'assignments', subData.assignmentId)
-    const assignmentSnap = await getDoc(assignmentRef)
+    const assignmentData = await getAssignmentById(subData.assignmentId)
 
-    if (assignmentSnap.exists()) {
-      const rubricId = assignmentSnap.data().rubricId
-      const rubricRef = doc(db, 'rubrics', rubricId)
-      const rubricSnap = await getDoc(rubricRef)
-      if (rubricSnap.exists()) {
-        rubric.value = rubricSnap.data()
+    if (assignmentData) {
+      const rubricId = assignmentData.rubricId
+      const rubricData = await getRubricById(rubricId)
+      if (rubricData) {
+        rubric.value = rubricData
 
         // 3. Build the scoring form
         // If scores already exist (re-evaluating), use them as starting values
@@ -354,25 +390,26 @@ const saveGrades = async () => {
     saveError.value = ''
     saveSuccess.value = ''
 
-    const updatedSubmission = {
-      ...submission.value,
-      scores: scoringForm.value.map((c) => ({
-        id: c.id,
-        label: c.label,
-        type: c.type,
-        maxScore: c.maxScore,
-        minScore: c.minScore,
-        description: c.description || '',
-        actualScore: Number(c.actualScore) || 0,
-      })),
-      status: 'evaluated',
-    }
+    const scoresPayload = scoringForm.value.map((c) => ({
+      id: c.id,
+      label: c.label,
+      type: c.type,
+      maxScore: c.maxScore,
+      minScore: c.minScore,
+      description: c.description || '',
+      actualScore: Number(c.actualScore) || 0,
+    }))
 
-    const subRef = doc(db, 'submissions', submissionId)
-    await setDoc(subRef, updatedSubmission)
+    const res = await evaluateSubmission(submissionId, scoresPayload)
 
     // Update local state to reflect saved state
-    submission.value = updatedSubmission
+    submission.value = {
+      ...submission.value,
+      scores: res.scores,
+      status: res.status,
+      totalScore: res.totalScore,
+    }
+
     saveSuccess.value =
       'Grades saved successfully! Submission is now marked as Evaluated.'
   } catch (err) {

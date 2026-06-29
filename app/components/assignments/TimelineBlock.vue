@@ -3,8 +3,20 @@ import { computed } from 'vue'
 import type { Assignment } from '~/schemas/assignments'
 
 const props = defineProps<{
-  assignment: Assignment & { status: 'upcoming' | 'open' | 'closed' }
+  assignment: Assignment & {
+    id: string
+    status: 'upcoming' | 'open' | 'closed'
+  }
   index: number
+}>()
+
+const emit = defineEmits<{
+  viewDetails: [
+    assignment: Assignment & {
+      id: string
+      status: 'upcoming' | 'open' | 'closed'
+    },
+  ]
 }>()
 
 const isEven = computed(() => props.index % 2 === 0)
@@ -67,24 +79,56 @@ const formatDate = (date: Date) => {
           class="absolute -top-12 -right-12 w-32 h-32 bg-brand-cyan/20 dark:bg-brand-cyan/10 rounded-full blur-2xl group-hover:scale-110 transition-transform"
         ></div>
 
-        <div class="relative z-10 flex flex-col items-start gap-4">
-          <div class="flex items-center justify-between w-full">
+        <div class="relative z-10 flex flex-col items-start gap-4 w-full">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-2 sm:gap-0"
+          >
             <span
-              class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-xl"
+              class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-xl self-start"
               :class="statusColors[assignment.status]"
             >
               {{ assignment.status }}
             </span>
-            <span class="text-sm text-gray-400 dark:text-gray-500 font-medium">
-              Due: {{ formatDate(assignment.submissionsCloseAt) }}
-            </span>
+            <div
+              class="flex flex-col text-xs sm:text-right text-gray-400 dark:text-gray-500 font-medium"
+            >
+              <span
+                >Open:
+                {{ formatDate(assignment.timeline.submissionsOpenAt) }}</span
+              >
+              <span>Due: {{ formatDate(assignment.submissionsCloseAt) }}</span>
+            </div>
           </div>
 
-          <h3
-            class="font-zalando text-2xl font-bold text-gray-900 dark:text-white leading-tight"
+          <template
+            v-if="
+              assignment.status === 'closed' || assignment.status === 'upcoming'
+            "
           >
-            {{ assignment.title }}
-          </h3>
+            <button
+              type="button"
+              @click="emit('viewDetails', assignment)"
+              class="group/title block text-left w-full cursor-pointer focus:outline-none"
+            >
+              <h3
+                class="font-zalando text-2xl font-bold text-gray-900 dark:text-white leading-tight hover:text-brand-blue dark:hover:text-brand-cyan transition-colors"
+              >
+                {{ assignment.title }}
+              </h3>
+            </button>
+          </template>
+          <template v-else>
+            <NuxtLink
+              :to="`/dashboard/assignments/${assignment.id}`"
+              class="group/title block"
+            >
+              <h3
+                class="font-zalando text-2xl font-bold text-gray-900 dark:text-white leading-tight hover:text-brand-blue dark:hover:text-brand-cyan transition-colors"
+              >
+                {{ assignment.title }}
+              </h3>
+            </NuxtLink>
+          </template>
 
           <p
             class="text-gray-600 dark:text-gray-300 leading-relaxed font-inter"
@@ -92,10 +136,24 @@ const formatDate = (date: Date) => {
             {{ assignment.description }}
           </p>
 
+          <button
+            v-if="
+              assignment.status === 'closed' || assignment.status === 'upcoming'
+            "
+            type="button"
+            @click="emit('viewDetails', assignment)"
+            class="mt-2 inline-flex items-center justify-center font-medium px-6 py-2.5 rounded-xl transition-all duration-200 w-full sm:w-auto text-center cursor-pointer text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-ink-secondary dark:text-slate-200 border border-hairline dark:border-slate-800 focus:outline-none"
+          >
+            {{
+              assignment.status === 'closed'
+                ? 'View Submission'
+                : 'View Details'
+            }}
+          </button>
           <NuxtLink
-            v-if="isSubmittable"
+            v-else
             :to="`/dashboard/assignments/${assignment.id}`"
-            class="mt-2 inline-flex items-center justify-center bg-brand-blue text-white font-medium px-6 py-2.5 rounded-xl hover:bg-blue-600 transition-colors w-full sm:w-auto shadow-[0_0_15px_rgba(49,113,219,0.2)]"
+            class="mt-2 inline-flex items-center justify-center font-medium px-6 py-2.5 rounded-xl transition-all duration-200 w-full sm:w-auto text-center cursor-pointer text-sm bg-brand-blue text-white hover:bg-blue-600 shadow-[0_0_15px_rgba(49,113,219,0.2)]"
           >
             Submit Assignment
           </NuxtLink>

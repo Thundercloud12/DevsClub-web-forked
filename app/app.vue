@@ -82,6 +82,7 @@ onUnmounted(() => {
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
+      <UiToastContainer />
     </div>
   </div>
 </template>

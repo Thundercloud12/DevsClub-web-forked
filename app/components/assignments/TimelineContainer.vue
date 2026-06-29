@@ -3,7 +3,18 @@ import { computed } from 'vue'
 import type { Assignment } from '~/schemas/assignments'
 
 const props = defineProps<{
-  assignments: Array<Assignment & { status: 'upcoming' | 'open' | 'closed' }>
+  assignments: Array<
+    Assignment & { id: string; status: 'upcoming' | 'open' | 'closed' }
+  >
+}>()
+
+const emit = defineEmits<{
+  viewDetails: [
+    assignment: Assignment & {
+      id: string
+      status: 'upcoming' | 'open' | 'closed'
+    },
+  ]
 }>()
 </script>
 
@@ -32,6 +43,7 @@ const props = defineProps<{
         :key="assignment.id"
         :assignment="assignment"
         :index="index"
+        @view-details="emit('viewDetails', $event)"
       />
     </div>
   </div>

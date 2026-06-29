@@ -23,21 +23,13 @@ export const useLeaderboard = () => {
     error.value = null
 
     try {
-      // 1. Fetch Students, Assignments, and Submissions in parallel
-      const [studentsSnap, assignmentsSnap, submissionsSnap] =
-        await Promise.all([
-          getDocs(collection(db, 'Students ')),
-          getDocs(collection(db, 'Assignments')),
-          getDocs(collection(db, 'Submissions')),
-        ])
+      // 1. Fetch Assignments and Submissions in parallel
+      const [assignmentsSnap, submissionsSnap] = await Promise.all([
+        getDocs(collection(db, 'Assignments')),
+        getDocs(collection(db, 'Submissions')),
+      ])
 
-      // 2. Map student names for instant O(1) client-side lookup
-      const studentMap = new Map<string, string>()
-      studentsSnap.forEach((doc) => {
-        studentMap.set(doc.id, doc.data().name || 'Unknown Student')
-      })
-
-      // 3. Filter assignments belonging to the selected track
+      // 2. Filter assignments belonging to the selected track
       const trackAssignmentIds = new Set<string>()
       assignmentsSnap.forEach((doc) => {
         const data = doc.data()
@@ -47,10 +39,10 @@ export const useLeaderboard = () => {
         }
       })
 
-      // 4. Aggregate evaluated submissions
+      // 3. Aggregate evaluated submissions
       const studentStats: Record<
         string,
-        { totalScore: number; count: number }
+        { name: string; totalScore: number; count: number }
       > = {}
 
       submissionsSnap.forEach((docSnapshot) => {
@@ -78,18 +70,22 @@ export const useLeaderboard = () => {
         }
 
         if (!studentStats[sub.studentId]) {
-          studentStats[sub.studentId] = { totalScore: 0, count: 0 }
+          studentStats[sub.studentId] = {
+            name: sub.studentName || 'Unknown Student',
+            totalScore: 0,
+            count: 0,
+          }
         }
 
         studentStats[sub.studentId]!.totalScore += score
         studentStats[sub.studentId]!.count += 1
       })
 
-      // 5. Convert stats map to sorted list and assign student names
+      // 4. Convert stats map to sorted list
       const leaderboard: LeaderboardEntry[] = Object.entries(studentStats)
         .map(([studentId, stats]) => ({
           studentId,
-          name: studentMap.get(studentId) || 'Unknown Student',
+          name: stats.name,
           totalScore: stats.totalScore,
           submissionsCount: stats.count,
         }))

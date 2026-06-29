@@ -1,10 +1,10 @@
 <!-- pages/auth/admin-login.vue -->
 <template>
   <div
-    class="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 bg-slate-50 dark:bg-slate-950"
+    class="flex flex-col items-center justify-center min-h-screen p-4 bg-canvas dark:bg-[#0b1120] gradient-mesh relative"
   >
     <UiCard
-      class="w-full max-w-md"
+      class="w-full max-w-md relative z-10 shadow-[0_20px_40px_rgba(0,55,112,0.1),0_1px_3px_rgba(0,55,112,0.05)] border border-hairline/80 dark:border-slate-800"
       title="Admin Sign In"
       description="Enter your official credentials to access the admin dashboard"
     >
@@ -23,7 +23,7 @@
           <UiLabel for="password">Password</UiLabel>
           <a
             href="#"
-            class="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
+            class="text-xs font-semibold uppercase tracking-wider text-primary hover:text-primary-deep dark:text-primary-soft transition-colors duration-150"
           >
             Forgot password?
           </a>
@@ -71,6 +71,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuthStore } from '~/stores/auth'
+import { useToastStore } from '~/stores/toast'
 
 import UiCard from '~/components/ui/Card.vue'
 import UiInput from '~/components/ui/Input.vue'
@@ -78,13 +79,14 @@ import UiLabel from '~/components/ui/Label.vue'
 import UiButton from '~/components/ui/Button.vue'
 
 const authStore = useAuthStore()
+const toastStore = useToastStore()
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
-    alert('Please fill in both email and password.')
+    toastStore.warning('Please fill in both email and password.')
     return
   }
 
@@ -93,15 +95,18 @@ const handleLogin = async () => {
     await authStore.login(email.value, password.value)
 
     if (authStore.role === 'admin') {
+      toastStore.success('Signed in successfully as Admin!')
       navigateTo('/admin/dashboard')
     } else {
       // If they signed in but they are not admin (e.g. they are a student)
-      alert('You do not have administrative privileges.')
+      toastStore.error('You do not have administrative privileges.')
       await authStore.logout()
     }
   } catch (error) {
     console.error('Admin login failed:', error)
-    alert('Invalid credentials or you are not a registered official.')
+    toastStore.error(
+      'Invalid credentials or you are not a registered official.'
+    )
   } finally {
     loading.value = false
   }

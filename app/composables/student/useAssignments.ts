@@ -4,6 +4,8 @@ import {
   getDocs,
   doc,
   getDoc,
+  query,
+  where,
 } from 'firebase/firestore'
 import { assignmentSchema, type Assignment } from '~/schemas/assignments'
 
@@ -13,7 +15,9 @@ export const useAssignments = () => {
   const getAssignments = async (): Promise<Assignment[]> => {
     const assignmentsRef = collection(db, 'Assignments')
     try {
-      const snapshot = await getDocs(assignmentsRef)
+      const now = new Date()
+      const q = query(assignmentsRef, where('timeline.publishedAt', '<=', now))
+      const snapshot = await getDocs(q)
 
       if (snapshot.empty) {
         return []
@@ -54,6 +58,15 @@ export const useAssignments = () => {
     if (!snapshot.exists()) return null
 
     const data = snapshot.data()
+    const publishedAt = data.timeline?.publishedAt
+      ? (data.timeline.publishedAt.toDate?.() ??
+        new Date(data.timeline.publishedAt))
+      : new Date()
+
+    if (publishedAt > new Date()) {
+      return null
+    }
+
     return {
       ...data,
       id: snapshot.id,
@@ -62,8 +75,7 @@ export const useAssignments = () => {
         data.submissionsCloseAt?.toDate?.() ?? data.submissionsCloseAt,
       timeline: {
         ...data.timeline,
-        publishedAt:
-          data.timeline?.publishedAt?.toDate?.() ?? data.timeline?.publishedAt,
+        publishedAt,
         submissionsOpenAt:
           data.timeline?.submissionsOpenAt?.toDate?.() ??
           data.timeline?.submissionsOpenAt,

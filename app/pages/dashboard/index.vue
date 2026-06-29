@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { navigateTo } from '#app'
-
-definePageMeta({ middleware: ['auth'] })
-
 onMounted(async () => {
   await navigateTo('/dashboard/assignments')
 })

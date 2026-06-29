@@ -1,11 +1,20 @@
 <template>
-  <div class="min-h-screen p-8 bg-slate-50 dark:bg-slate-950">
-    <div class="max-w-3xl mx-auto space-y-6">
-      <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">
+  <div
+    class="min-h-screen pt-24 pb-12 px-4 sm:px-8 bg-canvas dark:bg-[#0b1120] gradient-mesh"
+  >
+    <div class="max-w-3xl mx-auto space-y-8 relative z-10">
+      <div
+        class="flex items-center justify-between pb-4 border-b border-hairline/80 dark:border-slate-800"
+      >
+        <h1
+          class="text-3xl font-light tracking-[-0.64px] text-ink dark:text-slate-50"
+        >
           Create Assignment
         </h1>
-        <UiButton @click="navigateTo('/admin/dashboard')" variant="outline"
+        <UiButton
+          @click="navigateTo('/admin/dashboard')"
+          variant="outline"
+          size="sm"
           >Back to Dashboard</UiButton
         >
       </div>
@@ -26,48 +35,62 @@
 
             <div>
               <UiLabel for="description">Description</UiLabel>
-              <textarea
+              <UiTextarea
                 id="description"
                 v-model="form.description"
                 rows="4"
-                class="flex w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-50 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900"
                 placeholder="Detailed explanation of the assignment..."
                 required
-              ></textarea>
+              />
             </div>
 
             <div>
               <UiLabel for="rubric">Select Grading Rubric</UiLabel>
-              <div v-if="isLoadingRubrics" class="text-sm text-slate-500">
-                Loading rubrics...
-              </div>
-              <select
-                v-else
+              <UiSelect
                 id="rubric"
                 v-model="form.rubricId"
-                class="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-50 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900"
+                :options="rubricsOptions"
+                :isLoading="isLoadingRubrics"
+                placeholder="Select a rubric..."
                 required
+              />
+            </div>
+
+            <div>
+              <UiLabel>Select Tracks</UiLabel>
+              <div v-if="isLoadingTracks" class="text-sm text-slate-500">
+                Loading tracks...
+              </div>
+              <div
+                v-else-if="tracks.length === 0"
+                class="text-sm text-slate-500"
               >
-                <option value="" disabled class="dark:bg-slate-900">
-                  Select a rubric...
-                </option>
-                <option
-                  v-for="rubric in rubrics"
-                  :key="rubric.id"
-                  :value="rubric.id"
-                  class="dark:bg-slate-900"
-                >
-                  {{ rubric.name }}
-                </option>
-              </select>
+                No tracks found.
+                <NuxtLink
+                  to="/admin/tracks/create"
+                  class="text-primary hover:underline font-medium"
+                  >Create a track first</NuxtLink
+                >.
+              </div>
+              <div v-else class="grid grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+                <UiCheckbox
+                  v-for="track in tracks"
+                  :key="track.id"
+                  :value="track.id"
+                  v-model="form.tracks"
+                  :label="track.name"
+                />
+              </div>
             </div>
           </div>
 
-          <hr class="border-slate-200 dark:border-slate-800" />
+          <hr class="border-hairline dark:border-slate-800" />
 
           <!-- Timeline -->
           <div class="space-y-4">
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-50">
+            <h2
+              class="text-xl font-light tracking-[-0.22px] text-ink dark:text-slate-50"
+            >
               Timeline
             </h2>
 
@@ -127,27 +150,38 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { useAssignments } from '~/composables/useAssignments'
-import { useRubrics } from '~/composables/useRubrics'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
+import { useAdminRubrics } from '~/composables/admin/useAdminRubrics'
+import { useAdminTracks } from '~/composables/admin/useAdminTracks'
 import UiCard from '~/components/ui/Card.vue'
 import UiButton from '~/components/ui/Button.vue'
 import UiInput from '~/components/ui/Input.vue'
 import UiLabel from '~/components/ui/Label.vue'
+import UiSelect from '~/components/ui/Select.vue'
+import UiTextarea from '~/components/ui/Textarea.vue'
+import UiCheckbox from '~/components/ui/Checkbox.vue'
 
-const { createAssignment } = useAssignments()
-const { getRubrics } = useRubrics()
+const { createAssignment } = useAdminAssignments()
+const { getAdminRubrics } = useAdminRubrics()
+const { getAdminTracks } = useAdminTracks()
 
 const isSubmitting = ref(false)
 const isLoadingRubrics = ref(true)
+const isLoadingTracks = ref(true)
 const errorMessage = ref('')
 const successMessage = ref('')
 const rubrics = ref([])
+const tracks = ref([])
+const rubricsOptions = computed(() =>
+  rubrics.value.map((r) => ({ value: r.id, label: r.name }))
+)
 
 const form = reactive({
   title: '',
   description: '',
   rubricId: '',
+  tracks: [],
   timeline: {
     publishedAt: '',
     submissionsOpenAt: '',
@@ -157,12 +191,20 @@ const form = reactive({
 
 onMounted(async () => {
   try {
-    rubrics.value = await getRubrics()
+    rubrics.value = await getAdminRubrics()
   } catch (err) {
     console.error('Failed to load rubrics', err)
     errorMessage.value = 'Failed to load rubrics. Please refresh.'
   } finally {
     isLoadingRubrics.value = false
+  }
+
+  try {
+    tracks.value = await getAdminTracks()
+  } catch (err) {
+    console.error('Failed to load tracks', err)
+  } finally {
+    isLoadingTracks.value = false
   }
 })
 
@@ -177,6 +219,7 @@ const handleSubmit = async () => {
       title: form.title,
       description: form.description,
       rubricId: form.rubricId,
+      tracks: form.tracks,
       timeline: {
         publishedAt: new Date(form.timeline.publishedAt),
         submissionsOpenAt: new Date(form.timeline.submissionsOpenAt),

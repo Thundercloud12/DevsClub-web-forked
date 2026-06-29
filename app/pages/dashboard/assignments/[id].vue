@@ -6,9 +6,6 @@ import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAuthStore } from '~/stores/auth'
 import type { Assignment } from '~/schemas/assignments'
 import type { Submission } from '~/schemas/submissions'
-
-definePageMeta({ middleware: ['auth'] })
-
 const route = useRoute()
 const assignmentId = route.params.id as string
 
@@ -88,24 +85,26 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen bg-transparent pt-32 pb-24 px-6">
-    <div class="max-w-2xl mx-auto">
+  <div
+    class="min-h-screen bg-canvas dark:bg-[#0b1120] pt-32 pb-24 relative gradient-mesh"
+  >
+    <div class="max-w-2xl mx-auto relative z-10 px-6">
       <!-- Loading skeleton -->
       <div v-if="isLoading" class="space-y-6 animate-pulse">
-        <div class="h-6 w-32 bg-gray-200 dark:bg-slate-800 rounded-lg" />
-        <div class="h-12 w-3/4 bg-gray-200 dark:bg-slate-800 rounded-2xl" />
-        <div class="h-5 w-full bg-gray-200 dark:bg-slate-800 rounded-lg" />
-        <div class="h-5 w-2/3 bg-gray-200 dark:bg-slate-800 rounded-lg" />
-        <div class="h-64 bg-gray-200 dark:bg-slate-800 rounded-3xl" />
+        <div class="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+        <div class="h-12 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-2xl" />
+        <div class="h-5 w-full bg-slate-200 dark:bg-slate-800 rounded-lg" />
+        <div class="h-5 w-2/3 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+        <div class="h-64 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
       </div>
 
       <!-- Error state -->
       <div
         v-else-if="loadError"
-        class="rounded-2xl border border-red-500/30 bg-red-500/5 p-8 text-center space-y-3"
+        class="rounded-2xl border border-red-500/20 bg-red-500/5 p-8 text-center space-y-3"
       >
         <div
-          class="w-14 h-14 rounded-2xl bg-red-500/20 flex items-center justify-center mx-auto"
+          class="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto"
         >
           <svg
             class="w-7 h-7 text-red-500"
@@ -121,14 +120,12 @@ useHead({
             />
           </svg>
         </div>
-        <h2
-          class="font-zalando font-bold text-xl text-gray-900 dark:text-white"
-        >
+        <h2 class="font-light text-xl text-ink dark:text-white">
           {{ loadError }}
         </h2>
         <NuxtLink
           to="/dashboard/assignments"
-          class="inline-flex items-center text-brand-blue hover:underline text-sm font-medium"
+          class="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-primary hover:text-primary-deep dark:text-primary-soft transition-colors duration-150"
         >
           ← Back to Assignments
         </NuxtLink>
@@ -142,7 +139,7 @@ useHead({
         >
           <NuxtLink
             to="/dashboard/assignments"
-            class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-brand-blue dark:hover:text-brand-blue transition-colors mb-8 group"
+            class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-ink-mute hover:text-primary dark:hover:text-primary-soft transition-colors mb-8 group"
           >
             <svg
               class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform"
@@ -173,13 +170,13 @@ useHead({
         >
           <div class="flex items-center gap-2 mb-3">
             <span
-              class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-xl"
+              class="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full"
               :class="[
                 isSubmissionsOpen
-                  ? 'bg-brand-cyan/20 text-brand-blue dark:bg-brand-blue/20 dark:text-brand-cyan'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                   : isDeadlinePassed
-                    ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'
-                    : 'bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-gray-400',
+                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
               ]"
             >
               {{
@@ -190,110 +187,34 @@ useHead({
                     : 'Upcoming'
               }}
             </span>
-            <span class="text-sm text-gray-400 dark:text-gray-500">
-              Due {{ formatDate(assignment.submissionsCloseAt) }}
+            <span
+              class="text-xs text-ink-mute dark:text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-1"
+            >
+              <span
+                >Open:
+                {{ formatDate(assignment.timeline.submissionsOpenAt) }}</span
+              >
+              <span class="hidden sm:inline text-slate-300 dark:text-slate-700"
+                >•</span
+              >
+              <span>Due: {{ formatDate(assignment.submissionsCloseAt) }}</span>
             </span>
           </div>
 
           <h1
-            class="font-zalando text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight mb-3"
+            class="text-3xl md:text-4xl font-light tracking-[-0.64px] text-ink dark:text-white leading-tight mb-3"
           >
             {{ assignment.title }}
           </h1>
           <p
-            class="text-gray-600 dark:text-gray-300 leading-relaxed font-inter"
+            class="text-ink-secondary dark:text-slate-300 leading-relaxed font-light"
           >
             {{ assignment.description }}
           </p>
         </Motion>
 
-        <!-- Deadline passed — hard block (no form rendered at all) -->
+        <!-- Form card (open, closed, or upcoming) -->
         <Motion
-          v-if="isDeadlinePassed && !existingSubmission"
-          :initial="{ opacity: 0, y: 20 }"
-          :animate="{ opacity: 1, y: 0, transition: { delay: 0.15 } }"
-        >
-          <div
-            class="rounded-2xl border border-red-500/30 bg-red-500/5 dark:bg-red-900/10 p-8 text-center space-y-3"
-          >
-            <div
-              class="w-14 h-14 rounded-2xl bg-red-500/20 flex items-center justify-center mx-auto"
-            >
-              <svg
-                class="w-7 h-7 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h2
-              class="font-zalando font-bold text-xl text-gray-900 dark:text-white"
-            >
-              Submissions Closed
-            </h2>
-            <p
-              class="text-gray-500 dark:text-gray-400 text-sm max-w-sm mx-auto"
-            >
-              The deadline for this assignment passed on
-              <strong>{{ formatDate(assignment.submissionsCloseAt) }}</strong
-              >. No further submissions are accepted.
-            </p>
-          </div>
-        </Motion>
-
-        <!-- Not yet open -->
-        <Motion
-          v-else-if="!isSubmissionsOpen && !existingSubmission"
-          :initial="{ opacity: 0, y: 20 }"
-          :animate="{ opacity: 1, y: 0, transition: { delay: 0.15 } }"
-        >
-          <div
-            class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-[#151f32] p-8 text-center space-y-3"
-          >
-            <div
-              class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center mx-auto"
-            >
-              <svg
-                class="w-7 h-7 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <h2
-              class="font-zalando font-bold text-xl text-gray-900 dark:text-white"
-            >
-              Not Yet Open
-            </h2>
-            <p
-              class="text-gray-500 dark:text-gray-400 text-sm max-w-sm mx-auto"
-            >
-              Submissions open on
-              <strong>{{
-                formatDate(assignment.timeline.submissionsOpenAt)
-              }}</strong
-              >. Come back then!
-            </p>
-          </div>
-        </Motion>
-
-        <!-- Form card (open OR already submitted) -->
-        <Motion
-          v-else
           :initial="{ opacity: 0, y: 24, filter: 'blur(8px)' }"
           :animate="{
             opacity: 1,
@@ -303,17 +224,21 @@ useHead({
           }"
         >
           <div
-            class="bg-white dark:bg-[#151f32] border border-gray-100 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm"
+            class="bg-surface-card border border-hairline dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm"
           >
-            <h2
-              class="font-zalando font-bold text-xl text-gray-900 dark:text-white mb-6"
-            >
+            <h2 class="font-light text-xl text-ink dark:text-white mb-6">
               {{ existingSubmission ? 'Your Submission' : 'Submit Your Work' }}
             </h2>
 
             <AssignmentsSubmissionForm
               :assignment-id="assignmentId"
               :existing-submission="existingSubmission"
+              :is-locked="!isSubmissionsOpen"
+              :lock-reason="
+                isDeadlinePassed
+                  ? 'Submissions closed (deadline passed)'
+                  : `Submissions not open yet`
+              "
               @submitted="onSubmitted"
             />
           </div>

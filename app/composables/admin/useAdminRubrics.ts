@@ -5,6 +5,7 @@ import {
   setDoc,
   deleteDoc,
   getDocs,
+  getDoc,
 } from 'firebase/firestore'
 import { rubricSchema, type Rubric } from '~/schemas/rubrics'
 import { useAuthStore } from '~/stores/auth'
@@ -57,10 +58,23 @@ export const useAdminRubrics = () => {
     return snapshot.docs.map((doc) => doc.data() as Rubric)
   }
 
+  const getRubricById = async (id: string): Promise<Rubric | null> => {
+    if (authStore.role !== 'admin') {
+      throw new Error('Unauthorized: Only admins can access rubrics.')
+    }
+
+    const rubricRef = doc(db, 'Rubrics', id)
+    const snapshot = await getDoc(rubricRef)
+    if (!snapshot.exists()) return null
+
+    return snapshot.data() as Rubric
+  }
+
   return {
     createRubric,
     updateRubric,
     deleteRubric,
     getAdminRubrics,
+    getRubricById,
   }
 }

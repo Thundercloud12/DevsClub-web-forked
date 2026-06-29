@@ -6,6 +6,7 @@ import {
   signOut,
 } from 'firebase/auth'
 import { getFirestore, doc, getDoc } from 'firebase/firestore'
+import { getFunctions, httpsCallable } from 'firebase/functions'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -28,29 +29,58 @@ export const useAuthStore = defineStore('auth', {
         return
       }
 
-      const db = getFirestore()
       try {
-        // Check Student collection first
-        const studentRef = doc(db, 'Students ', firebaseUser.uid)
-        const studentSnap = await getDoc(studentRef)
+        // Get the initial ID token result to check if custom claims exist
+        let tokenResult = await firebaseUser.getIdTokenResult()
+        let role = tokenResult.claims.role as string | undefined
 
-        if (studentSnap.exists()) {
-          this.profile = studentSnap.data()
-          this.role = 'student'
-        } else {
-          const adminRef = doc(db, 'OfficialLogin', firebaseUser.uid)
-          const adminSnap = await getDoc(adminRef)
+        // If claim is missing, invoke the setRoleOnLogin Cloud Function
+        if (!role) {
+          const functions = getFunctions()
+          const setRole = httpsCallable(functions, 'setRoleOnLogin')
+          const result = await setRole()
+          const resultData = result.data as { role: string | null }
 
-          if (adminSnap.exists()) {
-            this.profile = adminSnap.data()
-            this.role = 'admin'
-          } else {
-            const auth = getAuth()
-            await signOut(auth)
-            this.user = null
-            this.profile = null
-            this.role = null
+          if (resultData.role) {
+            // Force refresh token to update the claims on the client side
+            await firebaseUser.getIdToken(true)
+            tokenResult = await firebaseUser.getIdTokenResult()
+            role = tokenResult.claims.role as string | undefined
           }
+        }
+
+        if (role === 'student' || role === 'admin') {
+          this.role = role
+          const db = getFirestore()
+          const collectionName =
+            role === 'student' ? 'Students ' : 'OfficialLogin'
+          const profileDocRef = doc(db, collectionName, firebaseUser.uid)
+          const profileSnap = await getDoc(profileDocRef)
+
+          if (profileSnap.exists()) {
+            this.profile = profileSnap.data()
+          } else {
+            this.profile = null
+          }
+
+          // Set the cookie for SSR middleware compatibility
+          const token = await firebaseUser.getIdToken()
+          const tokenCookie = useCookie('firebase-token', {
+            maxAge: 60 * 60 * 24 * 7, // 1 week
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+          })
+          tokenCookie.value = token
+        } else {
+          // If no role resolved, sign out the user
+          const auth = getAuth()
+          await signOut(auth)
+          this.user = null
+          this.profile = null
+          this.role = null
+
+          const tokenCookie = useCookie('firebase-token')
+          tokenCookie.value = null
         }
       } catch (error) {
         console.error('Error fetching user profile:', error)
@@ -59,6 +89,9 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
         this.profile = null
         this.role = null
+
+        const tokenCookie = useCookie('firebase-token')
+        tokenCookie.value = null
       }
     },
 
@@ -70,10 +103,22 @@ export const useAuthStore = defineStore('auth', {
           if (firebaseUser) {
             this.user = firebaseUser
             await this.fetchUserProfile(firebaseUser)
+
+            // Set the cookie for SSR middleware compatibility
+            const token = await firebaseUser.getIdToken()
+            const tokenCookie = useCookie('firebase-token', {
+              maxAge: 60 * 60 * 24 * 7,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+            })
+            tokenCookie.value = token
           } else {
             this.user = null
             this.profile = null
             this.role = null
+
+            const tokenCookie = useCookie('firebase-token')
+            tokenCookie.value = null
           }
 
           this.isReady = true
@@ -97,6 +142,10 @@ export const useAuthStore = defineStore('auth', {
       const auth = getAuth()
       await signOut(auth)
       this.role = null
+
+      const tokenCookie = useCookie('firebase-token')
+      tokenCookie.value = null
+
       navigateTo(redirectTo)
     },
   },

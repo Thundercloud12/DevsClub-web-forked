@@ -1,11 +1,20 @@
 <template>
-  <div class="min-h-screen p-8 bg-slate-50 dark:bg-slate-950">
-    <div class="max-w-3xl mx-auto space-y-6">
-      <div class="flex items-center justify-between">
-        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-50">
+  <div
+    class="min-h-screen pt-24 pb-12 px-4 sm:px-8 bg-canvas dark:bg-[#0b1120] gradient-mesh"
+  >
+    <div class="max-w-3xl mx-auto space-y-8 relative z-10">
+      <div
+        class="flex items-center justify-between pb-4 border-b border-hairline/80 dark:border-slate-800"
+      >
+        <h1
+          class="text-3xl font-light tracking-[-0.64px] text-ink dark:text-slate-50"
+        >
           Create Rubric Template
         </h1>
-        <UiButton @click="navigateTo('/admin/dashboard')" variant="outline"
+        <UiButton
+          @click="navigateTo('/admin/dashboard')"
+          variant="outline"
+          size="sm"
           >Back to Dashboard</UiButton
         >
       </div>
@@ -14,19 +23,6 @@
         <form @submit.prevent="handleSubmit" class="space-y-6">
           <!-- Rubric Basic Info -->
           <div class="space-y-4">
-            <div>
-              <UiLabel for="rubricId">Rubric ID</UiLabel>
-              <UiInput
-                id="rubricId"
-                v-model="rubricForm.id"
-                placeholder="e.g. week_1_frontend"
-                required
-              />
-              <p class="text-xs text-slate-500 mt-1">
-                Must be lowercase with underscores
-              </p>
-            </div>
-
             <div>
               <UiLabel for="rubricName">Rubric Name</UiLabel>
               <UiInput
@@ -38,13 +34,13 @@
             </div>
           </div>
 
-          <hr class="border-slate-200 dark:border-slate-800" />
+          <hr class="border-hairline dark:border-slate-800" />
 
           <!-- Criteria Builder -->
           <div class="space-y-4">
             <div class="flex items-center justify-between">
               <h2
-                class="text-xl font-semibold text-slate-900 dark:text-slate-50"
+                class="text-xl font-light tracking-[-0.22px] text-ink dark:text-slate-50"
               >
                 Evaluation Criteria
               </h2>
@@ -60,9 +56,9 @@
 
             <div
               v-if="rubricForm.criteria.length === 0"
-              class="text-center p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg"
+              class="text-center p-8 border-2 border-dashed border-hairline-input dark:border-slate-800 rounded-xl bg-canvas-soft/30"
             >
-              <p class="text-slate-500">
+              <p class="text-ink-mute dark:text-slate-500 text-sm">
                 No criteria added yet. Add at least one to continue.
               </p>
             </div>
@@ -70,27 +66,18 @@
             <div
               v-for="(criterion, index) in rubricForm.criteria"
               :key="index"
-              class="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg space-y-4 relative"
+              class="p-6 bg-canvas-soft/50 dark:bg-slate-900/30 border border-hairline dark:border-slate-800 rounded-xl space-y-4 relative shadow-sm"
             >
               <button
                 type="button"
                 @click="removeCriterion(index)"
-                class="absolute top-4 right-4 text-red-500 hover:text-red-700 text-sm font-medium"
+                class="absolute top-6 right-6 text-xs font-semibold uppercase tracking-wider text-rose-500 hover:text-rose-700 transition-colors duration-150"
               >
                 Remove
               </button>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <UiLabel :for="'crit-id-' + index">Criterion ID</UiLabel>
-                  <UiInput
-                    :id="'crit-id-' + index"
-                    v-model="criterion.id"
-                    placeholder="e.g. ui_design"
-                    required
-                  />
-                </div>
-                <div>
+                <div class="md:col-span-2">
                   <UiLabel :for="'crit-label-' + index">Label</UiLabel>
                   <UiInput
                     :id="'crit-label-' + index"
@@ -101,21 +88,11 @@
                 </div>
                 <div>
                   <UiLabel :for="'crit-type-' + index">Type</UiLabel>
-                  <select
+                  <UiSelect
                     :id="'crit-type-' + index"
                     v-model="criterion.type"
-                    class="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-50 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900"
-                  >
-                    <option value="number" class="dark:bg-slate-900">
-                      Number Score
-                    </option>
-                    <option value="boolean" class="dark:bg-slate-900">
-                      Pass/Fail (Boolean)
-                    </option>
-                    <option value="scale" class="dark:bg-slate-900">
-                      Scale (1-5)
-                    </option>
-                  </select>
+                    :options="criteriaTypes"
+                  />
                 </div>
                 <div>
                   <UiLabel :for="'crit-max-' + index">Max Score</UiLabel>
@@ -164,27 +141,41 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { useRubrics } from '~/composables/useRubrics'
+import { useAdminRubrics } from '~/composables/admin/useAdminRubrics'
 import UiCard from '~/components/ui/Card.vue'
 import UiButton from '~/components/ui/Button.vue'
 import UiInput from '~/components/ui/Input.vue'
 import UiLabel from '~/components/ui/Label.vue'
+import UiSelect from '~/components/ui/Select.vue'
 
-const { createRubric } = useRubrics()
+const { createRubric } = useAdminRubrics()
+
+const criteriaTypes = [
+  { value: 'number', label: 'Number Score' },
+  { value: 'boolean', label: 'Pass/Fail (Boolean)' },
+  { value: 'scale', label: 'Scale (1-5)' },
+]
 
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
 const rubricForm = reactive({
-  id: '',
   name: '',
   criteria: [],
 })
 
+const slugify = (text) => {
+  if (!text) return ''
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+}
+
 const addCriterion = () => {
   rubricForm.criteria.push({
-    id: '',
     label: '',
     type: 'number',
     maxScore: 10,
@@ -203,10 +194,16 @@ const handleSubmit = async () => {
     errorMessage.value = ''
     successMessage.value = ''
 
+    const rubricId = slugify(rubricForm.name)
+    const cleanCriteria = rubricForm.criteria.map((c) => ({
+      ...c,
+      id: slugify(c.label),
+    }))
+
     await createRubric({
-      id: rubricForm.id,
+      id: rubricId,
       name: rubricForm.name,
-      criteria: rubricForm.criteria,
+      criteria: cleanCriteria,
     })
 
     successMessage.value = 'Rubric created successfully!'

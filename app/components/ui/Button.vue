@@ -1,18 +1,19 @@
 <template>
   <button
     :class="[
-      'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300',
-      variant === 'default' && 'bg-blue-600 text-white hover:bg-blue-700',
+      'inline-flex items-center justify-center rounded-full text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
+      variant === 'default' &&
+        'bg-primary text-on-primary hover:bg-primary-deep active:bg-primary-press shadow-sm hover:shadow-md',
       variant === 'outline' &&
-        'border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50',
+        'border border-primary bg-transparent text-primary hover:bg-primary-bg-subdued-hover/10 active:bg-primary-bg-subdued-hover/20 dark:border-primary-soft dark:text-primary-soft',
       variant === 'ghost' &&
-        'hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-50',
+        'text-ink-secondary hover:bg-primary-bg-subdued-hover/10 dark:text-slate-300 dark:hover:bg-slate-800',
       variant === 'link' &&
-        'text-blue-600 underline-offset-4 hover:underline dark:text-blue-500',
-      size === 'default' && 'h-10 px-4 py-2',
-      size === 'sm' && 'h-9 rounded-md px-3',
-      size === 'lg' && 'h-11 rounded-md px-8',
-      size === 'icon' && 'h-10 w-10',
+        'text-primary hover:text-primary-deep underline-offset-4 hover:underline dark:text-primary-soft',
+      size === 'default' && 'h-10 px-5 py-2',
+      size === 'sm' && 'h-9 px-4 py-1.5 text-xs',
+      size === 'lg' && 'h-11 px-7 py-2.5 text-base',
+      size === 'icon' && 'h-10 w-10 p-0',
       className,
     ]"
     :disabled="disabled || loading"

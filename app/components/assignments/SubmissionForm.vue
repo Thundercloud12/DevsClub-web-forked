@@ -4,16 +4,13 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAuthStore } from '~/stores/auth'
+import type { Submission } from '~/schemas/submissions'
 
 const props = defineProps<{
   assignmentId: string
-  existingSubmission?: {
-    githubLink: string
-    videoLink?: string
-    liveUrl?: string
-    notes?: string
-    submittedAt: Date
-  } | null
+  existingSubmission?: Submission | null
+  isLocked?: boolean
+  lockReason?: string
 }>()
 
 const emit = defineEmits<{
@@ -60,6 +57,11 @@ async function onSubmit(event: FormSubmitEvent<FormSchema>) {
     await createSubmission({
       assignmentId: props.assignmentId,
       studentId,
+      studentName:
+        authStore.profile?.Name ||
+        authStore.profile?.name ||
+        authStore.user?.displayName ||
+        'Unknown Student',
       githubLink: event.data.githubLink,
       videoLink: event.data.videoLink || null,
       liveUrl: event.data.liveUrl || null,
@@ -89,7 +91,7 @@ const formatDate = (date: Date) =>
 
 <template>
   <UForm :schema="formSchema" :state="state" @submit="onSubmit">
-    <FormLayout
+    <UiFormLayout
       :is-read-only="!!existingSubmission"
       read-only-title="Already Submitted"
       :read-only-subtitle="
@@ -162,6 +164,33 @@ const formatDate = (date: Date) =>
         </div>
       </template>
 
+      <!-- Lock Warning Banner -->
+      <div
+        v-if="isLocked && !existingSubmission"
+        class="mb-6 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 text-xs flex items-start gap-2.5"
+      >
+        <svg
+          class="w-4.5 h-4.5 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        <div>
+          <p class="font-semibold">{{ lockReason || 'Submissions Locked' }}</p>
+          <p class="font-light mt-0.5">
+            You can view the requirements, but editing and submissions are
+            disabled.
+          </p>
+        </div>
+      </div>
+
       <!-- Form Fields -->
       <UFormField
         label="GitHub Repository"
@@ -185,6 +214,7 @@ const formatDate = (date: Date) =>
           v-model="state.githubLink"
           placeholder="https://github.com/username/repo"
           size="lg"
+          :disabled="isLocked"
           class="w-full mt-3 [&_input]:bg-[#eef2f8] [&_input]:dark:bg-[#0b1120] [&_input]:rounded-xl [&_input]:border [&_input]:border-gray-200 [&_input]:dark:border-slate-700 [&_input]:focus:border-brand-blue [&_input]:dark:focus:border-brand-blue [&_input]:transition-colors [&_input]:outline-none [&_input]:px-4 [&_input]:py-2.5"
         />
       </UFormField>
@@ -216,6 +246,7 @@ const formatDate = (date: Date) =>
           v-model="state.videoLink"
           placeholder="https://youtube.com/watch?v=..."
           size="lg"
+          :disabled="isLocked"
           class="w-full mt-3 [&_input]:bg-[#eef2f8] [&_input]:dark:bg-[#0b1120] [&_input]:rounded-xl [&_input]:border [&_input]:border-gray-200 [&_input]:dark:border-slate-700 [&_input]:focus:border-brand-blue [&_input]:dark:focus:border-brand-blue [&_input]:transition-colors [&_input]:outline-none [&_input]:px-4 [&_input]:py-2.5"
         />
       </UFormField>
@@ -251,6 +282,7 @@ const formatDate = (date: Date) =>
           v-model="state.liveUrl"
           placeholder="https://your-project.vercel.app"
           size="lg"
+          :disabled="isLocked"
           class="w-full mt-3 [&_input]:bg-[#eef2f8] [&_input]:dark:bg-[#0b1120] [&_input]:rounded-xl [&_input]:border [&_input]:border-gray-200 [&_input]:dark:border-slate-700 [&_input]:focus:border-brand-blue [&_input]:dark:focus:border-brand-blue [&_input]:transition-colors [&_input]:outline-none [&_input]:px-4 [&_input]:py-2.5"
         />
       </UFormField>
@@ -284,9 +316,76 @@ const formatDate = (date: Date) =>
           v-model="state.notes"
           placeholder="Anything you'd like the evaluators to know — challenges faced, design decisions, etc."
           :rows="4"
+          :disabled="isLocked"
           class="w-full mt-3 [&_textarea]:bg-[#eef2f8] [&_textarea]:dark:bg-[#0b1120] [&_textarea]:rounded-xl [&_textarea]:border [&_textarea]:border-gray-200 [&_textarea]:dark:border-slate-700 [&_textarea]:focus:border-brand-blue [&_textarea]:dark:focus:border-brand-blue [&_textarea]:transition-colors [&_textarea]:outline-none [&_textarea]:px-4 [&_textarea]:py-2.5 [&_textarea]:resize-none"
         />
       </UFormField>
-    </FormLayout>
+      <!-- Submit Button Override for Locked/Open States -->
+      <template #submit-button>
+        <button
+          v-if="isLocked && !existingSubmission"
+          type="button"
+          disabled
+          class="w-full flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-semibold px-6 py-3 rounded-xl cursor-not-allowed border border-hairline dark:border-slate-700/50"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
+          Submissions Locked
+        </button>
+        <button
+          v-else
+          type="submit"
+          :disabled="isSubmitting"
+          class="w-full flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold px-6 py-3 rounded-xl hover:bg-blue-600 active:scale-[0.98] transition-all duration-150 shadow-[0_0_20px_rgba(49,113,219,0.3)] disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          <svg
+            v-if="isSubmitting"
+            class="w-4 h-4 animate-spin"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
+          <svg
+            v-else
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+            />
+          </svg>
+          Submit Assignment
+        </button>
+      </template>
+    </UiFormLayout>
   </UForm>
 </template>
