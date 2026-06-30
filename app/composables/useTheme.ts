@@ -1,7 +1,8 @@
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
+import { useState } from '#app'
 
 export const useTheme = () => {
-  const isDark = ref(false)
+  const isDark = useState('theme-dark', () => false)
 
   const toggleTheme = () => {
     isDark.value = !isDark.value

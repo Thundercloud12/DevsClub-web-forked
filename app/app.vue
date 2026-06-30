@@ -2,9 +2,19 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from '#app'
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore'
+import { useTheme } from '~/composables/useTheme'
 
 const route = useRoute()
 const isAdminPage = computed(() => route.path.startsWith('/admin'))
+const { isDark } = useTheme()
+
+// Theme-reactive ShapeGrid colors — subtle blending
+const gridBorderColor = computed(() =>
+  isDark.value ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.05)'
+)
+const gridHoverFill = computed(() =>
+  isDark.value ? 'rgba(37,99,235,0.18)' : 'rgba(37,99,235,0.08)'
+)
 
 const isUnderMaintenance = ref(false)
 const isChecking = ref(true)
@@ -63,13 +73,29 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-else>
-      <UiAdminProtectedNavbar v-if="isAdminPage" />
-      <UiNavbar v-else />
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
-      <UiToastContainer />
+    <div v-else class="relative">
+      <!-- Fixed ShapeGrid background — sits behind all page content -->
+      <div class="fixed inset-0 z-0 pointer-events-none">
+        <UiShapeGrid
+          :border-color="gridBorderColor"
+          :hover-fill-color="gridHoverFill"
+          direction="diagonal"
+          :speed="0.3"
+          :square-size="48"
+          shape="square"
+          :hover-trail-amount="4"
+          class="pointer-events-auto"
+        />
+      </div>
+
+      <div class="relative z-10">
+        <UiAdminProtectedNavbar v-if="isAdminPage" />
+        <UiNavbar v-else />
+        <NuxtLayout>
+          <NuxtPage />
+        </NuxtLayout>
+        <UiToastContainer />
+      </div>
     </div>
   </div>
 </template>

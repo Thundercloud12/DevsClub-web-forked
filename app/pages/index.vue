@@ -32,9 +32,7 @@ const getAvatarGradient = (name: string) => {
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-canvas dark:bg-[#0b1120] pt-24 pb-24 relative overflow-hidden gradient-mesh"
-  >
+  <div class="min-h-screen pt-24 pb-24 relative overflow-hidden">
     <!-- Hero Section -->
     <section
       class="max-w-6xl mx-auto px-6 pt-12 pb-20 relative z-10 text-center space-y-8"

@@ -29,7 +29,6 @@ const emit = defineEmits<{
           y1="0"
           x2="1"
           y2="100%"
-          stroke="#9feffe"
           stroke-width="2"
           stroke-dasharray="8 8"
           class="timeline-line-animated"

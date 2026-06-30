@@ -44,7 +44,7 @@ const navShadow = useTransform(
       >
         <NuxtLink to="/" class="flex items-center gap-2">
           <span
-            class="font-inter font-light tracking-[-0.64px] text-xl text-primary"
+            class="font-zalando font-medium text-xl tracking-tight text-primary"
             >TSEC DevsClub</span
           >
         </NuxtLink>
