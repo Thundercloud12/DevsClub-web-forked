@@ -1,12 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from '#app'
-import {
-  getFirestore,
-  doc,
-  onSnapshot,
-  connectFirestoreEmulator,
-} from 'firebase/firestore'
+import { getFirestore, doc, onSnapshot } from 'firebase/firestore'
 
 const route = useRoute()
 const isAdminPage = computed(() => route.path.startsWith('/admin'))
@@ -17,14 +12,6 @@ let unsubscribe = null
 
 onMounted(() => {
   const db = getFirestore()
-
-  if (process.env.NODE_ENV === 'development') {
-    if (!db._emulatorConfigured) {
-      connectFirestoreEmulator(db, '127.0.0.1', 8080)
-      db._emulatorConfigured = true
-      console.log('🔥 Connected to Firestore Emulator for Maintenance Check')
-    }
-  }
 
   const docRef = doc(db, 'Maintainance', 'Web Maintenance')
 
@@ -76,7 +63,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-else-if="!isChecking && !isUnderMaintenance">
+    <div v-else>
       <UiAdminProtectedNavbar v-if="isAdminPage" />
       <UiNavbar v-else />
       <NuxtLayout>

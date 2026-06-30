@@ -19,7 +19,7 @@ const navShadow = useTransform(
 )
 
 const handleLogout = async () => {
-  await authStore.logout('/auth/admin-login')
+  await authStore.logout()
 }
 </script>
 

@@ -15,12 +15,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // 1. If NOT logged in
   if (!isLoggedIn) {
-    // If accessing admin pages, redirect to admin login
-    if (to.path.startsWith('/admin')) {
-      return navigateTo('/auth/admin-login', { replace: true })
-    }
-    // If accessing student pages, redirect to student signin
-    if (to.path.startsWith('/dashboard')) {
+    // Redirect unauthenticated requests for admin/dashboard pages to the signin page
+    if (to.path.startsWith('/admin') || to.path.startsWith('/dashboard')) {
       return navigateTo('/auth/signin', { replace: true })
     }
     return

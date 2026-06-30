@@ -6,26 +6,30 @@ import { getFunctions, connectFunctionsEmulator } from 'firebase/functions'
 export default defineNuxtPlugin(async () => {
   const config = useRuntimeConfig()
 
+  const isDev = process.env.NODE_ENV === 'development' || import.meta.dev
+
   const app = initializeApp({
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'demo-api-key',
+    apiKey: config.public.FIREBASE_API_KEY || (isDev ? 'demo-api-key' : ''),
     authDomain:
-      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
-      'demo-tsec-app.firebaseapp.com',
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'demo-tsec-app',
+      config.public.FIREBASE_AUTH_DOMAIN ||
+      (isDev ? 'demo-tsec-app.firebaseapp.com' : ''),
+    projectId:
+      config.public.FIREBASE_PROJECT_ID || (isDev ? 'demo-tsec-app' : ''),
     storageBucket:
-      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
-      'demo-tsec-app.appspot.com',
+      config.public.FIREBASE_STORAGE_BUCKET ||
+      (isDev ? 'demo-tsec-app.appspot.com' : ''),
     messagingSenderId:
-      process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1234567890',
+      config.public.FIREBASE_MESSAGING_SENDER_ID || (isDev ? '1234567890' : ''),
     appId:
-      process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1234567890:web:1234567890',
+      config.public.FIREBASE_APP_ID ||
+      (isDev ? '1:1234567890:web:1234567890' : ''),
   })
 
   const auth = getAuth(app)
   const db = getFirestore(app)
   const functions = getFunctions(app)
 
-  if (process.env.NODE_ENV === 'development') {
+  if (isDev) {
     connectAuthEmulator(auth, 'http://127.0.0.1:9098', {
       disableWarnings: true,
     })

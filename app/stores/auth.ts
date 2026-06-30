@@ -67,7 +67,7 @@ export const useAuthStore = defineStore('auth', {
           const token = await firebaseUser.getIdToken()
           const tokenCookie = useCookie('firebase-token', {
             maxAge: 60 * 60 * 24 * 7, // 1 week
-            secure: process.env.NODE_ENV === 'production',
+            secure: !import.meta.dev,
             sameSite: 'lax',
           })
           tokenCookie.value = token
@@ -108,7 +108,7 @@ export const useAuthStore = defineStore('auth', {
             const token = await firebaseUser.getIdToken()
             const tokenCookie = useCookie('firebase-token', {
               maxAge: 60 * 60 * 24 * 7,
-              secure: process.env.NODE_ENV === 'production',
+              secure: !import.meta.dev,
               sameSite: 'lax',
             })
             tokenCookie.value = token
@@ -141,6 +141,10 @@ export const useAuthStore = defineStore('auth', {
     async logout(redirectTo: string = '/auth/signin') {
       const auth = getAuth()
       await signOut(auth)
+
+      // Clear store state immediately and synchronously
+      this.user = null
+      this.profile = null
       this.role = null
 
       const tokenCookie = useCookie('firebase-token')

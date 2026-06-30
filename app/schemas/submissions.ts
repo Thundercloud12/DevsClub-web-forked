@@ -17,7 +17,7 @@ export const gradedCriterionSchema = criterionSchema
   })
 
 export const submissionSchema = z.object({
-  id: z.string().min(1, 'Submission ID is required'), // Usually assignmentId_studentId
+  id: z.string().min(1, 'Submission ID is required'),
   assignmentId: z.string().min(1, 'Assignment ID is required'),
   studentId: z.string().min(1, 'Student ID is required'),
   studentName: z.string().min(1, 'Student name is required'),
@@ -34,7 +34,6 @@ export const submissionSchema = z.object({
     .optional(),
   submittedAt: z.date(),
 
-  // The snapshot of the rubric criteria + the evaluator's actual scores
   scores: z.array(gradedCriterionSchema).optional(),
 
   status: z.enum(['pending', 'evaluated']),

@@ -5,7 +5,7 @@
   >
     <UiCard
       class="w-full max-w-md relative z-10 shadow-[0_20px_40px_rgba(0,55,112,0.1),0_1px_3px_rgba(0,55,112,0.05)] border border-hairline/80 dark:border-slate-800"
-      title="Student Sign In"
+      title="Sign In"
       description="Enter your email and password to access your dashboard"
     >
       <div class="space-y-2">
@@ -14,7 +14,7 @@
           id="email"
           v-model="email"
           type="email"
-          placeholder="student@example.com"
+          placeholder="user@example.com"
         />
       </div>
 
@@ -93,15 +93,22 @@ const handleLogin = async () => {
   try {
     loading.value = true
     await authStore.login(email.value, password.value)
-    toastStore.success('Signed in successfully!')
+
     if (authStore.role === 'admin') {
+      toastStore.success('Signed in successfully as Admin!')
       navigateTo('/admin/dashboard')
-    } else {
+    } else if (authStore.role === 'student') {
+      toastStore.success('Signed in successfully!')
       navigateTo('/dashboard')
+    } else {
+      toastStore.error(
+        'Your account is not authorized or has no assigned role.'
+      )
+      await authStore.logout()
     }
   } catch (error) {
     console.error('Login failed:', error)
-    toastStore.error('Invalid credentials or you are not a registered student.')
+    toastStore.error('Invalid credentials or unauthorized account.')
   } finally {
     loading.value = false
   }
