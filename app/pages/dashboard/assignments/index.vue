@@ -4,8 +4,7 @@ import { useAssignments } from '~/composables/student/useAssignments'
 import { useTracks } from '~/composables/student/useTracks'
 import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAuthStore } from '~/stores/auth'
-import type { Assignment } from '~/schemas/assignments'
-import type { Track } from '~/schemas/tracks'
+import type { DashboardAssignment, Track, Assignment } from '~/types'
 useHead({
   title: 'Assignments | TSEC DevsClub',
   meta: [
@@ -17,15 +16,13 @@ useHead({
   ],
 })
 
+import { useLoading } from '~/composables/useLoading'
+
 const { getAssignments } = useAssignments()
 const { getTracks } = useTracks()
 const { getSubmissionByUser } = useSubmissions()
 const authStore = useAuthStore()
-
-interface DashboardAssignment extends Assignment {
-  id: string
-  status: 'upcoming' | 'open' | 'closed'
-}
+const { startLoading, stopLoading } = useLoading()
 
 const assignments = ref<DashboardAssignment[]>([])
 const tracks = ref<Track[]>([])
@@ -103,6 +100,7 @@ const filteredAssignments = computed(() => {
 })
 
 onMounted(async () => {
+  startLoading('student-assignments')
   try {
     const [fetchedTracks, fetchedAssignments] = await Promise.all([
       getTracks(),
@@ -130,6 +128,7 @@ onMounted(async () => {
     loadError.value = err?.message ?? 'Failed to load assignments.'
   } finally {
     isLoading.value = false
+    stopLoading('student-assignments')
   }
 })
 </script>

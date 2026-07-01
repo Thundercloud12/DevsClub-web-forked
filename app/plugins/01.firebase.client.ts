@@ -9,20 +9,12 @@ export default defineNuxtPlugin(async () => {
   const isDev = process.env.NODE_ENV === 'development' || import.meta.dev
 
   const app = initializeApp({
-    apiKey: config.public.FIREBASE_API_KEY || (isDev ? 'demo-api-key' : ''),
-    authDomain:
-      config.public.FIREBASE_AUTH_DOMAIN ||
-      (isDev ? 'demo-tsec-app.firebaseapp.com' : ''),
-    projectId:
-      config.public.FIREBASE_PROJECT_ID || (isDev ? 'demo-tsec-app' : ''),
-    storageBucket:
-      config.public.FIREBASE_STORAGE_BUCKET ||
-      (isDev ? 'demo-tsec-app.appspot.com' : ''),
-    messagingSenderId:
-      config.public.FIREBASE_MESSAGING_SENDER_ID || (isDev ? '1234567890' : ''),
-    appId:
-      config.public.FIREBASE_APP_ID ||
-      (isDev ? '1:1234567890:web:1234567890' : ''),
+    apiKey: config.public.FIREBASE_API_KEY,
+    authDomain: config.public.FIREBASE_AUTH_DOMAIN,
+    projectId: config.public.FIREBASE_PROJECT_ID,
+    storageBucket: config.public.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: config.public.FIREBASE_MESSAGING_SENDER_ID,
+    appId: config.public.FIREBASE_APP_ID,
   })
 
   const auth = getAuth(app)

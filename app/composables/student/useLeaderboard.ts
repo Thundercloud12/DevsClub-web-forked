@@ -1,13 +1,6 @@
 import { getFirestore, collection, getDocs } from 'firebase/firestore'
 import { ref } from 'vue'
-import type { Submission } from '~/schemas/submissions'
-
-export interface LeaderboardEntry {
-  studentId: string
-  name: string
-  totalScore: number
-  submissionsCount: number
-}
+import type { Submission, LeaderboardEntry } from '~/types'
 
 export const useLeaderboard = () => {
   const db = getFirestore()

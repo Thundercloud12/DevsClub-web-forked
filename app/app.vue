@@ -1,10 +1,14 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useRoute } from '#app'
+import { useRoute, useRouter } from '#app'
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore'
 import { useTheme } from '~/composables/useTheme'
+import { useLoading } from '~/composables/useLoading'
 
 const route = useRoute()
+const router = useRouter()
+const { loading: globalLoading } = useLoading()
+
 const isAdminPage = computed(() => route.path.startsWith('/admin'))
 const { isDark } = useTheme()
 
@@ -19,6 +23,18 @@ const gridHoverFill = computed(() =>
 const isUnderMaintenance = ref(false)
 const isChecking = ref(true)
 let unsubscribe = null
+
+// Show loading state during route transitions
+router.beforeEach((to, from, next) => {
+  globalLoading.value = true
+  next()
+})
+
+router.afterEach(() => {
+  setTimeout(() => {
+    globalLoading.value = false
+  }, 150)
+})
 
 onMounted(() => {
   const db = getFirestore()
@@ -54,10 +70,17 @@ onUnmounted(() => {
   <div>
     <div
       v-if="isChecking"
-      class="h-screen w-screen flex items-center justify-center bg-gray-50"
+      class="h-screen w-screen flex flex-col items-center justify-center bg-canvas dark:bg-[#0b1120]"
     >
-      <div class="text-xl font-semibold animate-pulse text-gray-600">
-        Checking system status...
+      <div class="relative flex flex-col items-center gap-4">
+        <div
+          class="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"
+        ></div>
+        <span
+          class="font-inter text-sm font-medium tracking-wide text-ink-secondary dark:text-slate-300 animate-pulse"
+        >
+          Checking system status...
+        </span>
       </div>
     </div>
 
@@ -86,6 +109,23 @@ onUnmounted(() => {
           :hover-trail-amount="4"
           class="pointer-events-auto"
         />
+      </div>
+
+      <!-- Premium Glassmorphic Loading Overlay -->
+      <div
+        v-if="globalLoading"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-canvas/80 dark:bg-[#0b1120]/80 backdrop-blur-md transition-all duration-300"
+      >
+        <div class="relative flex flex-col items-center gap-4">
+          <div
+            class="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"
+          ></div>
+          <span
+            class="font-inter text-sm font-medium tracking-wide text-ink-secondary dark:text-slate-300 animate-pulse"
+          >
+            Loading...
+          </span>
+        </div>
       </div>
 
       <div class="relative z-10">

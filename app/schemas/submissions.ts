@@ -32,6 +32,13 @@ export const submissionSchema = z.object({
     .max(1000, 'Notes must be under 1000 characters')
     .nullable()
     .optional(),
+
+  feedback: z
+    .string()
+    .max(1000, 'Feedback must be under 1000 characters')
+    .nullable()
+    .optional(),
+
   submittedAt: z.date(),
 
   scores: z.array(gradedCriterionSchema).optional(),

@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import {
-  useLeaderboard,
-  type LeaderboardEntry,
-} from '~/composables/student/useLeaderboard'
+import { useLeaderboard } from '~/composables/student/useLeaderboard'
 import { useTracks } from '~/composables/student/useTracks'
 import { useAssignments } from '~/composables/student/useAssignments'
-import type { Track } from '~/schemas/tracks'
-import type { Assignment } from '~/schemas/assignments'
+import type { LeaderboardEntry, Track, Assignment } from '~/types'
 useHead({
   title: 'Leaderboard | TSEC DevsClub',
   meta: [
@@ -19,6 +15,8 @@ useHead({
   ],
 })
 
+import { useLoading } from '~/composables/useLoading'
+
 const {
   getTopStudents,
   isLoading: isLoadingLeaderboard,
@@ -26,6 +24,7 @@ const {
 } = useLeaderboard()
 const { getTracks } = useTracks()
 const { getAssignments } = useAssignments()
+const { startLoading, stopLoading } = useLoading()
 
 const tracks = ref<Track[]>([])
 const allAssignments = ref<Assignment[]>([])
@@ -70,6 +69,7 @@ const fetchEntries = async () => {
 }
 
 onMounted(async () => {
+  startLoading('leaderboard-init')
   try {
     const [fetchedTracks, fetchedAssignments] = await Promise.all([
       getTracks().catch(() => []),
@@ -93,6 +93,7 @@ onMounted(async () => {
     globalError.value = err?.message ?? 'Failed to load leaderboard data.'
   } finally {
     isLoadingData.value = false
+    stopLoading('leaderboard-init')
   }
 })
 
