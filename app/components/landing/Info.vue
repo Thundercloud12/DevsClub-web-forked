@@ -310,7 +310,6 @@ const setInputCommand = (cmd: string) => {
                 type="text"
                 placeholder="Type a command..."
                 class="w-full bg-transparent font-mono text-slate-300 outline-none placeholder-slate-600"
-                autofocus
               />
             </form>
           </div>
