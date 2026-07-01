@@ -10,7 +10,7 @@ const { isDark } = useTheme()
 
 // Theme-reactive ShapeGrid colors — subtle blending
 const gridBorderColor = computed(() =>
-  isDark.value ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.05)'
+  isDark.value ? 'rgba(255,255,255, 0.04)' : 'rgba(0,0,0,0.05)'
 )
 const gridHoverFill = computed(() =>
   isDark.value ? 'rgba(37,99,235,0.18)' : 'rgba(37,99,235,0.08)'

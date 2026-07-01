@@ -25,7 +25,7 @@ const navShadow = useTransform(
   >
     <Motion
       as="nav"
-      class="flex items-center justify-between px-8 py-4 pointer-events-auto backdrop-blur-xl max-w-7xl mx-auto border-gray-200 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden"
+      class="flex items-center justify-between px-8 py-4 pointer-events-auto backdrop-blur-xl mx-auto border-gray-200 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden"
       :style="{
         width: navWidth,
         borderRadius: navBorderRadius,
@@ -56,14 +56,14 @@ const navShadow = useTransform(
             v-if="!authStore.isLoggedIn"
             to="/"
             class="hover:text-primary transition-colors duration-200"
-            >Home</NuxtLink
-          >
+            >Home
+          </NuxtLink>
           <template v-if="authStore.isLoggedIn">
             <NuxtLink
               to="/dashboard/assignments"
               class="hover:text-primary transition-colors duration-200"
-              >Assignments</NuxtLink
-            >
+              >Assignments
+            </NuxtLink>
             <NuxtLink
               to="/dashboard/submissions"
               class="hover:text-primary transition-colors duration-200"
@@ -72,8 +72,8 @@ const navShadow = useTransform(
             <NuxtLink
               to="/dashboard/leaderboard"
               class="hover:text-primary transition-colors duration-200"
-              >Leaderboard</NuxtLink
-            >
+              >Leaderboard
+            </NuxtLink>
           </template>
 
           <UiThemeToggle />

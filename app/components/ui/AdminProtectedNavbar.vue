@@ -29,7 +29,7 @@ const handleLogout = async () => {
   >
     <Motion
       as="nav"
-      class="flex items-center justify-between px-8 py-4 pointer-events-auto backdrop-blur-xl max-w-7xl mx-auto border-gray-200 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden"
+      class="flex items-center justify-between px-8 py-4 pointer-events-auto backdrop-blur-xl mx-auto border-gray-200 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden"
       :style="{
         width: navWidth,
         borderRadius: navBorderRadius,
