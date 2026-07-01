@@ -78,8 +78,12 @@ import UiInput from '~/components/ui/Input.vue'
 import UiLabel from '~/components/ui/Label.vue'
 import UiButton from '~/components/ui/Button.vue'
 
+import { useLoading } from '~/composables/useLoading'
+
 const authStore = useAuthStore()
 const toastStore = useToastStore()
+const { setLoading } = useLoading()
+
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
@@ -92,6 +96,7 @@ const handleLogin = async () => {
 
   try {
     loading.value = true
+    setLoading(true)
     await authStore.login(email.value, password.value)
 
     if (authStore.role === 'admin') {
@@ -104,11 +109,13 @@ const handleLogin = async () => {
       toastStore.error(
         'Your account is not authorized or has no assigned role.'
       )
+      setLoading(false)
       await authStore.logout()
     }
   } catch (error) {
     console.error('Login failed:', error)
     toastStore.error('Invalid credentials or unauthorized account.')
+    setLoading(false)
   } finally {
     loading.value = false
   }

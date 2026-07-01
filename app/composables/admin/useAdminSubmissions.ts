@@ -58,7 +58,8 @@ export const useAdminSubmissions = () => {
 
   const evaluateSubmission = async (
     submissionId: string,
-    scores: GradedCriterion[]
+    scores: GradedCriterion[],
+    feedback?: string
   ) => {
     if (authStore.role !== 'admin') {
       throw new Error('Unauthorized: Only admins can evaluate submissions.')
@@ -91,6 +92,7 @@ export const useAdminSubmissions = () => {
       scores: validatedScores,
       totalScore,
       status: 'evaluated',
+      feedback: feedback || null,
     })
 
     return {
@@ -98,6 +100,7 @@ export const useAdminSubmissions = () => {
       scores: validatedScores,
       totalScore,
       status: 'evaluated' as const,
+      feedback: feedback || null,
     }
   }
 

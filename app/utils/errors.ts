@@ -5,7 +5,6 @@ export function formatErrorMessage(error: any): string {
     return error.issues.map((e) => e.message).join(', ')
   }
 
-  // Handle serialized Zod errors (JSON array strings)
   if (
     error &&
     typeof error.message === 'string' &&

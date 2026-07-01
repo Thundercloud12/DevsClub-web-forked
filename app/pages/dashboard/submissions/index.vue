@@ -366,6 +366,23 @@ onMounted(async () => {
           v-if="sub.status === 'evaluated' && expandedSubmissions[sub.id]"
           class="mt-6 pt-6 border-t border-hairline/80 dark:border-slate-800/80 space-y-4"
         >
+          <!-- Evaluator Feedback -->
+          <div
+            v-if="sub.feedback"
+            class="p-5 bg-primary-bg-subdued/30 dark:bg-primary-soft/5 border border-primary-border/40 dark:border-slate-800 rounded-2xl space-y-2"
+          >
+            <h4
+              class="text-xs font-bold uppercase tracking-wider text-primary dark:text-primary-soft"
+            >
+              Evaluator's Feedback
+            </h4>
+            <p
+              class="text-sm text-ink-secondary dark:text-slate-200 whitespace-pre-wrap leading-relaxed font-inter"
+            >
+              {{ sub.feedback }}
+            </p>
+          </div>
+
           <h3
             class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
           >

@@ -15,7 +15,6 @@ export const assignmentSchema = z.object({
       message: 'Close date must be after open date',
       path: ['submissionsCloseAt'],
     }),
-  // Denormalized for efficient Firestore querying — mirrors timeline.submissionsCloseAt
   submissionsCloseAt: z.date(),
   tracks: z.array(z.string()).default([]),
 })

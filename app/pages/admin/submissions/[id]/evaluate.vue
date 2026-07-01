@@ -241,6 +241,45 @@
             </div>
           </div>
 
+          <!-- Feedback Section -->
+          <div
+            class="pt-6 border-t border-hairline/60 dark:border-slate-800/60"
+          >
+            <h3
+              class="text-sm font-semibold uppercase tracking-wider text-ink-mute dark:text-slate-400 mb-3"
+            >
+              Evaluator Feedback
+            </h3>
+            <template v-if="canGrade">
+              <textarea
+                id="feedback"
+                v-model="feedback"
+                rows="4"
+                maxlength="1000"
+                placeholder="Add constructive feedback for this submission..."
+                class="w-full rounded-lg border border-hairline-input bg-canvas px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-900/50 dark:text-white transition-all duration-150"
+              />
+              <p class="text-[10px] text-ink-mute text-right mt-1">
+                {{ feedback.length }} / 1000 characters
+              </p>
+            </template>
+            <template v-else>
+              <div
+                v-if="submission.feedback"
+                class="p-4 bg-canvas-soft/50 dark:bg-slate-900/30 rounded-xl border border-hairline dark:border-slate-800"
+              >
+                <p
+                  class="text-sm text-ink-secondary dark:text-slate-300 whitespace-pre-wrap leading-relaxed"
+                >
+                  {{ submission.feedback }}
+                </p>
+              </div>
+              <p v-else class="text-sm text-ink-mute italic">
+                No feedback provided for this evaluation.
+              </p>
+            </template>
+          </div>
+
           <!-- Grader-Only Save Section -->
           <div
             v-if="canGrade"
@@ -324,6 +363,7 @@ const toastStore = useToastStore()
 const submission = ref(null)
 const rubric = ref(null)
 const scoringForm = ref([]) // array of { ...criterion, actualScore }
+const feedback = ref('')
 
 const isLoading = ref(true)
 const isLoadingRubric = ref(false)
@@ -357,6 +397,7 @@ onMounted(async () => {
     }
 
     submission.value = subData
+    feedback.value = subData.feedback || ''
 
     // 2. Fetch the rubric for the assignment
     isLoadingRubric.value = true
@@ -420,7 +461,11 @@ const saveGrades = async () => {
       actualScore: Number(c.actualScore) || 0,
     }))
 
-    const res = await evaluateSubmission(submissionId, scoresPayload)
+    const res = await evaluateSubmission(
+      submissionId,
+      scoresPayload,
+      feedback.value
+    )
 
     // Update local state to reflect saved state
     submission.value = {
@@ -428,6 +473,7 @@ const saveGrades = async () => {
       scores: res.scores,
       status: res.status,
       totalScore: res.totalScore,
+      feedback: res.feedback,
     }
 
     toastStore.success('Grades saved successfully!')
