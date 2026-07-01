@@ -181,7 +181,6 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import AdminPageLayout from '~/components/ui/AdminPageLayout.vue'
 
 const authStore = useAuthStore()
 </script>

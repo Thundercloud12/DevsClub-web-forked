@@ -127,7 +127,6 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useAdminRubrics } from '~/composables/admin/useAdminRubrics'
-import AdminPageLayout from '~/components/ui/AdminPageLayout.vue'
 import UiCard from '~/components/ui/Card.vue'
 import UiButton from '~/components/ui/Button.vue'
 import UiInput from '~/components/ui/Input.vue'

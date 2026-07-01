@@ -159,7 +159,6 @@ import { useRoute, navigateTo } from '#app'
 import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
 import { useAdminSubmissions } from '~/composables/admin/useAdminSubmissions'
 import { useLoading } from '~/composables/useLoading'
-import AdminPageLayout from '~/components/ui/AdminPageLayout.vue'
 
 const route = useRoute()
 const assignmentId = route.params.id

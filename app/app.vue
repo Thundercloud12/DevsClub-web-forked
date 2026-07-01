@@ -129,7 +129,7 @@ onUnmounted(() => {
       </div>
 
       <div class="relative z-10">
-        <UiAdminProtectedNavbar v-if="isAdminPage" />
+        <AdminProtectedNavbar v-if="isAdminPage" />
         <UiNavbar v-else />
         <NuxtLayout>
           <NuxtPage />

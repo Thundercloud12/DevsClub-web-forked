@@ -77,7 +77,6 @@
 import { ref, onMounted } from 'vue'
 import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
 import { useLoading } from '~/composables/useLoading'
-import AdminPageLayout from '~/components/ui/AdminPageLayout.vue'
 
 const { getAdminAssignments } = useAdminAssignments()
 const { startLoading, stopLoading } = useLoading()
