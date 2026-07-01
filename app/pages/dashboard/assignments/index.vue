@@ -17,10 +17,13 @@ useHead({
   ],
 })
 
+import { useLoading } from '~/composables/useLoading'
+
 const { getAssignments } = useAssignments()
 const { getTracks } = useTracks()
 const { getSubmissionByUser } = useSubmissions()
 const authStore = useAuthStore()
+const { startLoading, stopLoading } = useLoading()
 
 interface DashboardAssignment extends Assignment {
   id: string
@@ -103,6 +106,7 @@ const filteredAssignments = computed(() => {
 })
 
 onMounted(async () => {
+  startLoading('student-assignments')
   try {
     const [fetchedTracks, fetchedAssignments] = await Promise.all([
       getTracks(),
@@ -130,6 +134,7 @@ onMounted(async () => {
     loadError.value = err?.message ?? 'Failed to load assignments.'
   } finally {
     isLoading.value = false
+    stopLoading('student-assignments')
   }
 })
 </script>

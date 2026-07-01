@@ -6,12 +6,15 @@ import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAuthStore } from '~/stores/auth'
 import type { Assignment } from '~/schemas/assignments'
 import type { Submission } from '~/schemas/submissions'
+import { useLoading } from '~/composables/useLoading'
+
 const route = useRoute()
 const assignmentId = route.params.id as string
 
 const { getAssignmentById } = useAssignments()
 const { getSubmissionByUser } = useSubmissions()
 const authStore = useAuthStore()
+const { startLoading, stopLoading } = useLoading()
 
 const assignment = ref<Assignment | null>(null)
 const existingSubmission = ref<Submission | null>(null)
@@ -43,6 +46,7 @@ const formatDate = (date: Date | string) =>
   })
 
 onMounted(async () => {
+  startLoading('assignment-detail')
   try {
     const [fetchedAssignment, fetchedSubmission] = await Promise.all([
       getAssignmentById(assignmentId),
@@ -63,6 +67,7 @@ onMounted(async () => {
     loadError.value = err?.message ?? 'Failed to load assignment.'
   } finally {
     isLoading.value = false
+    stopLoading('assignment-detail')
   }
 })
 

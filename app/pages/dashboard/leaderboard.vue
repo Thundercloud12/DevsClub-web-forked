@@ -19,6 +19,8 @@ useHead({
   ],
 })
 
+import { useLoading } from '~/composables/useLoading'
+
 const {
   getTopStudents,
   isLoading: isLoadingLeaderboard,
@@ -26,6 +28,7 @@ const {
 } = useLeaderboard()
 const { getTracks } = useTracks()
 const { getAssignments } = useAssignments()
+const { startLoading, stopLoading } = useLoading()
 
 const tracks = ref<Track[]>([])
 const allAssignments = ref<Assignment[]>([])
@@ -70,6 +73,7 @@ const fetchEntries = async () => {
 }
 
 onMounted(async () => {
+  startLoading('leaderboard-init')
   try {
     const [fetchedTracks, fetchedAssignments] = await Promise.all([
       getTracks().catch(() => []),
@@ -93,6 +97,7 @@ onMounted(async () => {
     globalError.value = err?.message ?? 'Failed to load leaderboard data.'
   } finally {
     isLoadingData.value = false
+    stopLoading('leaderboard-init')
   }
 })
 

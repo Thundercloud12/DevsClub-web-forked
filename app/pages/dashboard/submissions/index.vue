@@ -16,9 +16,12 @@ useHead({
   ],
 })
 
+import { useLoading } from '~/composables/useLoading'
+
 const { getSubmissionsByStudent } = useSubmissions()
 const { getAssignments } = useAssignments()
 const authStore = useAuthStore()
+const { startLoading, stopLoading } = useLoading()
 
 const submissions = ref<Array<Submission & { assignment?: Assignment }>>([])
 const isLoading = ref(true)
@@ -57,6 +60,7 @@ onMounted(async () => {
     return
   }
 
+  startLoading('student-submissions')
   try {
     const [fetchedSubmissions, fetchedAssignments] = await Promise.all([
       getSubmissionsByStudent(userId),
@@ -76,6 +80,7 @@ onMounted(async () => {
     loadError.value = err?.message ?? 'Failed to load submissions.'
   } finally {
     isLoading.value = false
+    stopLoading('student-submissions')
   }
 })
 </script>
