@@ -4,8 +4,7 @@ import { useAssignments } from '~/composables/student/useAssignments'
 import { useTracks } from '~/composables/student/useTracks'
 import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAuthStore } from '~/stores/auth'
-import type { Assignment } from '~/schemas/assignments'
-import type { Track } from '~/schemas/tracks'
+import type { DashboardAssignment, Track, Assignment } from '~/types'
 useHead({
   title: 'Assignments | TSEC DevsClub',
   meta: [
@@ -24,11 +23,6 @@ const { getTracks } = useTracks()
 const { getSubmissionByUser } = useSubmissions()
 const authStore = useAuthStore()
 const { startLoading, stopLoading } = useLoading()
-
-interface DashboardAssignment extends Assignment {
-  id: string
-  status: 'upcoming' | 'open' | 'closed'
-}
 
 const assignments = ref<DashboardAssignment[]>([])
 const tracks = ref<Track[]>([])

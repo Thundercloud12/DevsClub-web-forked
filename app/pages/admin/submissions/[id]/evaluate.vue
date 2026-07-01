@@ -1,343 +1,353 @@
 <template>
-  <div
-    class="min-h-screen pt-24 pb-12 px-4 sm:px-8 bg-canvas dark:bg-[#0b1120] gradient-mesh"
+  <AdminPageLayout
+    title="Evaluate Submission"
+    :backUrl="
+      submission?.assignmentId
+        ? `/admin/submissions/${submission.assignmentId}`
+        : '/admin/submissions'
+    "
+    backLabel="Back to Submissions"
+    maxWidth="4xl"
   >
-    <div class="max-w-4xl mx-auto space-y-8 relative z-10">
-      <!-- Header -->
-      <div class="pb-4 border-b border-hairline/80 dark:border-slate-800">
-        <button
-          @click="
-            navigateTo(
-              submission?.assignmentId
-                ? `/admin/submissions/${submission.assignmentId}`
-                : '/admin/submissions'
-            )
-          "
-          class="text-xs font-semibold uppercase tracking-wider text-ink-mute hover:text-primary flex items-center gap-1.5 mb-3 transition-colors duration-150"
-        >
-          ← Back to Submissions
-        </button>
-        <h1
-          class="text-3xl font-light tracking-[-0.64px] text-ink dark:text-slate-50"
-        >
-          Evaluate Submission
-        </h1>
-      </div>
+    <!-- Error -->
+    <div
+      v-if="loadError"
+      class="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400"
+    >
+      {{ loadError }}
+    </div>
 
-      <!-- Loading -->
-      <div v-if="isLoading" class="space-y-4">
-        <div
-          class="h-32 bg-slate-100 dark:bg-slate-800/40 animate-pulse rounded-xl"
-        />
-        <div
-          class="h-48 bg-slate-100 dark:bg-slate-800/40 animate-pulse rounded-xl"
-        />
-      </div>
-
-      <!-- Error -->
+    <template v-else-if="submission">
+      <!-- Submission Info Card -->
       <div
-        v-else-if="loadError"
-        class="p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400"
+        class="bg-surface-card border border-hairline dark:border-slate-800 rounded-xl p-6 space-y-4 shadow-[0_4px_12px_rgba(0,55,112,0.02),0_1px_3px_rgba(0,55,112,0.01)]"
       >
-        {{ loadError }}
-      </div>
+        <div class="flex items-start justify-between">
+          <div>
+            <p
+              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
+            >
+              Student ID
+            </p>
+            <p class="font-mono text-sm text-ink-secondary dark:text-slate-200">
+              {{ submission.studentId }}
+            </p>
+          </div>
+          <span
+            class="text-[10px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider"
+            :class="
+              submission.status === 'evaluated'
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
+            "
+          >
+            {{
+              submission.status === 'evaluated' ? '✓ Evaluated' : '⏳ Pending'
+            }}
+          </span>
+        </div>
 
-      <template v-else-if="submission">
-        <!-- Submission Info Card -->
         <div
-          class="bg-surface-card border border-hairline dark:border-slate-800 rounded-xl p-6 space-y-4 shadow-[0_4px_12px_rgba(0,55,112,0.02),0_1px_3px_rgba(0,55,112,0.01)]"
+          class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-hairline/60 dark:border-slate-800/60"
         >
-          <div class="flex items-start justify-between">
-            <div>
-              <p
-                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
-              >
-                Student ID
-              </p>
-              <p
-                class="font-mono text-sm text-ink-secondary dark:text-slate-200"
-              >
-                {{ submission.studentId }}
-              </p>
-            </div>
-            <span
-              class="text-[10px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider"
-              :class="
-                submission.status === 'evaluated'
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
-                  : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
-              "
-            >
-              {{
-                submission.status === 'evaluated' ? '✓ Evaluated' : '⏳ Pending'
-              }}
-            </span>
-          </div>
-
-          <div
-            class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-hairline/60 dark:border-slate-800/60"
-          >
-            <div>
-              <p
-                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
-              >
-                GitHub Repo
-              </p>
-              <a
-                :href="submission.githubLink"
-                target="_blank"
-                class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
-              >
-                {{ submission.githubLink.replace('https://github.com/', '') }}
-              </a>
-            </div>
-            <div v-if="submission.liveUrl">
-              <p
-                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
-              >
-                Live URL
-              </p>
-              <a
-                :href="submission.liveUrl"
-                target="_blank"
-                class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
-              >
-                {{ submission.liveUrl.replace(/^https?:\/\//, '') }}
-              </a>
-            </div>
-            <div v-if="submission.videoLink">
-              <p
-                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
-              >
-                Video Demo
-              </p>
-              <a
-                :href="submission.videoLink"
-                target="_blank"
-                class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
-              >
-                Watch Video Demo
-              </a>
-            </div>
-          </div>
-
-          <div
-            v-if="submission.notes"
-            class="pt-4 border-t border-hairline/60 dark:border-slate-800/60"
-          >
+          <div>
             <p
-              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1.5"
+              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
             >
-              Student Notes
+              GitHub Repo
             </p>
+            <a
+              :href="submission.githubLink"
+              target="_blank"
+              class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
+            >
+              {{ submission.githubLink.replace('https://github.com/', '') }}
+            </a>
+          </div>
+          <div v-if="submission.liveUrl">
             <p
-              class="text-sm text-ink-secondary dark:text-slate-300 whitespace-pre-wrap leading-relaxed"
+              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
             >
-              {{ submission.notes }}
+              Live URL
             </p>
+            <a
+              :href="submission.liveUrl"
+              target="_blank"
+              class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
+            >
+              {{ submission.liveUrl }}
+            </a>
+          </div>
+          <div v-if="submission.videoLink">
+            <p
+              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
+            >
+              Video Link
+            </p>
+            <a
+              :href="submission.videoLink"
+              target="_blank"
+              class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
+            >
+              {{ submission.videoLink }}
+            </a>
           </div>
         </div>
 
-        <!-- No Rubric found -->
         <div
-          v-if="!rubric && !isLoadingRubric"
-          class="p-4 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-xl text-sm"
+          v-if="submission.notes"
+          class="pt-4 border-t border-hairline/60 dark:border-slate-800/60"
         >
-          Could not load the rubric for this assignment. Cannot evaluate without
-          it.
-        </div>
-
-        <!-- Rubric Loading -->
-        <div
-          v-else-if="isLoadingRubric"
-          class="h-40 bg-slate-100 dark:bg-slate-800/40 animate-pulse rounded-xl"
-        />
-
-        <!-- GRADING SECTION -->
-        <div
-          v-else-if="rubric"
-          class="bg-surface-card border border-hairline dark:border-slate-800 rounded-xl p-6 space-y-6 shadow-[0_4px_12px_rgba(0,55,112,0.02),0_1px_3px_rgba(0,55,112,0.01)]"
-        >
-          <div
-            class="flex items-center justify-between pb-4 border-b border-hairline/60 dark:border-slate-800/60"
+          <p
+            class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
           >
-            <h2
-              class="text-xl font-light tracking-[-0.22px] text-ink dark:text-slate-50"
-            >
-              Grading:
-              <span class="text-primary dark:text-primary-soft font-normal">{{
-                rubric.name
-              }}</span>
-            </h2>
-            <div class="text-right">
-              <p
-                class="text-3xl font-light font-mono text-ink dark:text-slate-50 tracking-tight"
-              >
-                {{ totalScore }}
-              </p>
-              <p
-                class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute"
-              >
-                out of {{ maxPossibleScore }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Criteria Scoring Rows -->
-          <div class="space-y-4">
-            <div
-              v-for="(criterion, index) in scoringForm"
-              :key="criterion.id"
-              class="p-6 bg-canvas-soft/50 dark:bg-slate-900/30 rounded-xl border border-hairline dark:border-slate-800"
-            >
-              <div class="flex items-start justify-between gap-4">
-                <div class="flex-1">
-                  <p class="font-medium text-ink dark:text-slate-50">
-                    {{ criterion.label }}
-                  </p>
-                  <p
-                    v-if="criterion.description"
-                    class="text-xs text-ink-mute dark:text-slate-400 mt-1.5 leading-relaxed"
-                  >
-                    {{ criterion.description }}
-                  </p>
-                  <p
-                    class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute/80 dark:text-slate-500 mt-2"
-                  >
-                    Max: {{ criterion.maxScore }} pts | Type:
-                    {{ criterion.type }}
-                  </p>
-                </div>
-
-                <div class="text-right shrink-0">
-                  <template v-if="canGrade">
-                    <input
-                      type="number"
-                      v-model.number="scoringForm[index].actualScore"
-                      :min="criterion.minScore"
-                      :max="criterion.maxScore"
-                      class="w-20 text-center rounded-lg border border-hairline-input bg-canvas px-2.5 py-1.5 text-sm font-semibold focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-900/50 dark:text-white transition-all duration-150"
-                    />
-                    <p
-                      class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute mt-1.5"
-                    >
-                      / {{ criterion.maxScore }}
-                    </p>
-                  </template>
-                  <template v-else>
-                    <p
-                      class="text-2xl font-light font-mono text-ink dark:text-slate-50"
-                    >
-                      {{ criterion.actualScore ?? '—' }}
-                    </p>
-                    <p
-                      class="text-[10px] font-semibold uppercase tracking-wider text-ink-mute mt-1"
-                    >
-                      / {{ criterion.maxScore }}
-                    </p>
-                  </template>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Feedback Section -->
-          <div
-            class="pt-6 border-t border-hairline/60 dark:border-slate-800/60"
+            Student Notes
+          </p>
+          <p
+            class="text-sm text-ink-secondary dark:text-slate-350 leading-relaxed"
           >
-            <h3
-              class="text-sm font-semibold uppercase tracking-wider text-ink-mute dark:text-slate-400 mb-3"
-            >
-              Evaluator Feedback
-            </h3>
-            <template v-if="canGrade">
-              <textarea
-                id="feedback"
-                v-model="feedback"
-                rows="4"
-                maxlength="1000"
-                placeholder="Add constructive feedback for this submission..."
-                class="w-full rounded-lg border border-hairline-input bg-canvas px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-900/50 dark:text-white transition-all duration-150"
-              />
-              <p class="text-[10px] text-ink-mute text-right mt-1">
-                {{ feedback.length }} / 1000 characters
-              </p>
-            </template>
-            <template v-else>
-              <div
-                v-if="submission.feedback"
-                class="p-4 bg-canvas-soft/50 dark:bg-slate-900/30 rounded-xl border border-hairline dark:border-slate-800"
-              >
-                <p
-                  class="text-sm text-ink-secondary dark:text-slate-300 whitespace-pre-wrap leading-relaxed"
-                >
-                  {{ submission.feedback }}
-                </p>
-              </div>
-              <p v-else class="text-sm text-ink-mute italic">
-                No feedback provided for this evaluation.
-              </p>
-            </template>
-          </div>
-
-          <!-- Grader-Only Save Section -->
-          <div
-            v-if="canGrade"
-            class="pt-6 border-t border-hairline/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-          >
-            <p
-              class="text-xs text-ink-mute dark:text-slate-400 flex items-center gap-1.5"
-            >
-              <svg
-                class="w-4 h-4 text-emerald-500 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-              <span
-                >Saving grades marks this submission as evaluated and updates
-                the leaderboard.</span
-              >
-            </p>
-            <UiButton @click="saveGrades" :disabled="isSaving">
-              {{ isSaving ? 'Saving...' : 'Save Grades' }}
-            </UiButton>
-          </div>
-
-          <!-- Read-only notice -->
-          <div
-            v-else
-            class="pt-4 border-t border-hairline/80 dark:border-slate-800"
-          >
-            <p
-              class="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-3 rounded-xl flex items-center gap-2"
-            >
-              <span v-if="submission.status === 'evaluated'">
-                ✓ This submission has already been evaluated. Scores cannot be
-                modified.
-              </span>
-              <span v-else>
-                ⚠️ You are viewing this submission in read-only mode. Only
-                Admins can edit scores.
-              </span>
-            </p>
-          </div>
-
-          <p v-if="saveError" class="text-red-500 text-sm">{{ saveError }}</p>
-          <p v-if="saveSuccess" class="text-green-500 text-sm font-medium">
-            {{ saveSuccess }}
+            {{ submission.notes }}
           </p>
         </div>
-      </template>
-    </div>
-  </div>
+      </div>
+
+      <!-- Grading Section -->
+      <div
+        class="bg-surface-card border border-hairline dark:border-slate-800 rounded-xl p-6 space-y-6 shadow-[0_4px_12px_rgba(0,55,112,0.02),0_1px_3px_rgba(0,55,112,0.01)]"
+      >
+        <div class="flex items-center justify-between">
+          <h2
+            class="text-xl font-light tracking-[-0.22px] text-ink dark:text-slate-50"
+          >
+            Criteria Grading
+          </h2>
+          <div class="text-right">
+            <p
+              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold"
+            >
+              Total Score
+            </p>
+            <p
+              class="text-2xl font-light font-mono text-primary dark:text-primary-soft"
+            >
+              {{ totalScore }} / {{ maxPossibleScore }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Rubric Criteria Forms -->
+        <div class="space-y-6">
+          <div v-if="isLoadingRubric" class="text-center py-6">
+            <p class="text-sm text-slate-500 animate-pulse">
+              Loading rubric schema...
+            </p>
+          </div>
+          <div
+            v-else-if="scoringForm.length === 0"
+            class="text-sm text-slate-500 italic"
+          >
+            No criteria loaded for this rubric.
+          </div>
+          <div
+            v-for="(criterion, index) in scoringForm"
+            :key="criterion.id"
+            class="p-5 bg-canvas-soft/40 dark:bg-slate-900/20 border border-hairline dark:border-slate-800 rounded-xl space-y-3"
+          >
+            <div
+              class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2"
+            >
+              <div>
+                <h4 class="font-medium text-ink dark:text-slate-100">
+                  {{ criterion.label }}
+                </h4>
+                <p
+                  v-if="criterion.description"
+                  class="text-xs text-ink-mute dark:text-slate-400 mt-0.5"
+                >
+                  {{ criterion.description }}
+                </p>
+              </div>
+              <span
+                class="text-[10px] uppercase tracking-wider px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded font-mono shrink-0 self-start"
+              >
+                {{ criterion.type }}
+              </span>
+            </div>
+
+            <!-- Score input based on type -->
+            <div class="flex items-center gap-4 pt-1 max-w-xs">
+              <!-- Number input -->
+              <template v-if="criterion.type === 'number'">
+                <div class="flex items-center gap-2 w-full">
+                  <UiInput
+                    type="number"
+                    v-model.number="criterion.actualScore"
+                    min="0"
+                    :max="criterion.maxScore"
+                    class="w-24 text-center font-mono font-bold"
+                    :disabled="!canGrade"
+                  />
+                  <span class="text-xs text-ink-mute"
+                    >/ {{ criterion.maxScore }} max</span
+                  >
+                </div>
+              </template>
+
+              <!-- Boolean (Pass / Fail) -->
+              <template v-else-if="criterion.type === 'boolean'">
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    @click="criterion.actualScore = criterion.maxScore"
+                    :disabled="!canGrade"
+                    class="px-4 py-1.5 rounded-lg border text-xs font-semibold tracking-wider transition-all"
+                    :class="
+                      criterion.actualScore === criterion.maxScore
+                        ? 'bg-green-500/10 text-green-600 border-green-500/30'
+                        : 'border-hairline bg-surface hover:bg-canvas-soft'
+                    "
+                  >
+                    PASS ({{ criterion.maxScore }})
+                  </button>
+                  <button
+                    type="button"
+                    @click="criterion.actualScore = 0"
+                    :disabled="!canGrade"
+                    class="px-4 py-1.5 rounded-lg border text-xs font-semibold tracking-wider transition-all"
+                    :class="
+                      criterion.actualScore === 0
+                        ? 'bg-red-500/10 text-red-600 border-red-500/30'
+                        : 'border-hairline bg-surface hover:bg-canvas-soft'
+                    "
+                  >
+                    FAIL (0)
+                  </button>
+                </div>
+              </template>
+
+              <!-- Scale 1-5 -->
+              <template v-else-if="criterion.type === 'scale'">
+                <div class="flex gap-1.5">
+                  <button
+                    v-for="val in [1, 2, 3, 4, 5]"
+                    :key="val"
+                    type="button"
+                    @click="
+                      criterion.actualScore = Math.round(
+                        (val / 5) * criterion.maxScore
+                      )
+                    "
+                    :disabled="!canGrade"
+                    class="w-8 h-8 rounded-lg border flex items-center justify-center text-xs font-mono font-bold transition-all"
+                    :class="
+                      criterion.actualScore ===
+                      Math.round((val / 5) * criterion.maxScore)
+                        ? 'bg-primary text-white border-primary'
+                        : 'border-hairline bg-surface hover:bg-canvas-soft'
+                    "
+                  >
+                    {{ val }}
+                  </button>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback Section -->
+        <div class="pt-6 border-t border-hairline/60 dark:border-slate-800/60">
+          <h3
+            class="text-sm font-semibold uppercase tracking-wider text-ink-mute dark:text-slate-400 mb-3"
+          >
+            Evaluator Feedback
+          </h3>
+          <template v-if="canGrade">
+            <textarea
+              id="feedback"
+              v-model="feedback"
+              rows="4"
+              maxlength="1000"
+              placeholder="Add constructive feedback for this submission..."
+              class="w-full rounded-lg border border-hairline-input bg-canvas px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-900/50 dark:text-white transition-all duration-150"
+            />
+            <p class="text-[10px] text-ink-mute text-right mt-1">
+              {{ feedback.length }} / 1000 characters
+            </p>
+          </template>
+          <template v-else>
+            <div
+              v-if="submission.feedback"
+              class="p-4 bg-canvas-soft/50 dark:bg-slate-900/30 rounded-xl border border-hairline dark:border-slate-800"
+            >
+              <p
+                class="text-sm text-ink-secondary dark:text-slate-300 whitespace-pre-wrap leading-relaxed"
+              >
+                {{ submission.feedback }}
+              </p>
+            </div>
+            <p v-else class="text-sm text-ink-mute italic">
+              No feedback provided for this evaluation.
+            </p>
+          </template>
+        </div>
+
+        <!-- Grader-Only Save Section -->
+        <div
+          v-if="canGrade"
+          class="pt-6 border-t border-hairline/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+        >
+          <p
+            class="text-xs text-ink-mute dark:text-slate-400 flex items-center gap-1.5"
+          >
+            <svg
+              class="w-4 h-4 text-emerald-500 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+            <span
+              >Saving grades marks this submission as evaluated and updates the
+              leaderboard.</span
+            >
+          </p>
+          <UiButton @click="saveGrades" :disabled="isSaving">
+            {{ isSaving ? 'Saving...' : 'Save Grades' }}
+          </UiButton>
+        </div>
+
+        <!-- Read-only notice -->
+        <div
+          v-else
+          class="pt-4 border-t border-hairline/80 dark:border-slate-800"
+        >
+          <p
+            class="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-3 rounded-xl flex items-center gap-2"
+          >
+            <span v-if="submission.status === 'evaluated'">
+              ✓ This submission has already been evaluated. Scores cannot be
+              modified.
+            </span>
+            <span v-else>
+              ⚠️ You are viewing this submission in read-only mode. Only Admins
+              can edit scores.
+            </span>
+          </p>
+        </div>
+
+        <p v-if="saveError" class="text-red-500 text-sm">{{ saveError }}</p>
+        <p v-if="saveSuccess" class="text-green-500 text-sm font-medium">
+          {{ saveSuccess }}
+        </p>
+      </div>
+    </template>
+  </AdminPageLayout>
 </template>
 
 <script setup>
@@ -346,7 +356,10 @@ import { useAuthStore } from '~/stores/auth'
 import { useAdminSubmissions } from '~/composables/admin/useAdminSubmissions'
 import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
 import { useAdminRubrics } from '~/composables/admin/useAdminRubrics'
+import { useLoading } from '~/composables/useLoading'
+import AdminPageLayout from '~/components/ui/AdminPageLayout.vue'
 import UiButton from '~/components/ui/Button.vue'
+import UiInput from '~/components/ui/Input.vue'
 import { useToastStore } from '~/stores/toast'
 import { formatErrorMessage } from '~/utils/errors'
 
@@ -359,6 +372,7 @@ const { getSubmissionById, evaluateSubmission } = useAdminSubmissions()
 const { getAssignmentById } = useAdminAssignments()
 const { getRubricById } = useAdminRubrics()
 const toastStore = useToastStore()
+const { startLoading, stopLoading } = useLoading()
 
 const submission = ref(null)
 const rubric = ref(null)
@@ -387,6 +401,7 @@ const maxPossibleScore = computed(() =>
 
 // ── Data Fetching ──────────────────────────────────────────────────────────────
 onMounted(async () => {
+  startLoading('admin-evaluate-submission')
   try {
     // 1. Fetch the submission document
     const subData = await getSubmissionById(submissionId)
@@ -427,6 +442,7 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
     isLoadingRubric.value = false
+    stopLoading('admin-evaluate-submission')
   }
 })
 
@@ -487,16 +503,5 @@ const saveGrades = async () => {
   } finally {
     isSaving.value = false
   }
-}
-
-const formatDate = (date) => {
-  if (!date) return 'N/A'
-  return new Date(date).toLocaleString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }
 </script>
