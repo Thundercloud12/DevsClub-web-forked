@@ -90,9 +90,7 @@ useHead({
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-canvas dark:bg-[#0b1120] pt-32 pb-24 relative gradient-mesh"
-  >
+  <div class="min-h-screen pt-32 pb-24 relative">
     <div class="max-w-2xl mx-auto relative z-10 px-6">
       <!-- Loading skeleton -->
       <div v-if="isLoading" class="space-y-6 animate-pulse">

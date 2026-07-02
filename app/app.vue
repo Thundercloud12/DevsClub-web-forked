@@ -70,7 +70,7 @@ onUnmounted(() => {
   <div>
     <div
       v-if="isChecking"
-      class="h-screen w-screen flex flex-col items-center justify-center bg-canvas dark:bg-[#0b1120]"
+      class="h-screen w-screen flex flex-col items-center justify-center relative"
     >
       <div class="relative flex flex-col items-center gap-4">
         <div
@@ -79,7 +79,7 @@ onUnmounted(() => {
         <span
           class="font-inter text-sm font-medium tracking-wide text-ink-secondary dark:text-slate-300 animate-pulse"
         >
-          Checking system status...
+          Loading...
         </span>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <!-- pages/auth/signin.vue -->
 <template>
   <div
-    class="flex flex-col items-center justify-center min-h-screen p-4 bg-canvas dark:bg-[#0b1120] gradient-mesh relative"
+    class="flex flex-col items-center justify-center min-h-screen p-4 relative"
   >
     <UiCard
       class="w-full max-w-md relative z-10 shadow-[0_20px_40px_rgba(0,55,112,0.1),0_1px_3px_rgba(0,55,112,0.05)] border border-hairline/80 dark:border-slate-800"

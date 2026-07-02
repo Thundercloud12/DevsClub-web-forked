@@ -11,9 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <div
-    class="min-h-screen pt-24 pb-12 px-4 sm:px-8 bg-canvas dark:bg-[#0b1120] gradient-mesh"
-  >
+  <div class="min-h-screen pt-24 pb-12 px-4 sm:px-8 mt-12 sm:mt-8 relative">
     <div
       :class="[
         maxWidth === '3xl'

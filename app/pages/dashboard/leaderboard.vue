@@ -133,9 +133,7 @@ const getInitials = (name: string) => {
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-canvas dark:bg-[#0b1120] pt-32 pb-24 relative gradient-mesh"
-  >
+  <div class="min-h-screen pt-32 pb-24 relative">
     <div
       class="max-w-5xl mx-auto px-6 text-center space-y-6 mb-12 relative z-10"
     >
