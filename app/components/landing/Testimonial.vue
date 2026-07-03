@@ -1,88 +1,113 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 interface Testimonial {
   id: number
-  quote: string
+  username: string
   name: string
   role: string
+  quote: string
+  commits: string
+  commitHash: string
+  avatarColor: string
+  reactions: {
+    rocket: number
+    fire: number
+    party: number
+  }
 }
 
-const currentIndex = ref(0)
-
-const testimonials: Testimonial[] = [
+const testimonials = ref<Testimonial[]>([
   {
     id: 1,
+    username: 'aarav-mehta',
+    name: 'Aarav Mehta',
+    role: 'TE Comps',
     quote:
-      'The community made the difference. Stuck at midnight? Someone was always online to unblock me.',
-    name: 'Sanya Kapoor',
-    role: 'SE Comps',
+      "I joined as a complete beginner. Eight weeks later I'd shipped four projects and made friends I still build with.",
+    commits: 'committed 4 frontend features',
+    commitHash: 'a8c2d91',
+    avatarColor: 'bg-indigo-500',
+    reactions: { rocket: 24, fire: 12, party: 8 },
   },
   {
     id: 2,
+    username: 'sanya-kapoor',
+    name: 'Sanya Kapoor',
+    role: 'SE Comps',
     quote:
-      "I joined as a complete beginner. Eight weeks later I'd shipped four projects and made friends I still build with.",
-    name: 'Aarav Mehta',
-    role: 'TE Comps',
+      'The community made the difference. Stuck at midnight? Someone was always online to unblock me.',
+    commits: 'resolved 12 merge conflicts',
+    commitHash: 'b4f7e2a',
+    avatarColor: 'bg-emerald-500',
+    reactions: { rocket: 19, fire: 15, party: 5 },
   },
   {
     id: 3,
+    username: 'vedant-patel',
+    name: 'Vedant Patel',
+    role: 'FE Comps',
     quote:
-      "Mentorship every week kept me honest. The roadmap turned 'I want to learn dev' into actual deployed apps.",
-    name: 'Riya Sharma',
-    role: 'SL IT',
+      "Real projects, real mentors, real growth. This isn't a course, it's a community of builders.",
+    commits: 'pushed 3 production deployments',
+    commitHash: 'c9d1a8e',
+    avatarColor: 'bg-amber-500',
+    reactions: { rocket: 32, fire: 22, party: 14 },
   },
   {
     id: 4,
+    username: 'riya-sharma',
+    name: 'Riya Sharma',
+    role: 'SL IT',
     quote:
-      "Real projects, real mentors, real growth. This isn't a course, it's a community of builders.",
-    name: 'Vedant Patel',
-    role: 'FE Comps',
+      "Mentorship every week kept me honest. The roadmap turned 'I want to learn dev' into actual deployed apps.",
+    commits: 'optimized database queries',
+    commitHash: 'd7e5f3c',
+    avatarColor: 'bg-rose-500',
+    reactions: { rocket: 15, fire: 9, party: 7 },
   },
   {
     id: 5,
-    quote:
-      'The structure and accountability changed everything. I went from zero to shipping in production.',
+    username: 'priya-nair',
     name: 'Priya Nair',
     role: 'BE Comps',
+    quote:
+      'The structure and accountability changed everything. I went from zero to shipping in production.',
+    commits: 'implemented custom auth flow',
+    commitHash: 'e3b8a1f',
+    avatarColor: 'bg-sky-500',
+    reactions: { rocket: 27, fire: 18, party: 11 },
   },
-]
-
-const totalPages = computed(() => testimonials.length)
-
-const getTestimonial = (index: number): Testimonial => {
-  const normalizedIndex =
-    ((index % testimonials.length) + testimonials.length) % testimonials.length
-  return testimonials[normalizedIndex] as Testimonial
-}
-
-const mainTestimonial = computed(() => getTestimonial(currentIndex.value))
-
-const sideTestimonials = computed(() => [
-  getTestimonial(currentIndex.value + 1),
-  getTestimonial(currentIndex.value + 2),
 ])
 
-const previousSlide = () => {
-  currentIndex.value =
-    (currentIndex.value - 1 + testimonials.length) % testimonials.length
-}
+const activeReactions = ref<Record<string, boolean>>({})
 
-const nextSlide = () => {
-  currentIndex.value = (currentIndex.value + 1) % testimonials.length
-}
+const handleReact = (
+  testimonialId: number,
+  type: 'rocket' | 'fire' | 'party'
+) => {
+  const key = `${testimonialId}-${type}`
+  const test = testimonials.value.find((t) => t.id === testimonialId)
+  if (!test) return
 
-const goToSlide = (index: number) => {
-  currentIndex.value = index
+  if (activeReactions.value[key]) {
+    test.reactions[type]--
+    activeReactions.value[key] = false
+  } else {
+    test.reactions[type]++
+    activeReactions.value[key] = true
+  }
 }
 </script>
 
 <template>
-  <section class="relative py-24 px-6">
-    <div class="relative mx-auto max-w-7xl">
+  <section class="relative py-24 px-6 bg-canvas/30">
+    <div class="relative mx-auto max-w-4xl">
       <!-- Header -->
       <div class="mb-16 text-center">
-        <h2 class="text-5xl font-bold text-white md:text-6xl">
+        <h2
+          class="text-4xl font-bold text-white md:text-5xl tracking-tight font-inter"
+        >
           Hear from the past participants
         </h2>
         <p class="mt-4 text-lg text-slate-400">
@@ -90,128 +115,244 @@ const goToSlide = (index: number) => {
         </p>
       </div>
 
-      <!-- Testimonials Layout: three centered cards (side cards blurred) -->
+      <!-- Mock Pull Request Top Panel -->
       <div
-        class="flex flex-col items-center gap-8 lg:flex-row lg:items-center lg:justify-center"
+        class="border border-slate-800 bg-[#0b1120]/60 rounded-xl p-6 backdrop-blur-md mb-12 shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
       >
-        <!-- Left blurred side card -->
-        <div class="hidden lg:flex lg:w-1/5 lg:justify-center">
-          <div
-            v-if="sideTestimonials[0]"
-            class="w-64 rounded-2xl border border-slate-700/20 bg-slate-900/30 p-6 backdrop-blur-xl text-slate-300 transform scale-95 opacity-80"
-          >
-            <p class="mb-4 text-sm leading-6 text-slate-300">
-              "{{ sideTestimonials[0].quote }}"
-            </p>
-            <div>
-              <p class="text-sm font-semibold text-white">
-                {{ sideTestimonials[0].name }}
-              </p>
-              <p class="text-xs text-slate-400">
-                {{ sideTestimonials[0].role }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Center spotlight (reduced length) -->
         <div
-          class="w-full lg:w-2/5 rounded-2xl border border-slate-700/50 bg-slate-900/60 p-6 md:p-8 backdrop-blur-md max-h-[320px] overflow-hidden text-center"
+          class="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
-          <p class="mb-6 text-xl leading-relaxed text-white md:text-2xl">
-            "{{ mainTestimonial.quote }}"
-          </p>
-
           <div>
-            <p class="font-semibold text-white text-lg">
-              {{ mainTestimonial.name }}
-            </p>
-            <p class="mt-1 text-sm text-slate-400">
-              {{ mainTestimonial.role }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Right blurred side card -->
-        <div class="hidden lg:flex lg:w-1/5 lg:justify-center">
-          <div
-            v-if="sideTestimonials[1]"
-            class="w-64 rounded-2xl border border-slate-700/20 bg-slate-900/30 p-6 backdrop-blur-xl text-slate-300 transform scale-95 opacity-80"
-          >
-            <p class="mb-4 text-sm leading-6 text-slate-300">
-              "{{ sideTestimonials[1].quote }}"
-            </p>
-            <div>
-              <p class="text-sm font-semibold text-white">
-                {{ sideTestimonials[1].name }}
-              </p>
-              <p class="text-xs text-slate-400">
-                {{ sideTestimonials[1].role }}
-              </p>
+            <div class="flex items-center gap-3 flex-wrap">
+              <h3
+                class="text-xl md:text-2xl font-semibold text-white font-mono tracking-tight"
+              >
+                Refactor participant skillset to production-ready
+                <span class="text-slate-500">#42</span>
+              </h3>
+            </div>
+            <div
+              class="flex items-center gap-2 mt-4 flex-wrap text-xs md:text-sm text-slate-400 font-inter"
+            >
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20"
+              >
+                <svg
+                  class="w-4 h-4 shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm0 2.122a2.25 2.25 0 1 0-1.5 0v5.256a2.251 2.251 0 1 0 1.5 0V5.372Zm8 .506a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm0 2.122a2.25 2.25 0 1 0-1.5 0v.756a2.251 2.251 0 1 0 1.5 0v-.756ZM11 5.372v.756a3.75 3.75 0 0 1-3.75 3.75H6.25a.75.75 0 0 0 0 1.5h1a5.25 5.25 0 0 0 5.25-5.25v-.756Z"
+                  />
+                </svg>
+                Merged
+              </span>
+              <span class="font-semibold text-slate-200">keerthan-poojary</span>
+              <span>merged 5 approvals from contributors into</span>
+              <span
+                class="font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-xs"
+                >main</span
+              >
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Navigation Controls -->
-      <div class="mt-12 flex items-center justify-center gap-6">
-        <!-- Left Arrow -->
-        <button
-          @click="previousSlide"
-          class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-slate-400 transition hover:border-slate-500 hover:text-slate-300"
-          aria-label="Previous testimonials"
-        >
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
+      <!-- Vertical Git Timeline -->
+      <div
+        class="relative pl-8 md:pl-12 border-l-2 border-slate-800 space-y-12 ml-4"
+      >
+        <!-- Loop over testimonials -->
+        <template v-for="test in testimonials" :key="test.id">
+          <!-- Commit Event -->
+          <div class="relative">
+            <!-- Commit Icon on Timeline -->
+            <span
+              class="absolute -left-[41px] md:-left-[57px] top-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-[#0b1120] border-2 border-slate-800 text-slate-500 shadow-inner"
+            >
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
+                <path
+                  fill-rule="evenodd"
+                  d="M10.5 7.75a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm.088.75H14a.75.75 0 0 0 0-1.5h-3.412a2.5 2.5 0 0 1 0 1.5ZM5.412 7H2a.75.75 0 0 0 0 1.5h3.412a2.5 2.5 0 0 1 0-1.5Z"
+                />
+              </svg>
+            </span>
+            <div
+              class="flex items-center gap-2 text-xs md:text-sm text-slate-400 font-mono"
+            >
+              <span class="font-semibold text-slate-200"
+                >@{{ test.username }}</span
+              >
+              <span>{{ test.commits }}</span>
+              <span class="text-slate-600 font-semibold">{{
+                test.commitHash
+              }}</span>
+            </div>
+          </div>
 
-        <!-- Dots -->
-        <div class="flex gap-2">
-          <button
-            v-for="(_, index) in totalPages"
-            :key="index"
-            @click="goToSlide(index)"
-            :class="[
-              'h-2 rounded-full transition-all',
-              index === currentIndex
-                ? 'w-8 bg-blue-500'
-                : 'w-2 bg-slate-600 hover:bg-slate-500',
-            ]"
-            :aria-label="`Go to testimonial ${index + 1}`"
-          />
+          <!-- Review Event Box -->
+          <div class="relative group">
+            <!-- Student Avatar on Timeline -->
+            <span
+              class="absolute -left-[49px] md:-left-[65px] top-2.5 flex items-center justify-center w-10 h-10 rounded-full border border-slate-700 overflow-hidden shadow-md font-mono text-sm font-bold text-white transition-all duration-300 group-hover:border-slate-500"
+              :class="test.avatarColor"
+            >
+              {{
+                test.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+              }}
+            </span>
+
+            <!-- PR Review Box Card -->
+            <div
+              class="border border-slate-800/80 bg-[#0b1120]/45 rounded-xl overflow-hidden backdrop-blur-md transition-all duration-300 hover:border-slate-700/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
+            >
+              <!-- Box Header -->
+              <div
+                class="bg-[#0b1120]/80 px-5 py-3 border-b border-slate-800/60 flex items-center justify-between flex-wrap gap-2"
+              >
+                <div
+                  class="flex items-center gap-2 text-xs md:text-sm font-inter"
+                >
+                  <span class="font-bold text-slate-200"
+                    >@{{ test.username }}</span
+                  >
+                  <span class="text-slate-400">approved these changes</span>
+                </div>
+                <span
+                  class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20"
+                >
+                  ✓ Approved
+                </span>
+              </div>
+
+              <!-- Box Body -->
+              <div class="p-6 space-y-4">
+                <blockquote
+                  class="text-sm md:text-base leading-relaxed text-slate-350 italic border-l-2 border-slate-700 pl-4 font-inter"
+                >
+                  "{{ test.quote }}"
+                </blockquote>
+
+                <!-- Box Footer -->
+                <div
+                  class="flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-slate-800/40"
+                >
+                  <!-- Student Identification -->
+                  <div
+                    class="flex items-center gap-2 text-xs text-slate-500 font-inter"
+                  >
+                    <svg
+                      class="w-4 h-4 text-slate-600"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                      />
+                    </svg>
+                    <span class="font-semibold text-slate-400">{{
+                      test.name
+                    }}</span>
+                    <span>•</span>
+                    <span class="text-slate-500 font-mono">{{
+                      test.role
+                    }}</span>
+                  </div>
+
+                  <!-- Clickable Reaction Badges -->
+                  <div class="flex gap-2">
+                    <button
+                      @click="handleReact(test.id, 'rocket')"
+                      class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
+                      :class="
+                        activeReactions[`${test.id}-rocket`]
+                          ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.1)]'
+                          : 'bg-slate-800/30 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                      "
+                    >
+                      <span>🚀</span>
+                      <span class="font-mono text-[10px] font-semibold">{{
+                        test.reactions.rocket
+                      }}</span>
+                    </button>
+                    <button
+                      @click="handleReact(test.id, 'fire')"
+                      class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
+                      :class="
+                        activeReactions[`${test.id}-fire`]
+                          ? 'bg-orange-500/10 border-orange-500/30 text-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.1)]'
+                          : 'bg-slate-800/30 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                      "
+                    >
+                      <span>🔥</span>
+                      <span class="font-mono text-[10px] font-semibold">{{
+                        test.reactions.fire
+                      }}</span>
+                    </button>
+                    <button
+                      @click="handleReact(test.id, 'party')"
+                      class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
+                      :class="
+                        activeReactions[`${test.id}-party`]
+                          ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.15)]'
+                          : 'bg-slate-800/30 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                      "
+                    >
+                      <span>🎉</span>
+                      <span class="font-mono text-[10px] font-semibold">{{
+                        test.reactions.party
+                      }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Final Merge Event -->
+        <div
+          class="relative pl-8 md:pl-12 border-l-2 border-slate-800 ml-4 pb-4"
+        >
+          <span
+            class="absolute -left-[45px] md:-left-[61px] top-1.5 flex items-center justify-center w-8 h-8 rounded-full bg-purple-950/40 border border-purple-500/40 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)]"
+          >
+            <svg
+              class="w-4 h-4 shrink-0"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm0 2.122a2.25 2.25 0 1 0-1.5 0v5.256a2.251 2.251 0 1 0 1.5 0V5.372Zm8 .506a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm0 2.122a2.25 2.25 0 1 0-1.5 0v.756a2.251 2.251 0 1 0 1.5 0v-.756ZM11 5.372v.756a3.75 3.75 0 0 1-3.75 3.75H6.25a.75.75 0 0 0 0 1.5h1a5.25 5.25 0 0 0 5.25-5.25v-.756Z"
+              />
+            </svg>
+          </span>
+          <div
+            class="flex items-center gap-2 text-xs md:text-sm text-slate-400 font-mono flex-wrap"
+          >
+            <span class="font-semibold text-purple-400">devsclub-bot</span>
+            <span>merged commit</span>
+            <span
+              class="font-mono text-[10px] bg-purple-500/10 border border-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded"
+              >cf9d1a8</span
+            >
+            <span>into</span>
+            <span
+              class="font-mono bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded text-xs"
+              >main</span
+            >
+          </div>
         </div>
-
-        <!-- Right Arrow -->
-        <button
-          @click="nextSlide"
-          class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-slate-400 transition hover:border-slate-500 hover:text-slate-300"
-          aria-label="Next testimonials"
-        >
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
       </div>
     </div>
   </section>
