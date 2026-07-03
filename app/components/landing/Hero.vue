@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { Motion } from 'motion-v'
 import { useAuthStore } from '~/stores/auth'
+import Terminal from './Info.vue' // adjust path if needed
 
 const authStore = useAuthStore()
 </script>
 
 <template>
-  <section class="relative min-h-[92vh] flex items-center overflow-hidden">
+  <section
+    class="relative flex min-h-screen items-center overflow-hidden pt-28"
+  >
     <!-- background glow -->
     <div
       class="absolute right-0 top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full bg-primary/10 blur-[140px]"
@@ -26,16 +29,7 @@ const authStore = useAuthStore()
           <h1
             class="text-6xl font-semibold leading-[0.95] tracking-[-0.04em] text-ink dark:text-white md:text-7xl"
           >
-            Learn to ship.
-          </h1>
-          <h1
-            class="text-6xl font-semibold leading-[0.95] tracking-[-0.04em] md:text-7xl"
-          >
-            <span
-              class="bg-gradient-to-r from-primary via-indigo-500 to-violet-500 bg-clip-text text-transparent"
-            >
-              Build like a dev.
-            </span>
+            Membership Drive 2026
           </h1>
         </div>
 
@@ -43,9 +37,8 @@ const authStore = useAuthStore()
         <p
           class="mt-8 max-w-xl text-lg leading-9 text-ink-mute dark:text-slate-400"
         >
-          Join TSEC DevsClub's Membership Drive — a hands-on program where
-          engineering students learn by building real projects, completing
-          weekly mentorship, and collaborating with a community that ships.
+          Our structured learning program designed to help students begin their
+          software development journey.
         </p>
 
         <!-- Buttons -->
@@ -103,79 +96,22 @@ const authStore = useAuthStore()
         </div>
       </Motion>
 
-      <div class="relative hidden h-[560px] lg:block">
-        <!-- Glow -->
-        <div
-          class="absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-[120px]"
-        />
+      <Motion
+        :initial="{ opacity: 0, x: 40 }"
+        :animate="{ opacity: 1, x: 0 }"
+        :transition="{ duration: 0.8, delay: 0.2 }"
+        class="hidden lg:flex items-center justify-center"
+      >
+        <div class="relative w-full max-w-2xl">
+          <!-- background glow -->
+          <div class="absolute inset-0 rounded-3xl bg-primary/10 blur-3xl" />
 
-        <!-- Main Terminal -->
-        <div class="absolute right-0 top-15 z-20">
-          <div
-            class="overflow-hidden rounded-md border border-slate-800 bg-[#0F172A]/95 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl"
-          >
-            <!-- Header -->
-
-            <div
-              class="flex items-center justify-between border-b border-slate-800 px-5 py-4"
-            >
-              <div class="flex items-center gap-2">
-                <span class="h-3 w-3 rounded-full bg-red-400"></span>
-                <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
-                <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
-              </div>
-
-              <span class="text-xs font-medium tracking-wide text-slate-500">
-                ~tsec-devs-club
-              </span>
-            </div>
-
-            <!-- Body -->
-            <div class="w-[580px] p-8 font-mono text-[14px] leading-8">
-              <div class="mb-4 text-slate-600">$ npm run membership-drive</div>
-
-              <div>
-                <span class="text-pink-400">const</span>
-                <span class="text-cyan-400"> you </span>
-                <span class="text-white">=</span>
-                <span class="text-emerald-300"> await</span>
-                <span class="text-white"> developer.ship() </span>
-              </div>
-
-              <br />
-
-              <div>
-                <span class="text-violet-400"> ➜ tracks : </span>
-
-                <span class="text-slate-300">
-                  ['frontend', 'backend', 'app', 'devops']
-                </span>
-              </div>
-
-              <div>
-                <span class="text-violet-400"> ➜ weeks : </span>
-
-                <span class="text-emerald-400"> 8 </span>
-              </div>
-
-              <div>
-                <span class="text-violet-400"> ➜ mentors : </span>
-
-                <span class="text-emerald-400"> true </span>
-              </div>
-
-              <br />
-
-              <div class="text-slate-500">✓ ready in 2 months</div>
-
-              <div class="text-emerald-400">
-                ➜ welcome aboard
-                <span class="animate-pulse"> █ </span>
-              </div>
-            </div>
+          <!-- terminal -->
+          <div class="relative scale-95 xl:scale-100">
+            <Terminal />
           </div>
         </div>
-      </div>
+      </Motion>
     </div>
   </section>
 </template>

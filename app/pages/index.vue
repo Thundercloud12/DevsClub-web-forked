@@ -13,7 +13,6 @@ useHead({
 <template>
   <div class="min-h-screen overflow-hidden">
     <LandingHero />
-    <LandingInfo />
     <LandingTimeline />
     <LandingTestimonial />
     <LandingFAQ />

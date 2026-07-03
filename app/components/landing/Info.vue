@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+
+const inputRef = ref<HTMLInputElement | null>(null)
 
 type SystemEntry = { type: 'system'; text: string }
 type InputEntry = { type: 'input'; text: string }
@@ -27,10 +29,7 @@ type TerminalEntry =
   | InsightEntry
   | SuccessEntry
 
-const history = ref<TerminalEntry[]>([
-  { type: 'system', text: '$ npm run membership-drive' },
-  { type: 'system', text: '' },
-])
+const history = ref<TerminalEntry[]>([])
 
 const input = ref('')
 const suggestions = ref([
@@ -205,14 +204,19 @@ const handleSubmit = () => {
 
 const setInputCommand = (cmd: string) => {
   input.value = cmd
+  handleSubmit()
 }
+onMounted(async () => {
+  await nextTick()
+  inputRef.value?.focus()
+})
 </script>
 
 <template>
-  <div class="w-full py-12 px-6">
+  <div class="w-full">
     <!-- Terminal Container -->
     <div
-      class="mx-auto w-full max-w-[85%] overflow-hidden rounded-lg border border-slate-800 bg-[#0F172A]/95 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl"
+      class="mx-auto w-full max-w-full overflow-hidden rounded-lg border border-slate-800 bg-[#0F172A]/95 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl"
     >
       <!-- Terminal Header -->
       <div
@@ -229,7 +233,7 @@ const setInputCommand = (cmd: string) => {
       </div>
 
       <!-- Terminal Body -->
-      <div class="flex h-[500px] flex-col font-mono text-sm leading-7">
+      <div class="flex h-[440px] flex-col font-mono text-sm leading-7">
         <!-- Output Area -->
         <div class="flex-1 overflow-y-auto px-8 py-6 terminal-scroll">
           <!-- Output Lines -->
@@ -300,12 +304,11 @@ const setInputCommand = (cmd: string) => {
           </div>
 
           <!-- Inline command input inside terminal output -->
-          <div
-            class="mt-4 flex items-center gap-2 border-t border-slate-800 pt-4 text-slate-300"
-          >
+          <div class="flex items-center gap-2 text-slate-300">
             <span class="text-slate-500">$</span>
             <form @submit.prevent="handleSubmit" class="flex-1">
               <input
+                ref="inputRef"
                 v-model="input"
                 type="text"
                 placeholder="Type a command..."
