@@ -21,26 +21,30 @@ const socialLinks = [
 </script>
 
 <template>
-  <footer class="p-6 border-t border-slate-800 bg-slate-900">
+  <footer
+    class="p-6 border-t border-hairline dark:border-slate-800 bg-canvas dark:bg-slate-900"
+  >
     <div class="mx-auto max-w-7xl">
       <!-- Footer Content -->
       <div class="grid gap-8 md:grid-cols-3">
         <!-- Branding -->
         <div>
-          <h3 class="text-lg font-bold text-white">TSEC DevsClub</h3>
-          <p class="mt-2 text-slate-400">
+          <h3 class="text-lg font-bold text-ink dark:text-white">
+            TSEC DevsClub
+          </h3>
+          <p class="mt-2 text-ink-mute dark:text-slate-400">
             Building a community of developers who ship real projects.
           </p>
         </div>
 
         <!-- Quick Links -->
         <div>
-          <h4 class="font-semibold text-white">Quick Links</h4>
+          <h4 class="font-semibold text-ink dark:text-white">Quick Links</h4>
           <ul class="mt-4 space-y-2">
             <li>
               <a
                 href="#hero"
-                class="text-slate-400 transition hover:text-white"
+                class="text-ink-mute dark:text-slate-400 transition hover:text-ink dark:hover:text-white"
               >
                 Home
               </a>
@@ -48,7 +52,7 @@ const socialLinks = [
             <li>
               <a
                 href="#info"
-                class="text-slate-400 transition hover:text-white"
+                class="text-ink-mute dark:text-slate-400 transition hover:text-ink dark:hover:text-white"
               >
                 About
               </a>
@@ -56,7 +60,7 @@ const socialLinks = [
             <li>
               <a
                 href="#timeline"
-                class="text-slate-400 transition hover:text-white"
+                class="text-ink-mute dark:text-slate-400 transition hover:text-ink dark:hover:text-white"
               >
                 Timeline
               </a>
@@ -64,7 +68,7 @@ const socialLinks = [
             <li>
               <a
                 href="#testimonials"
-                class="text-slate-400 transition hover:text-white"
+                class="text-ink-mute dark:text-slate-400 transition hover:text-ink dark:hover:text-white"
               >
                 Testimonials
               </a>
@@ -74,7 +78,7 @@ const socialLinks = [
 
         <!-- Social Links -->
         <div>
-          <h4 class="font-semibold text-white">Connect</h4>
+          <h4 class="font-semibold text-ink dark:text-white">Connect</h4>
           <div class="mt-4 flex gap-4">
             <a
               v-for="link in socialLinks"
@@ -83,7 +87,7 @@ const socialLinks = [
               target="_blank"
               rel="noopener noreferrer"
               :aria-label="`Visit us on ${link.name}`"
-              class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-slate-400 transition hover:border-slate-500 hover:text-white hover:bg-slate-800"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-hairline dark:border-slate-700 text-ink-mute dark:text-slate-400 transition hover:border-primary-soft dark:hover:border-slate-500 hover:text-ink dark:hover:text-white hover:bg-canvas-soft dark:hover:bg-slate-800"
             >
               <svg
                 v-if="link.icon === 'linkedin'"
@@ -121,10 +125,10 @@ const socialLinks = [
       </div>
 
       <!-- Divider -->
-      <div class="my-8 border-t border-slate-700"></div>
+      <div class="my-8 border-t border-hairline dark:border-slate-700"></div>
 
       <!-- Bottom -->
-      <p class="py-4 text-slate-400">
+      <p class="py-4 text-ink-mute dark:text-slate-400">
         © {{ currentYear }} TSEC DevsClub. All rights reserved.
       </p>
     </div>

@@ -18,34 +18,100 @@
       </div>
 
       <div
-        class="mt-10 flex flex-wrap justify-center gap-3 text-sm text-ink-mute"
+        class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[100px]"
       >
-        <span class="rounded-full border border-hairline px-4 py-2"
-          >Frontend</span
+        <!-- Frontend -->
+        <div
+          class="md:col-span-2 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
         >
-        <span class="rounded-full border border-hairline px-4 py-2"
-          >Backend</span
+          <h3
+            class="font-zalando text-xl md:text-2xl text-rose-900 dark:text-rose-200"
+          >
+            Frontend
+          </h3>
+          <p
+            class="text-rose-700/80 dark:text-rose-300/80 text-xs md:text-sm mt-0.5"
+          >
+            Craft beautiful and interactive user interfaces.
+          </p>
+        </div>
+        <!-- Backend -->
+        <div
+          class="md:col-span-1 rounded-2xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
         >
-        <span class="rounded-full border border-hairline px-4 py-2">App</span>
-        <span class="rounded-full border border-hairline px-4 py-2"
-          >DevOps</span
+          <h3
+            class="font-zalando text-xl md:text-2xl text-blue-900 dark:text-blue-200"
+          >
+            Backend
+          </h3>
+          <p
+            class="text-blue-700/80 dark:text-blue-300/80 text-xs md:text-sm mt-0.5"
+          >
+            Architect robust APIs and server logic.
+          </p>
+        </div>
+        <!-- App -->
+        <div
+          class="md:col-span-1 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
         >
+          <h3
+            class="font-zalando text-xl md:text-2xl text-amber-900 dark:text-amber-200"
+          >
+            App
+          </h3>
+          <p
+            class="text-amber-700/80 dark:text-amber-300/80 text-xs md:text-sm mt-0.5"
+          >
+            Build native mobile apps.
+          </p>
+        </div>
+        <!-- DevOps -->
+        <div
+          class="md:col-span-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
+        >
+          <h3
+            class="font-zalando text-xl md:text-2xl text-emerald-900 dark:text-emerald-200"
+          >
+            DevOps
+          </h3>
+          <p
+            class="text-emerald-700/80 dark:text-emerald-300/80 text-xs md:text-sm mt-0.5"
+          >
+            Automate deployments and manage infrastructure.
+          </p>
+        </div>
       </div>
 
       <!-- TIMELINE -->
-      <div class="mt-20 relative">
-        <div
-          class="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-hairline"
-        ></div>
+      <div class="mt-20 text-center mb-16 relative z-10">
+        <h2 class="font-zalando text-4xl md:text-5xl text-ink dark:text-white">
+          Timeline
+        </h2>
+      </div>
+
+      <div class="relative">
+        <div class="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 z-0">
+          <svg class="h-full w-full" preserveAspectRatio="none">
+            <line
+              x1="1"
+              y1="0"
+              x2="1"
+              y2="100%"
+              stroke-width="2"
+              stroke-dasharray="8 8"
+              class="timeline-line-animated"
+            />
+          </svg>
+        </div>
 
         <div class="space-y-14">
           <div
             v-for="(event, index) in timeline"
             :key="event.label + index"
-            class="relative flex items-start"
+            class="relative flex items-start z-10"
           >
             <div
-              class="absolute left-1/2 top-6 -translate-x-1/2 h-4 w-4 rounded-full border-2 border-primary bg-surface"
+              class="absolute left-1/2 top-6 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-4 border-canvas-soft dark:border-[#0b1120] shadow-sm"
             ></div>
 
             <div class="w-1/2 pr-8" v-if="index % 2 === 0">

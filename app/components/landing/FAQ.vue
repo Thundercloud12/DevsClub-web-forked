@@ -1,11 +1,11 @@
 <template>
   <section class="py-20">
     <div class="mx-auto max-w-4xl px-6">
-      <h2 class="text-center text-4xl font-semibold text-white">
+      <h2 class="text-center text-4xl font-semibold text-ink dark:text-white">
         Frequently Asked Questions
       </h2>
 
-      <p class="text-center mt-3 text-slate-400">
+      <p class="text-center mt-3 text-ink-mute dark:text-slate-400">
         Quick answers about the Membership Drive and participation.
       </p>
 
@@ -13,7 +13,7 @@
         <div
           v-for="(f, i) in faqs"
           :key="f.q"
-          class="faq-card rounded-2xl border border-slate-700/50 bg-slate-900 p-4 pl-4"
+          class="faq-card rounded-2xl border border-hairline dark:border-slate-700/50 bg-canvas-soft dark:bg-slate-900 p-4 pl-4"
         >
           <button
             @click="toggle(i)"
@@ -22,14 +22,16 @@
             <span
               :class="[
                 'text-left font-medium',
-                openIndex === i ? 'text-blue-400' : 'text-white',
+                openIndex === i
+                  ? 'text-primary-soft'
+                  : 'text-ink dark:text-white',
               ]"
               >{{ f.q }}</span
             >
             <svg
               v-if="openIndex === i"
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 text-emerald-400"
+              class="h-5 w-5 text-emerald-500 dark:text-emerald-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -44,7 +46,7 @@
             <svg
               v-else
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 text-slate-400"
+              class="h-5 w-5 text-ink-mute dark:text-slate-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -61,7 +63,7 @@
           <transition name="fade">
             <div
               v-show="openIndex === i"
-              class="mt-3 text-slate-300 text-sm leading-6"
+              class="mt-3 text-ink-secondary dark:text-slate-300 text-sm leading-6"
             >
               {{ f.a }}
             </div>

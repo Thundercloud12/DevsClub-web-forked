@@ -106,18 +106,18 @@ const handleReact = (
       <!-- Header -->
       <div class="mb-16 text-center">
         <h2
-          class="text-4xl font-bold text-white md:text-5xl tracking-tight font-inter"
+          class="text-4xl font-bold text-ink dark:text-white md:text-5xl tracking-tight font-inter"
         >
           Hear from the past participants
         </h2>
-        <p class="mt-4 text-lg text-slate-400">
+        <p class="mt-4 text-lg text-ink-mute dark:text-slate-400">
           Real students. Real builds. Real growth.
         </p>
       </div>
 
       <!-- Mock Pull Request Top Panel -->
       <div
-        class="border border-slate-800 bg-[#0b1120]/60 rounded-xl p-6 backdrop-blur-md mb-12 shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
+        class="border border-hairline dark:border-slate-800 bg-surface-card/60 dark:bg-[#0b1120]/60 rounded-xl p-6 backdrop-blur-md mb-12 shadow-sm dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
       >
         <div
           class="flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -125,14 +125,14 @@ const handleReact = (
           <div>
             <div class="flex items-center gap-3 flex-wrap">
               <h3
-                class="text-xl md:text-2xl font-semibold text-white font-mono tracking-tight"
+                class="text-xl md:text-2xl font-semibold text-ink dark:text-white font-mono tracking-tight"
               >
                 Refactor participant skillset to production-ready
-                <span class="text-slate-500">#42</span>
+                <span class="text-ink-mute dark:text-slate-500">#42</span>
               </h3>
             </div>
             <div
-              class="flex items-center gap-2 mt-4 flex-wrap text-xs md:text-sm text-slate-400 font-inter"
+              class="flex items-center gap-2 mt-4 flex-wrap text-xs md:text-sm text-ink-mute dark:text-slate-400 font-inter"
             >
               <span
                 class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20"
@@ -149,10 +149,12 @@ const handleReact = (
                 </svg>
                 Merged
               </span>
-              <span class="font-semibold text-slate-200">keerthan-poojary</span>
+              <span class="font-semibold text-ink dark:text-slate-200"
+                >keerthan-poojary</span
+              >
               <span>merged 5 approvals from contributors into</span>
               <span
-                class="font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-xs"
+                class="font-mono bg-canvas-soft dark:bg-slate-800 text-ink-secondary dark:text-slate-300 px-2 py-0.5 rounded text-xs"
                 >main</span
               >
             </div>
@@ -162,7 +164,7 @@ const handleReact = (
 
       <!-- Vertical Git Timeline -->
       <div
-        class="relative pl-8 md:pl-12 border-l-2 border-slate-800 space-y-12 ml-4"
+        class="relative pl-8 md:pl-12 border-l-2 border-hairline dark:border-slate-800 space-y-12 ml-4"
       >
         <!-- Loop over testimonials -->
         <template v-for="test in testimonials" :key="test.id">
@@ -170,7 +172,7 @@ const handleReact = (
           <div class="relative">
             <!-- Commit Icon on Timeline -->
             <span
-              class="absolute -left-[41px] md:-left-[57px] top-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-[#0b1120] border-2 border-slate-800 text-slate-500 shadow-inner"
+              class="absolute -left-[41px] md:-left-[57px] top-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-canvas dark:bg-[#0b1120] border-2 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-500 shadow-inner"
             >
               <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
                 <path
@@ -180,13 +182,13 @@ const handleReact = (
               </svg>
             </span>
             <div
-              class="flex items-center gap-2 text-xs md:text-sm text-slate-400 font-mono"
+              class="flex items-center gap-2 text-xs md:text-sm text-ink-mute dark:text-slate-400 font-mono"
             >
-              <span class="font-semibold text-slate-200"
+              <span class="font-semibold text-ink dark:text-slate-200"
                 >@{{ test.username }}</span
               >
               <span>{{ test.commits }}</span>
-              <span class="text-slate-600 font-semibold">{{
+              <span class="text-ink-mute dark:text-slate-600 font-semibold">{{
                 test.commitHash
               }}</span>
             </div>
@@ -196,7 +198,7 @@ const handleReact = (
           <div class="relative group">
             <!-- Student Avatar on Timeline -->
             <span
-              class="absolute -left-[49px] md:-left-[65px] top-2.5 flex items-center justify-center w-10 h-10 rounded-full border border-slate-700 overflow-hidden shadow-md font-mono text-sm font-bold text-white transition-all duration-300 group-hover:border-slate-500"
+              class="absolute -left-[49px] md:-left-[65px] top-2.5 flex items-center justify-center w-10 h-10 rounded-full border border-hairline dark:border-slate-700 overflow-hidden shadow-md font-mono text-sm font-bold text-white transition-all duration-300 group-hover:border-primary-soft dark:group-hover:border-slate-500"
               :class="test.avatarColor"
             >
               {{
@@ -209,19 +211,21 @@ const handleReact = (
 
             <!-- PR Review Box Card -->
             <div
-              class="border border-slate-800/80 bg-[#0b1120]/45 rounded-xl overflow-hidden backdrop-blur-md transition-all duration-300 hover:border-slate-700/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
+              class="border border-hairline dark:border-slate-800/80 bg-surface-card/80 dark:bg-[#0b1120]/45 rounded-xl overflow-hidden backdrop-blur-md transition-all duration-300 hover:border-primary-soft dark:hover:border-slate-700/80 hover:shadow-md dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
             >
               <!-- Box Header -->
               <div
-                class="bg-[#0b1120]/80 px-5 py-3 border-b border-slate-800/60 flex items-center justify-between flex-wrap gap-2"
+                class="bg-surface-card dark:bg-[#0b1120]/80 px-5 py-3 border-b border-hairline dark:border-slate-800/60 flex items-center justify-between flex-wrap gap-2"
               >
                 <div
                   class="flex items-center gap-2 text-xs md:text-sm font-inter"
                 >
-                  <span class="font-bold text-slate-200"
+                  <span class="font-bold text-ink dark:text-slate-200"
                     >@{{ test.username }}</span
                   >
-                  <span class="text-slate-400">approved these changes</span>
+                  <span class="text-ink-mute dark:text-slate-400"
+                    >approved these changes</span
+                  >
                 </div>
                 <span
                   class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400 border border-green-500/20"
@@ -230,24 +234,23 @@ const handleReact = (
                 </span>
               </div>
 
-              <!-- Box Body -->
               <div class="p-6 space-y-4">
                 <blockquote
-                  class="text-sm md:text-base leading-relaxed text-slate-350 italic border-l-2 border-slate-700 pl-4 font-inter"
+                  class="text-sm md:text-base leading-relaxed text-ink-secondary dark:text-slate-300 italic border-l-2 border-hairline dark:border-slate-700 pl-4 font-inter"
                 >
                   "{{ test.quote }}"
                 </blockquote>
 
                 <!-- Box Footer -->
                 <div
-                  class="flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-slate-800/40"
+                  class="flex items-center justify-between flex-wrap gap-4 pt-2 border-t border-hairline dark:border-slate-800/40"
                 >
                   <!-- Student Identification -->
                   <div
-                    class="flex items-center gap-2 text-xs text-slate-500 font-inter"
+                    class="flex items-center gap-2 text-xs text-ink-mute dark:text-slate-500 font-inter"
                   >
                     <svg
-                      class="w-4 h-4 text-slate-600"
+                      class="w-4 h-4 text-ink-mute dark:text-slate-600"
                       fill="none"
                       stroke="currentColor"
                       stroke-width="2"
@@ -259,11 +262,12 @@ const handleReact = (
                         d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                       />
                     </svg>
-                    <span class="font-semibold text-slate-400">{{
-                      test.name
-                    }}</span>
+                    <span
+                      class="font-semibold text-ink-mute dark:text-slate-400"
+                      >{{ test.name }}</span
+                    >
                     <span>•</span>
-                    <span class="text-slate-500 font-mono">{{
+                    <span class="text-ink-mute dark:text-slate-500 font-mono">{{
                       test.role
                     }}</span>
                   </div>
@@ -275,8 +279,8 @@ const handleReact = (
                       class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
                       :class="
                         activeReactions[`${test.id}-rocket`]
-                          ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.1)]'
-                          : 'bg-slate-800/30 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                          ? 'bg-blue-500/10 border-blue-500/30 text-blue-500 dark:text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.1)]'
+                          : 'bg-canvas-soft/30 dark:bg-slate-800/30 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-400 hover:border-primary-soft dark:hover:border-slate-700 hover:text-ink dark:hover:text-slate-300'
                       "
                     >
                       <span>🚀</span>
@@ -289,8 +293,8 @@ const handleReact = (
                       class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
                       :class="
                         activeReactions[`${test.id}-fire`]
-                          ? 'bg-orange-500/10 border-orange-500/30 text-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.1)]'
-                          : 'bg-slate-800/30 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                          ? 'bg-orange-500/10 border-orange-500/30 text-orange-500 dark:text-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.1)]'
+                          : 'bg-canvas-soft/30 dark:bg-slate-800/30 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-400 hover:border-primary-soft dark:hover:border-slate-700 hover:text-ink dark:hover:text-slate-300'
                       "
                     >
                       <span>🔥</span>
@@ -303,8 +307,8 @@ const handleReact = (
                       class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
                       :class="
                         activeReactions[`${test.id}-party`]
-                          ? 'bg-purple-500/10 border-purple-500/30 text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.15)]'
-                          : 'bg-slate-800/30 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
+                          ? 'bg-purple-500/10 border-purple-500/30 text-purple-500 dark:text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.15)]'
+                          : 'bg-canvas-soft/30 dark:bg-slate-800/30 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-400 hover:border-primary-soft dark:hover:border-slate-700 hover:text-ink dark:hover:text-slate-300'
                       "
                     >
                       <span>🎉</span>
@@ -321,7 +325,7 @@ const handleReact = (
 
         <!-- Final Merge Event -->
         <div
-          class="relative pl-8 md:pl-12 border-l-2 border-slate-800 ml-4 pb-4"
+          class="relative pl-8 md:pl-12 border-l-2 border-hairline dark:border-slate-800 ml-4 pb-4"
         >
           <span
             class="absolute -left-[45px] md:-left-[61px] top-1.5 flex items-center justify-center w-8 h-8 rounded-full bg-purple-950/40 border border-purple-500/40 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)]"
@@ -338,17 +342,19 @@ const handleReact = (
             </svg>
           </span>
           <div
-            class="flex items-center gap-2 text-xs md:text-sm text-slate-400 font-mono flex-wrap"
+            class="flex items-center gap-2 text-xs md:text-sm text-ink-mute dark:text-slate-400 font-mono flex-wrap"
           >
-            <span class="font-semibold text-purple-400">devsclub-bot</span>
+            <span class="font-semibold text-purple-500 dark:text-purple-400"
+              >devsclub-bot</span
+            >
             <span>merged commit</span>
             <span
-              class="font-mono text-[10px] bg-purple-500/10 border border-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded"
+              class="font-mono text-[10px] bg-purple-500/10 border border-purple-500/20 text-purple-500 dark:text-purple-400 px-1.5 py-0.5 rounded"
               >cf9d1a8</span
             >
             <span>into</span>
             <span
-              class="font-mono bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded text-xs"
+              class="font-mono bg-canvas-soft dark:bg-slate-800 text-ink-secondary dark:text-slate-300 px-1.5 py-0.5 rounded text-xs"
               >main</span
             >
           </div>

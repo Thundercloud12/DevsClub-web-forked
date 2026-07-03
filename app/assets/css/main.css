@@ -186,3 +186,12 @@ button.rounded-full {
   stroke: #3b82f6;
   opacity: 0.35;
 }
+
+@keyframes dash-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -16;
+  }
+}
