@@ -5,7 +5,22 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 if (!admin.apps.length) {
+  let credential
+
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+      credential = admin.credential.cert(serviceAccount)
+    } catch (err) {
+      console.error(
+        'Failed to parse FIREBASE_SERVICE_ACCOUNT environment variable:',
+        err
+      )
+    }
+  }
+
   admin.initializeApp({
+    credential,
     projectId: process.env.FIREBASE_PROJECT_ID,
   })
 }

@@ -30,11 +30,9 @@ export const useAuthStore = defineStore('auth', {
       }
 
       try {
-        // Get the initial ID token result to check if custom claims exist
         let tokenResult = await firebaseUser.getIdTokenResult()
         let role = tokenResult.claims.role as string | undefined
 
-        // If claim is missing, invoke the setRoleOnLogin Cloud Function
         if (!role) {
           const functions = getFunctions()
           const setRole = httpsCallable(functions, 'setRoleOnLogin')
@@ -42,7 +40,6 @@ export const useAuthStore = defineStore('auth', {
           const resultData = result.data as { role: string | null }
 
           if (resultData.role) {
-            // Force refresh token to update the claims on the client side
             await firebaseUser.getIdToken(true)
             tokenResult = await firebaseUser.getIdTokenResult()
             role = tokenResult.claims.role as string | undefined
@@ -63,16 +60,14 @@ export const useAuthStore = defineStore('auth', {
             this.profile = null
           }
 
-          // Set the cookie for SSR middleware compatibility
           const token = await firebaseUser.getIdToken()
           const tokenCookie = useCookie('firebase-token', {
-            maxAge: 60 * 60 * 24 * 7, // 1 week
+            maxAge: 60 * 60 * 24 * 7,
             secure: !import.meta.dev,
             sameSite: 'lax',
           })
           tokenCookie.value = token
         } else {
-          // If no role resolved, sign out the user
           const auth = getAuth()
           await signOut(auth)
           this.user = null
