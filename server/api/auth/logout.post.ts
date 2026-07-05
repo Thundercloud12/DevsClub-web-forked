@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
       await admin.auth().revokeRefreshTokens(decodedClaims.sub)
     } catch (error) {
       // Ignore errors if the cookie has already expired or is invalid
-      console.warn('Could not revoke refresh tokens on logout:', error)
     }
   }
 

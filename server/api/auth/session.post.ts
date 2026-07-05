@@ -39,7 +39,6 @@ export default defineEventHandler(async (event) => {
 
     return { status: 'success' }
   } catch (error: any) {
-    console.error('Failed to create Firebase session cookie:', error)
     throw createError({
       statusCode: 401,
       statusMessage: 'Unauthorized',

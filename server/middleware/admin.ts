@@ -17,7 +17,6 @@ export default defineEventHandler(async (event) => {
       return sendRedirect(event, '/auth/signin')
     }
   } catch (error) {
-    console.error('SSR Auth Middleware Error:', error)
     return sendRedirect(event, '/auth/signin')
   }
 })

@@ -17,12 +17,16 @@ export default defineNitroPlugin(() => {
         adminConfig.credential = admin.credential.cert(
           JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
         )
+        console.log(
+          'Using service account:',
+          !!process.env.FIREBASE_SERVICE_ACCOUNT
+        )
       } else {
+        console.log('Using application default credentials')
         adminConfig.credential = admin.credential.applicationDefault()
       }
     }
 
     admin.initializeApp(adminConfig)
-    console.log('[Nitro Plugin] Firebase Admin SDK initialized successfully.')
   }
 })
