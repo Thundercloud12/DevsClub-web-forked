@@ -46,16 +46,17 @@ const handleLogout = async () => {
       <div
         class="relative z-10 flex items-center justify-between w-full border-none"
       >
-        <NuxtLink to="/admin/dashboard" class="flex items-center gap-2">
-          <span
-            class="font-zalando font-medium text-xl tracking-tight text-primary"
-          >
-            TSEC DevsClub
-            <span
-              class="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-primary-bg-subdued-hover/30 text-primary-deep ml-1 uppercase dark:bg-primary-soft/10 dark:text-primary-soft"
-              >Admin</span
-            >
-          </span>
+        <NuxtLink to="/admin/dashboard" class="flex items-center gap-2.5">
+          <img
+            src="/devs-dark.png"
+            alt="TSEC DevsClub Logo"
+            class="h-8 w-auto dark:hidden"
+          />
+          <img
+            src="/devs-light.png"
+            alt="TSEC DevsClub Logo"
+            class="h-8 w-auto hidden dark:block"
+          />
         </NuxtLink>
 
         <div

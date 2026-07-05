@@ -1,28 +1,27 @@
 import admin from 'firebase-admin'
 
-if (process.env.NODE_ENV === 'development') {
+const isDev = process.env.NODE_ENV === 'development'
+
+if (isDev) {
   process.env.FIREBASE_AUTH_EMULATOR_HOST = '127.0.0.1:9098'
 }
 
 if (!admin.apps.length) {
-  let credential
+  const adminConfig: admin.AppOptions = {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+  }
 
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    try {
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-      credential = admin.credential.cert(serviceAccount)
-    } catch (err) {
-      console.error(
-        'Failed to parse FIREBASE_SERVICE_ACCOUNT environment variable:',
-        err
+  if (!isDev) {
+    if (process.env.FIREBASE_SERVICE_KEY) {
+      adminConfig.credential = admin.credential.cert(
+        JSON.parse(process.env.FIREBASE_SERVICE_KEY)
       )
+    } else {
+      adminConfig.credential = admin.credential.applicationDefault()
     }
   }
 
-  admin.initializeApp({
-    credential,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-  })
+  admin.initializeApp(adminConfig)
 }
 
 export default defineEventHandler(async (event) => {

@@ -42,22 +42,22 @@ const navShadow = useTransform(
       <div
         class="relative z-10 flex items-center justify-between w-full border-none"
       >
-        <NuxtLink to="/" class="flex items-center gap-2">
-          <span
-            class="font-zalando font-medium text-xl tracking-tight text-primary"
-            >TSEC DevsClub</span
-          >
+        <NuxtLink to="/" class="flex items-center gap-2.5">
+          <img
+            src="/devs-light.png"
+            alt="TSEC DevsClub Logo"
+            class="h-8 w-auto dark:hidden"
+          />
+          <img
+            src="/devs-dark.png"
+            alt="TSEC DevsClub Logo"
+            class="h-8 w-auto hidden dark:block"
+          />
         </NuxtLink>
 
         <div
           class="hidden md:flex items-center gap-8 font-inter font-medium text-sm text-ink-secondary dark:text-slate-300"
         >
-          <NuxtLink
-            v-if="!authStore.isLoggedIn"
-            to="/"
-            class="hover:text-primary transition-colors duration-200"
-            >Home
-          </NuxtLink>
           <template v-if="authStore.isLoggedIn">
             <NuxtLink
               to="/dashboard/assignments"
