@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'Unauthorized',
-      message: 'Invalid ID Token or session creation failed',
+      message: error.message || 'Invalid ID Token or session creation failed',
     })
   }
 })

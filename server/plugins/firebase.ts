@@ -13,9 +13,9 @@ export default defineNitroPlugin(() => {
     }
 
     if (!isDev) {
-      if (process.env.FIREBASE_SERVICE_KEY) {
+      if (process.env.FIREBASE_SERVICE_ACCOUNT) {
         adminConfig.credential = admin.credential.cert(
-          JSON.parse(process.env.FIREBASE_SERVICE_KEY)
+          JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
         )
       } else {
         adminConfig.credential = admin.credential.applicationDefault()
