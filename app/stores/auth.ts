@@ -61,10 +61,12 @@ export const useAuthStore = defineStore('auth', {
           }
 
           const token = await firebaseUser.getIdToken()
-          await $fetch('/api/auth/session', {
-            method: 'POST',
-            body: { idToken: token },
+          const tokenCookie = useCookie('firebase-token', {
+            maxAge: 60 * 60 * 24 * 7,
+            secure: !import.meta.dev,
+            sameSite: 'lax',
           })
+          tokenCookie.value = token
         } else {
           const auth = getAuth()
           await signOut(auth)
@@ -72,7 +74,8 @@ export const useAuthStore = defineStore('auth', {
           this.profile = null
           this.role = null
 
-          await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+          const tokenCookie = useCookie('firebase-token')
+          tokenCookie.value = null
         }
       } catch (error) {
         console.error('Error fetching user profile:', error)
@@ -82,7 +85,8 @@ export const useAuthStore = defineStore('auth', {
         this.profile = null
         this.role = null
 
-        await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+        const tokenCookie = useCookie('firebase-token')
+        tokenCookie.value = null
       }
     },
 
@@ -94,17 +98,22 @@ export const useAuthStore = defineStore('auth', {
           if (firebaseUser) {
             this.user = firebaseUser
             await this.fetchUserProfile(firebaseUser)
+
+            // Set the cookie for SSR middleware compatibility
+            const token = await firebaseUser.getIdToken()
+            const tokenCookie = useCookie('firebase-token', {
+              maxAge: 60 * 60 * 24 * 7,
+              secure: !import.meta.dev,
+              sameSite: 'lax',
+            })
+            tokenCookie.value = token
           } else {
-            const wasLoggedIn = !!this.user
             this.user = null
             this.profile = null
             this.role = null
 
-            if (wasLoggedIn) {
-              await $fetch('/api/auth/logout', { method: 'POST' }).catch(
-                () => {}
-              )
-            }
+            const tokenCookie = useCookie('firebase-token')
+            tokenCookie.value = null
           }
 
           this.isReady = true
@@ -133,11 +142,8 @@ export const useAuthStore = defineStore('auth', {
       this.profile = null
       this.role = null
 
-      try {
-        await $fetch('/api/auth/logout', { method: 'POST' })
-      } catch (error) {
-        console.error('Failed to log out on server:', error)
-      }
+      const tokenCookie = useCookie('firebase-token')
+      tokenCookie.value = null
 
       navigateTo(redirectTo)
     },
