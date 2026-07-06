@@ -247,7 +247,7 @@ onMounted(async () => {
             <!-- Links list -->
             <div class="flex flex-wrap gap-2 pt-2">
               <a
-                :href="sub.githubLink"
+                :href="sanitizeUrl(sub.githubLink)"
                 target="_blank"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-50 hover:bg-slate-100 dark:bg-slate-900/50 dark:hover:bg-slate-800 border border-hairline dark:border-slate-800 text-ink dark:text-slate-300 transition-colors"
               >

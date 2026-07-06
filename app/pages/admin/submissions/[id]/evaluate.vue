@@ -57,7 +57,7 @@
               GitHub Repo
             </p>
             <a
-              :href="submission.githubLink"
+              :href="sanitizeUrl(submission.githubLink)"
               target="_blank"
               class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
             >
@@ -71,7 +71,7 @@
               Live URL
             </p>
             <a
-              :href="submission.liveUrl"
+              :href="sanitizeUrl(submission.liveUrl)"
               target="_blank"
               class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
             >
@@ -85,7 +85,7 @@
               Video Link
             </p>
             <a
-              :href="submission.videoLink"
+              :href="sanitizeUrl(submission.videoLink)"
               target="_blank"
               class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline text-sm truncate block transition-colors duration-150 font-medium"
             >
