@@ -22,61 +22,43 @@
       >
         <!-- Frontend -->
         <div
-          class="md:col-span-2 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
+          class="md:col-span-2 rounded-2xl border border-blue-500/20 bg-blue-500/10 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
         >
-          <h3
-            class="font-zalando text-xl md:text-2xl text-rose-900 dark:text-rose-200"
-          >
+          <h3 class="font-zalando text-xl md:text-2xl text-blue-300">
             Frontend
           </h3>
-          <p
-            class="text-rose-700/80 dark:text-rose-300/80 text-xs md:text-sm mt-0.5"
-          >
+          <p class="text-blue-100/80 text-xs md:text-sm mt-0.5">
             Craft beautiful and interactive user interfaces.
           </p>
         </div>
         <!-- Backend -->
         <div
-          class="md:col-span-1 rounded-2xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
+          class="md:col-span-1 rounded-2xl border border-indigo-500/20 bg-indigo-500/10 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
         >
-          <h3
-            class="font-zalando text-xl md:text-2xl text-blue-900 dark:text-blue-200"
-          >
+          <h3 class="font-zalando text-xl md:text-2xl text-indigo-300">
             Backend
           </h3>
-          <p
-            class="text-blue-700/80 dark:text-blue-300/80 text-xs md:text-sm mt-0.5"
-          >
+          <p class="text-indigo-100/80 text-xs md:text-sm mt-0.5">
             Architect robust APIs and server logic.
           </p>
         </div>
         <!-- App -->
         <div
-          class="md:col-span-1 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
+          class="md:col-span-1 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
         >
-          <h3
-            class="font-zalando text-xl md:text-2xl text-amber-900 dark:text-amber-200"
-          >
-            App
-          </h3>
-          <p
-            class="text-amber-700/80 dark:text-amber-300/80 text-xs md:text-sm mt-0.5"
-          >
+          <h3 class="font-zalando text-xl md:text-2xl text-cyan-300">App</h3>
+          <p class="text-cyan-100/80 text-xs md:text-sm mt-0.5">
             Build native mobile apps.
           </p>
         </div>
         <!-- DevOps -->
         <div
-          class="md:col-span-2 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
+          class="md:col-span-2 rounded-2xl border border-violet-500/20 bg-violet-500/10 flex flex-col justify-end p-5 hover:-translate-y-1 transition-transform duration-300"
         >
-          <h3
-            class="font-zalando text-xl md:text-2xl text-emerald-900 dark:text-emerald-200"
-          >
+          <h3 class="font-zalando text-xl md:text-2xl text-violet-300">
             DevOps
           </h3>
-          <p
-            class="text-emerald-700/80 dark:text-emerald-300/80 text-xs md:text-sm mt-0.5"
-          >
+          <p class="text-violet-100/80 text-xs md:text-sm mt-0.5">
             Automate deployments and manage infrastructure.
           </p>
         </div>

@@ -32,11 +32,11 @@ const testimonials = ref<Testimonial[]>([
   },
   {
     id: 2,
-    username: 'manish',
-    name: 'Manish',
+    username: 'manish-rajaranthinam',
+    name: 'Manish Rajaranthinam',
     role: 'App Track',
     quote:
-      'app is cool, got to interact with lot of capable seniors and learnt many things',
+      'App is cool, got to interact with lot of capable seniors and learnt many things',
     commits: 'resolved app layout bugs',
     commitHash: 'b4f7e2a',
     avatarColor: 'bg-emerald-500',
@@ -44,14 +44,26 @@ const testimonials = ref<Testimonial[]>([
   },
   {
     id: 3,
-    username: 'daryl',
-    name: 'Daryl',
+    username: 'darryl-mathias',
+    name: 'Darryl Mathias',
     role: 'Web Track',
     quote:
       'Personally, the Membership Drive was one of the best things I joined in my first year. What I appreciated the most was that instead of a short, paid workshop, we got an 8-week, free, learning experience completely focused on helping students grow.',
     commits: 'built 8-week core projects',
     commitHash: 'c9d1a8e',
     avatarColor: 'bg-amber-500',
+    reactions: { rocket: 0, fire: 0, party: 0 },
+  },
+  {
+    id: 4,
+    username: 'richa-sharangdhar',
+    name: 'Richa Sharangdhar',
+    role: 'Web Track',
+    quote:
+      'The membership drive was a great learning experience. As a first-year student, it gave me hands-on exposure to web development through practical tasks and regular review sessions. The honest feedback from seniors not only helped me improve my skills but also gave me the opportunity to learn from their experience. It was a rewarding journey of learning, applying, improving, and growing.',
+    commits: 'completed web track tasks',
+    commitHash: 'f18b2c4',
+    avatarColor: 'bg-pink-500',
     reactions: { rocket: 0, fire: 0, party: 0 },
   },
 ])
