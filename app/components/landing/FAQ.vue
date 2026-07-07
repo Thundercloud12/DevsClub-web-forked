@@ -5,7 +5,7 @@
         Frequently Asked Questions
       </h2>
 
-      <p class="text-center mt-3 text-ink-mute dark:text-slate-400">
+      <p class="mt-3 text-center text-ink-mute dark:text-slate-400">
         Quick answers about the Membership Drive and participation.
       </p>
 
@@ -13,21 +13,23 @@
         <div
           v-for="(f, i) in faqs"
           :key="f.q"
-          class="faq-card rounded-2xl border border-hairline dark:border-slate-700/50 bg-canvas-soft dark:bg-slate-900 p-4 pl-4"
+          class="faq-card overflow-hidden rounded-2xl border border-hairline bg-canvas-soft p-4 dark:border-slate-700/50 dark:bg-slate-900"
         >
           <button
             @click="toggle(i)"
-            class="w-full flex items-center justify-between gap-4"
+            class="flex w-full items-center justify-between gap-4"
           >
             <span
               :class="[
-                'text-left font-medium',
+                'text-left font-medium transition-colors',
                 openIndex === i
                   ? 'text-primary-soft'
                   : 'text-ink dark:text-white',
               ]"
-              >{{ f.q }}</span
             >
+              {{ f.q }}
+            </span>
+
             <svg
               v-if="openIndex === i"
               xmlns="http://www.w3.org/2000/svg"
@@ -43,6 +45,7 @@
                 d="M20 12H4"
               />
             </svg>
+
             <svg
               v-else
               xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +66,7 @@
           <transition name="fade">
             <div
               v-show="openIndex === i"
-              class="mt-3 text-ink-secondary dark:text-slate-300 text-sm leading-6"
+              class="mt-3 text-sm leading-6 text-ink-secondary dark:text-slate-300"
             >
               {{ f.a }}
             </div>
@@ -77,20 +80,23 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-type FAQ = { q: string; a: string }
+type FAQ = {
+  q: string
+  a: string
+}
 
 const faqs: FAQ[] = [
   {
     q: 'Do I need experience?',
-    a: 'No - the drive is friendly to beginners; mentors help as you learn.',
+    a: 'No — the drive is friendly to beginners; mentors help as you learn.',
   },
   {
     q: 'Is this free?',
-    a: "Yes - it's a student-run community program, free to join.",
+    a: "Yes — it's a student-run community program, free to join.",
   },
   {
     q: 'How long does it run?',
-    a: 'Typically 8-10 weeks with weekly checkpoints and a final showcase.',
+    a: 'Typically 8–10 weeks with weekly checkpoints and a final showcase.',
   },
   {
     q: 'What are the tracks?',
@@ -99,6 +105,7 @@ const faqs: FAQ[] = [
 ]
 
 const openIndex = ref<number | null>(null)
+
 const toggle = (i: number) => {
   openIndex.value = openIndex.value === i ? null : i
 }
@@ -126,18 +133,16 @@ const toggle = (i: number) => {
 
 .faq-card {
   position: relative;
+  overflow: hidden;
 }
 
 .faq-card::before {
   content: '';
   position: absolute;
-  left: 0;
   top: 0;
   bottom: 0;
+  left: 0;
   width: 4px;
   background: rgba(59, 130, 246, 0.6);
-  /* blue-500 @ 60% */
-  border-top-left-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
 }
 </style>
