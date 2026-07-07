@@ -1,5 +1,5 @@
 <template>
-  <section class="py-24">
+  <section id="timeline" class="py-24">
     <div class="mx-auto max-w-5xl px-6">
       <!-- HEADER -->
       <div class="text-center">

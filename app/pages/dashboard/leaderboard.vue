@@ -76,16 +76,7 @@ onMounted(async () => {
       getAssignments().catch(() => []),
     ])
 
-    // Fallback tracks if collection is empty
-    if (fetchedTracks.length === 0) {
-      tracks.value = [
-        { id: 'web-dev', name: 'Web Development' },
-        { id: 'app-dev', name: 'App Development' },
-        { id: 'aiml', name: 'AI & ML' },
-      ]
-    } else {
-      tracks.value = fetchedTracks
-    }
+    tracks.value = fetchedTracks
 
     allAssignments.value = fetchedAssignments
     await fetchEntries()

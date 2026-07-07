@@ -101,7 +101,7 @@ const handleReact = (
 </script>
 
 <template>
-  <section class="relative py-24 px-6 bg-transparent">
+  <section id="testimonials" class="relative py-24 px-6 bg-transparent">
     <div class="relative mx-auto max-w-4xl">
       <!-- Header -->
       <div class="mb-16 text-center">

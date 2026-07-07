@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 @custom-variant dark (&:is(.dark *));
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --bg-surface: #ffffff;
   --bg-card: #ffffff;

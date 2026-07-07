@@ -8,6 +8,7 @@ const authStore = useAuthStore()
 
 <template>
   <section
+    id="hero"
     class="relative flex min-h-screen items-center overflow-hidden pt-28"
   >
     <!-- background glow -->
