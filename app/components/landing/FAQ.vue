@@ -1,5 +1,5 @@
 <template>
-  <section class="py-20">
+  <section id="faq" class="py-20">
     <div class="mx-auto max-w-4xl px-6">
       <h2 class="text-center text-4xl font-semibold text-ink dark:text-white">
         Frequently Asked Questions

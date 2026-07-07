@@ -28,7 +28,7 @@ const authStore = useAuthStore()
         <!-- Heading -->
         <div>
           <h1
-            class="text-6xl font-semibold leading-[0.95] tracking-[-0.04em] text-ink dark:text-white md:text-7xl"
+            class="text-5xl font-semibold leading-[0.95] tracking-[-0.04em] text-ink dark:text-white sm:text-6xl md:text-7xl"
           >
             Membership Drive 2026
           </h1>
@@ -101,7 +101,7 @@ const authStore = useAuthStore()
         :initial="{ opacity: 0, x: 40 }"
         :animate="{ opacity: 1, x: 0 }"
         :transition="{ duration: 0.8, delay: 0.2 }"
-        class="hidden lg:flex items-center justify-center"
+        class="flex items-center justify-center mt-12 lg:mt-0"
       >
         <div class="relative w-full max-w-2xl">
           <!-- background glow -->

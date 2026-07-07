@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useScroll, useTransform } from 'motion-v'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
 const { scrollY } = useScroll()
+
+const isMobileMenuOpen = ref(false)
 
 const navWidth = useTransform(scrollY, [0, 50], ['90%', '100%'])
 const navBorderRadius = useTransform(scrollY, [0, 50], ['32px', '0px'])
@@ -29,7 +32,7 @@ const handleLogout = async () => {
   >
     <Motion
       as="nav"
-      class="flex items-center justify-between px-8 py-4 pointer-events-auto backdrop-blur-xl mx-auto border-gray-200 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden"
+      class="flex flex-col justify-center px-8 py-4 pointer-events-auto backdrop-blur-xl mx-auto border-gray-200 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden"
       :style="{
         width: navWidth,
         borderRadius: navBorderRadius,
@@ -43,60 +46,106 @@ const handleLogout = async () => {
         :style="{ opacity: navBgOpacity }"
       ></Motion>
 
-      <div
-        class="relative z-10 flex items-center justify-between w-full border-none"
-      >
-        <NuxtLink to="/admin/dashboard" class="flex items-center gap-2.5">
-          <img
-            src="/devs-dark.png"
-            alt="TSEC DevsClub Logo"
-            class="h-8 w-auto dark:hidden"
-          />
-          <img
-            src="/devs-light.png"
-            alt="TSEC DevsClub Logo"
-            class="h-8 w-auto hidden dark:block"
-          />
-        </NuxtLink>
+      <div class="relative z-10 flex flex-col w-full border-none">
+        <!-- Header row -->
+        <div class="flex items-center justify-between w-full">
+          <NuxtLink
+            to="/admin/dashboard"
+            class="flex items-center gap-2.5"
+            @click="isMobileMenuOpen = false"
+          >
+            <img
+              src="/devs-dark.png"
+              alt="TSEC DevsClub Logo"
+              class="h-8 w-auto dark:hidden"
+            />
+            <img
+              src="/devs-light.png"
+              alt="TSEC DevsClub Logo"
+              class="h-8 w-auto hidden dark:block"
+            />
+          </NuxtLink>
 
+          <!-- Desktop Navigation -->
+          <div
+            class="hidden md:flex items-center gap-8 font-inter font-medium text-sm text-ink-secondary dark:text-slate-300"
+          >
+            <NuxtLink
+              to="/admin/dashboard"
+              class="hover:text-primary transition-colors duration-200"
+            >
+              Dashboard
+            </NuxtLink>
+
+            <UiThemeToggle />
+
+            <button
+              @click="handleLogout"
+              class="inline-flex items-center justify-center rounded-full text-xs font-medium h-9 px-4 border border-rose-500 text-rose-600 hover:bg-rose-500/5 active:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/50 transition-all duration-200"
+            >
+              Sign Out
+            </button>
+          </div>
+
+          <!-- Mobile Toggle Buttons -->
+          <div class="md:hidden flex items-center gap-2">
+            <UiThemeToggle />
+            <button
+              @click="isMobileMenuOpen = !isMobileMenuOpen"
+              class="text-gray-700 dark:text-gray-300 focus:outline-none p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition"
+              aria-label="Toggle Menu"
+            >
+              <svg
+                v-if="!isMobileMenuOpen"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+              <svg
+                v-else
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Content -->
         <div
-          class="hidden md:flex items-center gap-8 font-inter font-medium text-sm text-ink-secondary dark:text-slate-300"
+          v-if="isMobileMenuOpen"
+          class="md:hidden flex flex-col gap-4 mt-6 pt-6 border-t border-gray-100 dark:border-slate-800/60 font-inter font-medium text-sm text-ink-secondary dark:text-slate-300"
         >
           <NuxtLink
             to="/admin/dashboard"
-            class="hover:text-primary transition-colors duration-200"
+            class="hover:text-primary transition-colors duration-200 py-1"
+            @click="isMobileMenuOpen = false"
+            >Dashboard</NuxtLink
           >
-            Dashboard
-          </NuxtLink>
-
-          <UiThemeToggle />
-
           <button
-            @click="handleLogout"
-            class="inline-flex items-center justify-center rounded-full text-xs font-medium h-9 px-4 border border-rose-500 text-rose-600 hover:bg-rose-500/5 active:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/50 transition-all duration-200"
+            @click="authStore.logout(); isMobileMenuOpen = false"
+            class="w-full mt-2 inline-flex items-center justify-center rounded-full text-xs font-medium h-9 px-4 border border-rose-500 text-rose-600 hover:bg-rose-500/5 active:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/50 transition-all duration-200"
           >
             Sign Out
-          </button>
-        </div>
-
-        <div class="md:hidden flex items-center gap-2">
-          <UiThemeToggle />
-          <button class="text-gray-700 dark:text-gray-300">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
           </button>
         </div>
       </div>
