@@ -20,84 +20,41 @@ interface Testimonial {
 const testimonials = ref<Testimonial[]>([
   {
     id: 1,
-    username: 'aarav-mehta',
-    name: 'Aarav Mehta',
-    role: 'TE Comps',
+    username: 'aryan-pathak',
+    name: 'Aryan Pathak',
+    role: 'App Track',
     quote:
-      "I joined as a complete beginner. Eight weeks later I'd shipped four projects and made friends I still build with.",
-    commits: 'committed 4 frontend features',
+      'Membership drive was one of the best things that happened to me, it was the reason I pursued app development and am on the way to make a career in it',
+    commits: 'pushed app track solutions',
     commitHash: 'a8c2d91',
     avatarColor: 'bg-indigo-500',
-    reactions: { rocket: 24, fire: 12, party: 8 },
+    reactions: { rocket: 0, fire: 0, party: 0 },
   },
   {
     id: 2,
-    username: 'sanya-kapoor',
-    name: 'Sanya Kapoor',
-    role: 'SE Comps',
+    username: 'manish',
+    name: 'Manish',
+    role: 'App Track',
     quote:
-      'The community made the difference. Stuck at midnight? Someone was always online to unblock me.',
-    commits: 'resolved 12 merge conflicts',
+      'app is cool, got to interact with lot of capable seniors and learnt many things',
+    commits: 'resolved app layout bugs',
     commitHash: 'b4f7e2a',
     avatarColor: 'bg-emerald-500',
-    reactions: { rocket: 19, fire: 15, party: 5 },
+    reactions: { rocket: 0, fire: 0, party: 0 },
   },
   {
     id: 3,
-    username: 'vedant-patel',
-    name: 'Vedant Patel',
-    role: 'FE Comps',
+    username: 'daryl',
+    name: 'Daryl',
+    role: 'Web Track',
     quote:
-      "Real projects, real mentors, real growth. This isn't a course, it's a community of builders.",
-    commits: 'pushed 3 production deployments',
+      'Personally, the Membership Drive was one of the best things I joined in my first year. What I appreciated the most was that instead of a short, paid workshop, we got an 8-week, free, learning experience completely focused on helping students grow.',
+    commits: 'built 8-week core projects',
     commitHash: 'c9d1a8e',
     avatarColor: 'bg-amber-500',
-    reactions: { rocket: 32, fire: 22, party: 14 },
-  },
-  {
-    id: 4,
-    username: 'riya-sharma',
-    name: 'Riya Sharma',
-    role: 'SL IT',
-    quote:
-      "Mentorship every week kept me honest. The roadmap turned 'I want to learn dev' into actual deployed apps.",
-    commits: 'optimized database queries',
-    commitHash: 'd7e5f3c',
-    avatarColor: 'bg-rose-500',
-    reactions: { rocket: 15, fire: 9, party: 7 },
-  },
-  {
-    id: 5,
-    username: 'priya-nair',
-    name: 'Priya Nair',
-    role: 'BE Comps',
-    quote:
-      'The structure and accountability changed everything. I went from zero to shipping in production.',
-    commits: 'implemented custom auth flow',
-    commitHash: 'e3b8a1f',
-    avatarColor: 'bg-sky-500',
-    reactions: { rocket: 27, fire: 18, party: 11 },
+    reactions: { rocket: 0, fire: 0, party: 0 },
   },
 ])
-
-const activeReactions = ref<Record<string, boolean>>({})
-
-const handleReact = (
-  testimonialId: number,
-  type: 'rocket' | 'fire' | 'party'
-) => {
-  const key = `${testimonialId}-${type}`
-  const test = testimonials.value.find((t) => t.id === testimonialId)
-  if (!test) return
-
-  if (activeReactions.value[key]) {
-    test.reactions[type]--
-    activeReactions.value[key] = false
-  } else {
-    test.reactions[type]++
-    activeReactions.value[key] = true
-  }
-}
 </script>
 
 <template>
@@ -150,7 +107,7 @@ const handleReact = (
                 Merged
               </span>
               <span class="font-semibold text-ink dark:text-slate-200"
-                >keerthan-poojary</span
+                >devsclub</span
               >
               <span>merged 5 approvals from contributors into</span>
               <span
@@ -196,19 +153,6 @@ const handleReact = (
 
           <!-- Review Event Box -->
           <div class="relative group">
-            <!-- Student Avatar on Timeline -->
-            <span
-              class="absolute -left-[49px] md:-left-[65px] top-2.5 flex items-center justify-center w-10 h-10 rounded-full border border-hairline dark:border-slate-700 overflow-hidden shadow-md font-mono text-sm font-bold text-white transition-all duration-300 group-hover:border-primary-soft dark:group-hover:border-slate-500"
-              :class="test.avatarColor"
-            >
-              {{
-                test.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-              }}
-            </span>
-
             <!-- PR Review Box Card -->
             <div
               class="border border-hairline dark:border-slate-800/80 bg-surface-card/80 dark:bg-[#0b1120]/45 rounded-xl overflow-hidden backdrop-blur-md transition-all duration-300 hover:border-primary-soft dark:hover:border-slate-700/80 hover:shadow-md dark:hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)]"
@@ -270,52 +214,6 @@ const handleReact = (
                     <span class="text-ink-mute dark:text-slate-500 font-mono">{{
                       test.role
                     }}</span>
-                  </div>
-
-                  <!-- Clickable Reaction Badges -->
-                  <div class="flex gap-2">
-                    <button
-                      @click="handleReact(test.id, 'rocket')"
-                      class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
-                      :class="
-                        activeReactions[`${test.id}-rocket`]
-                          ? 'bg-blue-500/10 border-blue-500/30 text-blue-500 dark:text-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.1)]'
-                          : 'bg-canvas-soft/30 dark:bg-slate-800/30 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-400 hover:border-primary-soft dark:hover:border-slate-700 hover:text-ink dark:hover:text-slate-300'
-                      "
-                    >
-                      <span>🚀</span>
-                      <span class="font-mono text-[10px] font-semibold">{{
-                        test.reactions.rocket
-                      }}</span>
-                    </button>
-                    <button
-                      @click="handleReact(test.id, 'fire')"
-                      class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
-                      :class="
-                        activeReactions[`${test.id}-fire`]
-                          ? 'bg-orange-500/10 border-orange-500/30 text-orange-500 dark:text-orange-400 shadow-[0_0_8px_rgba(249,115,22,0.1)]'
-                          : 'bg-canvas-soft/30 dark:bg-slate-800/30 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-400 hover:border-primary-soft dark:hover:border-slate-700 hover:text-ink dark:hover:text-slate-300'
-                      "
-                    >
-                      <span>🔥</span>
-                      <span class="font-mono text-[10px] font-semibold">{{
-                        test.reactions.fire
-                      }}</span>
-                    </button>
-                    <button
-                      @click="handleReact(test.id, 'party')"
-                      class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs border transition-all duration-200 active:scale-95"
-                      :class="
-                        activeReactions[`${test.id}-party`]
-                          ? 'bg-purple-500/10 border-purple-500/30 text-purple-500 dark:text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.15)]'
-                          : 'bg-canvas-soft/30 dark:bg-slate-800/30 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-400 hover:border-primary-soft dark:hover:border-slate-700 hover:text-ink dark:hover:text-slate-300'
-                      "
-                    >
-                      <span>🎉</span>
-                      <span class="font-mono text-[10px] font-semibold">{{
-                        test.reactions.party
-                      }}</span>
-                    </button>
                   </div>
                 </div>
               </div>

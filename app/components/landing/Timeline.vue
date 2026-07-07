@@ -1,5 +1,5 @@
 <template>
-  <section id="timeline" class="py-24">
+  <section id="tracks" class="py-24">
     <div class="mx-auto max-w-5xl px-6">
       <!-- HEADER -->
       <div class="text-center">
@@ -83,7 +83,7 @@
       </div>
 
       <!-- TIMELINE -->
-      <div class="mt-20 text-center mb-16 relative z-10">
+      <div id="timeline" class="mt-20 text-center mb-16 relative z-10">
         <h2 class="font-zalando text-4xl md:text-5xl text-ink dark:text-white">
           Timeline
         </h2>

@@ -88,12 +88,12 @@ const authStore = useAuthStore()
             </svg>
           </NuxtLink>
 
-          <NuxtLink
-            to="/dashboard/leaderboard"
+          <a
+            href="#tracks"
             class="rounded-full border border-hairline bg-surface-card px-7 py-4 text-sm font-semibold text-ink transition-all duration-300 hover:border-primary/30 hover:bg-primary/5 dark:text-white"
           >
             Explore Tracks
-          </NuxtLink>
+          </a>
         </div>
       </Motion>
 
