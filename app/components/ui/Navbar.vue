@@ -162,6 +162,7 @@ const navShadow = useTransform(
             >
             <a
               href="/#info"
+              Navbar.vue
               class="hover:text-primary transition-colors duration-200 py-1"
               @click="isMobileMenuOpen = false"
               >About</a
