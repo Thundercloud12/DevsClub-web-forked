@@ -213,7 +213,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full">
+  <div id="info" class="w-full">
     <!-- Terminal Container -->
     <div
       class="mx-auto w-full max-w-full overflow-hidden rounded-lg border border-slate-800 bg-[#0F172A]/95 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl"
