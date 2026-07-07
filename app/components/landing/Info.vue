@@ -235,7 +235,9 @@ onMounted(async () => {
       <!-- Terminal Body -->
       <div class="flex h-[440px] flex-col font-mono text-sm leading-7">
         <!-- Output Area -->
-        <div class="flex-1 overflow-y-auto px-8 py-6 terminal-scroll">
+        <div
+          class="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6 terminal-scroll"
+        >
           <!-- Output Lines -->
           <div v-for="(entry, idx) in history" :key="idx">
             <!-- System message -->

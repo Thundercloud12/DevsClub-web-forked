@@ -132,16 +132,19 @@ const testimonials = ref<Testimonial[]>([
       </div>
 
       <!-- Vertical Git Timeline -->
-      <div
-        class="relative pl-8 md:pl-12 border-l-2 border-hairline dark:border-slate-800 space-y-12 ml-4"
-      >
+      <div class="relative pl-8 md:pl-12 space-y-12 ml-4">
+        <!-- Timeline Line -->
+        <div
+          class="absolute left-0 top-3 bottom-6 w-0.5 bg-hairline dark:bg-slate-800/60 z-0"
+        ></div>
+
         <!-- Loop over testimonials -->
         <template v-for="test in testimonials" :key="test.id">
           <!-- Commit Event -->
           <div class="relative">
             <!-- Commit Icon on Timeline -->
             <span
-              class="absolute -left-[41px] md:-left-[57px] top-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-canvas dark:bg-[#0b1120] border-2 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-500 shadow-inner"
+              class="absolute -left-[44px] md:-left-[60px] top-1.5 flex items-center justify-center w-6 h-6 rounded-full bg-canvas dark:bg-[#0b1120] border-2 border-hairline dark:border-slate-800 text-ink-mute dark:text-slate-500 shadow-inner"
             >
               <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
                 <path
@@ -234,11 +237,9 @@ const testimonials = ref<Testimonial[]>([
         </template>
 
         <!-- Final Merge Event -->
-        <div
-          class="relative pl-8 md:pl-12 border-l-2 border-hairline dark:border-slate-800 ml-4 pb-4"
-        >
+        <div class="relative">
           <span
-            class="absolute -left-[45px] md:-left-[61px] top-1.5 flex items-center justify-center w-8 h-8 rounded-full bg-purple-950/40 border border-purple-500/40 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)]"
+            class="absolute -left-[48px] md:-left-[64px] top-1.5 flex items-center justify-center w-8 h-8 rounded-full bg-purple-950/40 border border-purple-500/40 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)]"
           >
             <svg
               class="w-4 h-4 shrink-0"
