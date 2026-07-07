@@ -100,7 +100,7 @@
                 </td>
                 <td class="px-6 py-4">
                   <a
-                    :href="sub.githubLink"
+                    :href="sanitizeUrl(sub.githubLink)"
                     target="_blank"
                     class="text-primary hover:text-primary-deep dark:text-primary-soft hover:underline truncate max-w-[200px] block transition-colors duration-150 font-medium"
                   >

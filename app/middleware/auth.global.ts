@@ -1,4 +1,5 @@
 import { useAuthStore } from '~/stores/auth'
+import { getAuth } from 'firebase/auth'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) return
@@ -11,7 +12,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const isLoggedIn = authStore.isLoggedIn
-  const role = authStore.role
 
   // 1. If NOT logged in
   if (!isLoggedIn) {
@@ -22,7 +22,23 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return
   }
 
-  // 2. If logged in
+  // 2. Prevent students from accessing admin pages
+  // Re-verify the role from the cryptographically signed JWT, ignoring Pinia
+  if (to.path.startsWith('/admin')) {
+    const auth = getAuth()
+    const firebaseUser = auth.currentUser
+    if (!firebaseUser) {
+      return navigateTo('/auth/signin', { replace: true })
+    }
+    const tokenResult = await firebaseUser.getIdTokenResult()
+    if (tokenResult.claims.role !== 'admin') {
+      return navigateTo('/dashboard', { replace: true })
+    }
+  }
+
+  const role = authStore.role
+
+  // 3. If logged in
   // Redirect logged-in users away from auth pages to their respective dashboards
   if (to.path === '/' || to.path.startsWith('/auth/')) {
     if (role === 'admin') {
@@ -30,11 +46,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
     } else {
       return navigateTo('/dashboard', { replace: true })
     }
-  }
-
-  // Prevent students from accessing admin pages
-  if (to.path.startsWith('/admin') && role !== 'admin') {
-    return navigateTo('/dashboard', { replace: true })
   }
 
   // Prevent admins from accessing student dashboard pages

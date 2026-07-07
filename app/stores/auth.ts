@@ -59,23 +59,12 @@ export const useAuthStore = defineStore('auth', {
           } else {
             this.profile = null
           }
-
-          const token = await firebaseUser.getIdToken()
-          const tokenCookie = useCookie('firebase-token', {
-            maxAge: 60 * 60 * 24 * 7,
-            secure: !import.meta.dev,
-            sameSite: 'lax',
-          })
-          tokenCookie.value = token
         } else {
           const auth = getAuth()
           await signOut(auth)
           this.user = null
           this.profile = null
           this.role = null
-
-          const tokenCookie = useCookie('firebase-token')
-          tokenCookie.value = null
         }
       } catch (error) {
         console.error('Error fetching user profile:', error)
@@ -84,9 +73,6 @@ export const useAuthStore = defineStore('auth', {
         this.user = null
         this.profile = null
         this.role = null
-
-        const tokenCookie = useCookie('firebase-token')
-        tokenCookie.value = null
       }
     },
 
@@ -98,22 +84,10 @@ export const useAuthStore = defineStore('auth', {
           if (firebaseUser) {
             this.user = firebaseUser
             await this.fetchUserProfile(firebaseUser)
-
-            // Set the cookie for SSR middleware compatibility
-            const token = await firebaseUser.getIdToken()
-            const tokenCookie = useCookie('firebase-token', {
-              maxAge: 60 * 60 * 24 * 7,
-              secure: !import.meta.dev,
-              sameSite: 'lax',
-            })
-            tokenCookie.value = token
           } else {
             this.user = null
             this.profile = null
             this.role = null
-
-            const tokenCookie = useCookie('firebase-token')
-            tokenCookie.value = null
           }
 
           this.isReady = true
@@ -141,9 +115,6 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       this.profile = null
       this.role = null
-
-      const tokenCookie = useCookie('firebase-token')
-      tokenCookie.value = null
 
       navigateTo(redirectTo)
     },

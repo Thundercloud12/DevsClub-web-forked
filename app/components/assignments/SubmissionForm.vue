@@ -115,7 +115,7 @@ const formatDate = (date: Date) =>
             >GitHub Repository</span
           >
           <a
-            :href="existingSubmission.githubLink"
+            :href="sanitizeUrl(existingSubmission.githubLink)"
             target="_blank"
             rel="noopener noreferrer"
             class="text-brand-blue hover:underline text-sm truncate"
@@ -129,7 +129,7 @@ const formatDate = (date: Date) =>
             >Video Demo</span
           >
           <a
-            :href="existingSubmission.videoLink"
+            :href="sanitizeUrl(existingSubmission.videoLink)"
             target="_blank"
             rel="noopener noreferrer"
             class="text-brand-blue hover:underline text-sm truncate"
@@ -143,7 +143,7 @@ const formatDate = (date: Date) =>
             >Live URL</span
           >
           <a
-            :href="existingSubmission.liveUrl"
+            :href="sanitizeUrl(existingSubmission.liveUrl)"
             target="_blank"
             rel="noopener noreferrer"
             class="text-brand-blue hover:underline text-sm truncate"
