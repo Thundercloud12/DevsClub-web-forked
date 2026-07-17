@@ -62,6 +62,7 @@ async function onSubmit(event: FormSubmitEvent<FormSchema>) {
         authStore.profile?.name ||
         authStore.user?.displayName ||
         'Unknown Student',
+      gradyear: authStore.profile?.gradyear || null,
       githubLink: event.data.githubLink,
       videoLink: event.data.videoLink || null,
       liveUrl: event.data.liveUrl || null,

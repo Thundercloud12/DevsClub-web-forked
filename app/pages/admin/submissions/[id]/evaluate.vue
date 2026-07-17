@@ -23,15 +23,31 @@
         class="bg-surface-card border border-hairline dark:border-slate-800 rounded-xl p-6 space-y-4 shadow-[0_4px_12px_rgba(0,55,112,0.02),0_1px_3px_rgba(0,55,112,0.01)]"
       >
         <div class="flex items-start justify-between">
-          <div>
-            <p
-              class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
-            >
-              Student ID
-            </p>
-            <p class="font-mono text-sm text-ink-secondary dark:text-slate-200">
-              {{ submission.studentId }}
-            </p>
+          <div class="flex flex-wrap gap-x-8 gap-y-2">
+            <div>
+              <p
+                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
+              >
+                Student ID
+              </p>
+              <p
+                class="font-mono text-sm text-ink-secondary dark:text-slate-200"
+              >
+                {{ submission.studentId }}
+              </p>
+            </div>
+            <div>
+              <p
+                class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
+              >
+                Grad Year
+              </p>
+              <p
+                class="font-mono text-sm text-ink-secondary dark:text-slate-200"
+              >
+                {{ submission.gradyear || '—' }}
+              </p>
+            </div>
           </div>
           <span
             class="text-[10px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider"
