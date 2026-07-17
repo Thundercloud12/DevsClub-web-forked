@@ -21,6 +21,7 @@ export const submissionSchema = z.object({
   assignmentId: z.string().min(1, 'Assignment ID is required'),
   studentId: z.string().min(1, 'Student ID is required'),
   studentName: z.string().min(1, 'Student name is required'),
+  gradyear: z.string().nullable().optional(),
   githubLink: z
     .string()
     .url('Must be a valid URL')

@@ -60,6 +60,12 @@
                 >
                   Student ID
                 </th>
+
+                <th
+                  class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-ink-secondary dark:text-slate-300"
+                >
+                  Grad Year
+                </th>
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-ink-secondary dark:text-slate-300"
                 >
@@ -97,6 +103,12 @@
                   class="px-6 py-4 font-mono text-xs text-ink-secondary dark:text-slate-300"
                 >
                   {{ sub.studentId }}
+                </td>
+
+                <td
+                  class="px-6 py-4 text-xs font-mono text-ink-secondary dark:text-slate-300"
+                >
+                  {{ sub.gradyear || '—' }}
                 </td>
                 <td class="px-6 py-4">
                   <a
