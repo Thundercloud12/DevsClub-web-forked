@@ -79,7 +79,13 @@ export const useSubmissions = () => {
       return []
     }
 
-    return snapshot.docs.map((doc) => doc.data() as Submission)
+    return snapshot.docs.map((doc) => {
+      const data = doc.data() as Record<string, any>
+      return {
+        ...data,
+        submittedAt: data.submittedAt?.toDate?.() ?? new Date(data.submittedAt),
+      } as Submission
+    })
   }
 
   const getSubmissionByUser = async (
@@ -91,7 +97,11 @@ export const useSubmissions = () => {
     const snapshot = await getDoc(submissionRef)
 
     if (!snapshot.exists()) return null
-    return snapshot.data() as Submission
+    const data = snapshot.data() as Record<string, any>
+    return {
+      ...data,
+      submittedAt: data.submittedAt?.toDate?.() ?? new Date(data.submittedAt),
+    } as Submission
   }
 
   const getSubmissionsByStudent = async (
