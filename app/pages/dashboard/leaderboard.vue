@@ -193,7 +193,7 @@ const getInitials = (name: string) => {
         class="max-w-4xl mx-auto px-6 mb-12 flex flex-col md:flex-row items-center justify-between gap-6 relative z-20"
       >
         <!-- Track Tabs Selector -->
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center justify-center gap-2">
           <button
             @click="selectedTrack = 'all'"
             class="px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 border"
