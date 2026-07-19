@@ -4,9 +4,11 @@ import {
   doc,
   getDoc,
   getDocs,
+  deleteDoc,
   query,
   where,
   updateDoc,
+  writeBatch,
 } from 'firebase/firestore'
 import {
   submissionSchema,
@@ -120,9 +122,35 @@ export const useAdminSubmissions = () => {
     } as Submission
   }
 
+  const deleteSubmissionsByAssignmentId = async (
+    assignmentId: string
+  ): Promise<number> => {
+    if (authStore.role !== 'admin') {
+      throw new Error('Unauthorized: Only admins can delete submissions.')
+    }
+
+    const submissionsRef = collection(db, 'Submissions')
+    const q = query(submissionsRef, where('assignmentId', '==', assignmentId))
+    const snapshot = await getDocs(q)
+
+    if (snapshot.empty) return 0
+
+    // Firestore batch supports up to 500 writes; chunk if needed
+    const docs = snapshot.docs
+    const batchSize = 400
+    for (let i = 0; i < docs.length; i += batchSize) {
+      const batch = writeBatch(db)
+      docs.slice(i, i + batchSize).forEach((d) => batch.delete(d.ref))
+      await batch.commit()
+    }
+
+    return docs.length
+  }
+
   return {
     getAdminSubmissions,
     getSubmissionById,
     evaluateSubmission,
+    deleteSubmissionsByAssignmentId,
   }
 }
