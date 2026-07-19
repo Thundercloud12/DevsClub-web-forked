@@ -28,12 +28,12 @@
               <p
                 class="text-[10px] uppercase tracking-wider text-ink-mute dark:text-slate-500 font-semibold mb-1"
               >
-                Student ID
+                Student Name
               </p>
               <p
-                class="font-mono text-sm text-ink-secondary dark:text-slate-200"
+                class="text-sm text-ink-secondary dark:text-slate-200 font-medium"
               >
-                {{ submission.studentId }}
+                {{ submission.studentName || submission.studentId }}
               </p>
             </div>
             <div>
