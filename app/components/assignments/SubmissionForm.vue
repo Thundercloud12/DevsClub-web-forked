@@ -96,11 +96,6 @@ const formatDate = (date: Date) =>
     <UiFormLayout
       :is-read-only="!!existingSubmission"
       read-only-title="Already Submitted"
-      :read-only-subtitle="
-        existingSubmission
-          ? `Submitted on ${formatDate(existingSubmission.submittedAt)}`
-          : undefined
-      "
       :is-success="isSuccess"
       success-title="Submission Received!"
       success-message="Your assignment has been submitted successfully. You'll be notified once it's evaluated."

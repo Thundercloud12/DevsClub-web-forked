@@ -6,6 +6,7 @@ const props = defineProps<{
   assignments: Array<
     Assignment & { id: string; status: 'upcoming' | 'open' | 'closed' }
   >
+  submittedAssignmentIds?: Set<string>
 }>()
 
 const emit = defineEmits<{
@@ -42,6 +43,7 @@ const emit = defineEmits<{
         :key="assignment.id"
         :assignment="assignment"
         :index="index"
+        :has-submitted="submittedAssignmentIds?.has(assignment.id) || false"
         @view-details="emit('viewDetails', $event)"
       />
     </div>

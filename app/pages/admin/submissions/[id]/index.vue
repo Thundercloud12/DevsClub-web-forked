@@ -58,9 +58,8 @@
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-ink-secondary dark:text-slate-300"
                 >
-                  Student ID
+                  Student Name
                 </th>
-
                 <th
                   class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-ink-secondary dark:text-slate-300"
                 >
@@ -100,9 +99,9 @@
                 class="hover:bg-canvas-soft/40 dark:hover:bg-slate-800/30 transition-colors"
               >
                 <td
-                  class="px-6 py-4 font-mono text-xs text-ink-secondary dark:text-slate-300"
+                  class="px-6 py-4 text-sm text-ink-secondary dark:text-slate-300 font-medium"
                 >
-                  {{ sub.studentId }}
+                  {{ sub.studentName || sub.studentId }}
                 </td>
 
                 <td

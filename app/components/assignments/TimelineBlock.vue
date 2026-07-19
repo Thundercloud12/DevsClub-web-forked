@@ -8,6 +8,7 @@ const props = defineProps<{
     status: 'upcoming' | 'open' | 'closed'
   }
   index: number
+  hasSubmitted?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -101,7 +102,9 @@ const formatDate = (date: Date) => {
 
           <template
             v-if="
-              assignment.status === 'closed' || assignment.status === 'upcoming'
+              assignment.status === 'closed' ||
+              assignment.status === 'upcoming' ||
+              hasSubmitted
             "
           >
             <button
@@ -137,14 +140,16 @@ const formatDate = (date: Date) => {
 
           <button
             v-if="
-              assignment.status === 'closed' || assignment.status === 'upcoming'
+              assignment.status === 'closed' ||
+              assignment.status === 'upcoming' ||
+              hasSubmitted
             "
             type="button"
             @click="emit('viewDetails', assignment)"
             class="mt-2 inline-flex items-center justify-center font-medium px-6 py-2.5 rounded-md transition-all duration-200 w-full sm:w-auto text-center cursor-pointer text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-ink-secondary dark:text-slate-200 border border-hairline dark:border-slate-800 focus:outline-none"
           >
             {{
-              assignment.status === 'closed'
+              assignment.status === 'closed' || hasSubmitted
                 ? 'View Submission'
                 : 'View Details'
             }}

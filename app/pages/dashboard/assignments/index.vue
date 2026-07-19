@@ -20,7 +20,7 @@ import { useLoading } from '~/composables/useLoading'
 
 const { getAssignments } = useAssignments()
 const { getTracks } = useTracks()
-const { getSubmissionByUser } = useSubmissions()
+const { getSubmissionByUser, getSubmissionsByStudent } = useSubmissions()
 const authStore = useAuthStore()
 const { startLoading, stopLoading } = useLoading()
 
@@ -29,6 +29,7 @@ const tracks = ref<Track[]>([])
 const selectedTrack = ref('all')
 const isLoading = ref(true)
 const loadError = ref<string | null>(null)
+const submittedAssignmentIds = ref<Set<string>>(new Set())
 
 // Modal Overlay State
 const isModalOpen = ref(false)
@@ -124,6 +125,19 @@ onMounted(async () => {
         const timeB = dateB ? new Date(dateB).getTime() : 0
         return timeA - timeB
       })
+
+    if (authStore.user?.uid) {
+      try {
+        const userSubmissions = await getSubmissionsByStudent(
+          authStore.user.uid
+        )
+        submittedAssignmentIds.value = new Set(
+          userSubmissions.map((s) => s.assignmentId)
+        )
+      } catch (err) {
+        console.error('Failed to load user submissions', err)
+      }
+    }
   } catch (err: any) {
     loadError.value = err?.message ?? 'Failed to load assignments.'
   } finally {
@@ -262,6 +276,7 @@ onMounted(async () => {
       <div v-else class="relative z-10">
         <AssignmentsTimelineContainer
           :assignments="filteredAssignments"
+          :submitted-assignment-ids="submittedAssignmentIds"
           @view-details="openSubmissionModal"
         />
       </div>
