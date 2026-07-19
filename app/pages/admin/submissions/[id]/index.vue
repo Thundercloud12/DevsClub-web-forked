@@ -18,12 +18,17 @@
     <!-- Submissions Table section -->
     <template v-else-if="assignment">
       <div class="flex items-center justify-between pb-2">
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
           <span
             class="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full"
             :class="getStatusClass(assignment)"
           >
             {{ getStatus(assignment) }}
+          </span>
+          <span
+            class="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+          >
+            {{ getTrackNames(assignment) }}
           </span>
           <span class="text-xs text-ink-mute dark:text-slate-400">
             Closes: {{ formatDate(assignment.submissionsCloseAt) }}
@@ -169,6 +174,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, navigateTo } from '#app'
 import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
 import { useAdminSubmissions } from '~/composables/admin/useAdminSubmissions'
+import { useAdminTracks } from '~/composables/admin/useAdminTracks'
 import { useLoading } from '~/composables/useLoading'
 
 const route = useRoute()
@@ -176,20 +182,24 @@ const assignmentId = route.params.id
 
 const { getAssignmentById } = useAdminAssignments()
 const { getAdminSubmissions } = useAdminSubmissions()
+const { getAdminTracks } = useAdminTracks()
 const { startLoading, stopLoading } = useLoading()
 
 const assignment = ref(null)
 const submissions = ref([])
+const tracks = ref([])
 const isLoading = ref(true)
 const loadError = ref(null)
 
 onMounted(async () => {
   startLoading('admin-submissions-detail')
   try {
-    const [fetchedAssignment, fetchedSubmissions] = await Promise.all([
-      getAssignmentById(assignmentId),
-      getAdminSubmissions({ assignmentId }),
-    ])
+    const [fetchedAssignment, fetchedSubmissions, fetchedTracks] =
+      await Promise.all([
+        getAssignmentById(assignmentId),
+        getAdminSubmissions({ assignmentId }),
+        getAdminTracks(),
+      ])
 
     if (!fetchedAssignment) {
       loadError.value = 'Assignment not found.'
@@ -198,6 +208,7 @@ onMounted(async () => {
 
     assignment.value = fetchedAssignment
     submissions.value = fetchedSubmissions
+    tracks.value = fetchedTracks
   } catch (err) {
     loadError.value = err.message || 'Failed to load assignment submissions.'
   } finally {
@@ -205,6 +216,18 @@ onMounted(async () => {
     stopLoading('admin-submissions-detail')
   }
 })
+
+const getTrackNames = (assignment) => {
+  if (!assignment || !assignment.tracks || !Array.isArray(assignment.tracks))
+    return 'No Track'
+  const names = assignment.tracks
+    .map((trackId) => {
+      const track = tracks.value.find((t) => t.id === trackId)
+      return track ? track.name : trackId
+    })
+    .filter(Boolean)
+  return names.length > 0 ? names.join(', ') : 'No Track'
+}
 
 const formatDate = (date) => {
   if (!date) return 'N/A'
