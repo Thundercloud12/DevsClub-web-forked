@@ -38,7 +38,7 @@
         class="group cursor-pointer bg-surface-card border border-hairline dark:border-slate-800 hover:border-primary-soft hover:shadow-[0_8px_16px_rgba(0,55,112,0.03)] rounded-xl p-6 transition-all duration-200 flex items-center justify-between"
       >
         <div>
-          <div class="flex items-center gap-3 mb-1.5">
+          <div class="flex flex-wrap items-center gap-3 mb-1.5">
             <h3
               class="font-medium text-ink dark:text-slate-50 group-hover:text-primary dark:group-hover:text-primary-soft transition-colors"
             >
@@ -49,6 +49,11 @@
               :class="getStatusClass(assignment)"
             >
               {{ getStatus(assignment) }}
+            </span>
+            <span
+              class="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+            >
+              {{ getTrackNames(assignment) }}
             </span>
           </div>
           <p class="text-xs text-ink-mute dark:text-slate-400">
@@ -76,19 +81,27 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
+import { useAdminTracks } from '~/composables/admin/useAdminTracks'
 import { useLoading } from '~/composables/useLoading'
 
 const { getAdminAssignments } = useAdminAssignments()
+const { getAdminTracks } = useAdminTracks()
 const { startLoading, stopLoading } = useLoading()
 
 const assignments = ref([])
+const tracks = ref([])
 const isLoading = ref(true)
 const loadError = ref(null)
 
 onMounted(async () => {
   startLoading('admin-submissions-index')
   try {
-    assignments.value = await getAdminAssignments()
+    const [fetchedAssignments, fetchedTracks] = await Promise.all([
+      getAdminAssignments(),
+      getAdminTracks(),
+    ])
+    assignments.value = fetchedAssignments
+    tracks.value = fetchedTracks
   } catch (err) {
     loadError.value = err.message || 'Failed to load assignments.'
   } finally {
@@ -96,6 +109,17 @@ onMounted(async () => {
     stopLoading('admin-submissions-index')
   }
 })
+
+const getTrackNames = (assignment) => {
+  if (!assignment.tracks || !Array.isArray(assignment.tracks)) return 'No Track'
+  const names = assignment.tracks
+    .map((trackId) => {
+      const track = tracks.value.find((t) => t.id === trackId)
+      return track ? track.name : trackId
+    })
+    .filter(Boolean)
+  return names.length > 0 ? names.join(', ') : 'No Track'
+}
 
 const formatDate = (date) => {
   if (!date) return 'N/A'

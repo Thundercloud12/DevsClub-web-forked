@@ -72,6 +72,26 @@ const closeModal = () => {
   fetchError.value = null
 }
 
+const refreshSubmissions = async () => {
+  if (authStore.user?.uid) {
+    try {
+      const userSubmissions = await getSubmissionsByStudent(authStore.user.uid)
+      submittedAssignmentIds.value = new Set(
+        userSubmissions.map((s) => s.assignmentId)
+      )
+      // Also update the current modal submission if it exists
+      if (selectedAssignment.value) {
+        submission.value = await getSubmissionByUser(
+          selectedAssignment.value.id,
+          authStore.user.uid
+        )
+      }
+    } catch (err) {
+      console.error('Failed to load user submissions', err)
+    }
+  }
+}
+
 const formatDate = (date: any) => {
   if (!date) return ''
   const d = new Date(date)
@@ -127,16 +147,7 @@ onMounted(async () => {
       })
 
     if (authStore.user?.uid) {
-      try {
-        const userSubmissions = await getSubmissionsByStudent(
-          authStore.user.uid
-        )
-        submittedAssignmentIds.value = new Set(
-          userSubmissions.map((s) => s.assignmentId)
-        )
-      } catch (err) {
-        console.error('Failed to load user submissions', err)
-      }
+      await refreshSubmissions()
     }
   } catch (err: any) {
     loadError.value = err?.message ?? 'Failed to load assignments.'
@@ -391,12 +402,13 @@ onMounted(async () => {
                   <AssignmentsSubmissionForm
                     :assignment-id="selectedAssignment.id"
                     :existing-submission="submission"
-                    :is-locked="true"
+                    :is-locked="selectedAssignment.status !== 'open'"
                     :lock-reason="
                       selectedAssignment.status === 'closed'
                         ? 'Submissions closed (deadline passed)'
                         : 'Submissions not open yet'
                     "
+                    @submitted="refreshSubmissions"
                   />
                 </div>
               </div>
