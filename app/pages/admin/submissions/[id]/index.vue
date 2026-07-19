@@ -30,9 +30,60 @@
           >
             {{ getTrackNames(assignment) }}
           </span>
-          <span class="text-xs text-ink-mute dark:text-slate-400">
-            Closes: {{ formatDate(assignment.submissionsCloseAt) }}
-          </span>
+          <div
+            v-if="!isEditingDate"
+            class="flex items-center gap-2 text-xs text-ink-mute dark:text-slate-400"
+          >
+            <span>Closes: {{ formatDate(assignment.submissionsCloseAt) }}</span>
+            <button
+              type="button"
+              @click="startEditingDate"
+              class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-primary dark:text-primary-soft transition-colors text-[10px] font-semibold uppercase tracking-wider cursor-pointer"
+            >
+              <svg
+                class="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                />
+              </svg>
+              Edit
+            </button>
+          </div>
+          <div
+            v-else
+            class="flex items-center gap-2 text-xs bg-slate-50 dark:bg-slate-900/50 px-3 py-1.5 rounded-xl border border-hairline dark:border-slate-800/80"
+          >
+            <span class="text-ink-mute dark:text-slate-400 font-medium"
+              >Closes:</span
+            >
+            <input
+              type="datetime-local"
+              v-model="editCloseDateVal"
+              class="bg-white dark:bg-slate-950 border border-hairline dark:border-slate-800 rounded-lg px-2.5 py-1 text-xs text-ink dark:text-slate-200 outline-none focus:border-brand-blue"
+            />
+            <button
+              type="button"
+              @click="handleSaveCloseDate"
+              :disabled="isUpdatingDate"
+              class="px-3 py-1.5 bg-brand-blue text-white rounded-lg text-xs font-semibold hover:bg-blue-600 transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {{ isUpdatingDate ? 'Saving...' : 'Save' }}
+            </button>
+            <button
+              type="button"
+              @click="isEditingDate = false"
+              class="px-3 py-1.5 border border-hairline dark:border-slate-800 text-ink dark:text-slate-200 rounded-lg text-xs hover:bg-canvas-soft transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
         <span class="text-xs text-ink-mute dark:text-slate-500 font-medium">
           {{ submissions.length }} submission(s)
@@ -176,20 +227,63 @@ import { useAdminAssignments } from '~/composables/admin/useAdminAssignments'
 import { useAdminSubmissions } from '~/composables/admin/useAdminSubmissions'
 import { useAdminTracks } from '~/composables/admin/useAdminTracks'
 import { useLoading } from '~/composables/useLoading'
+import { useToastStore } from '~/stores/toast'
 
 const route = useRoute()
 const assignmentId = route.params.id
 
-const { getAssignmentById } = useAdminAssignments()
+const { getAssignmentById, updateAssignment } = useAdminAssignments()
 const { getAdminSubmissions } = useAdminSubmissions()
 const { getAdminTracks } = useAdminTracks()
 const { startLoading, stopLoading } = useLoading()
+const toastStore = useToastStore()
 
 const assignment = ref(null)
 const submissions = ref([])
 const tracks = ref([])
 const isLoading = ref(true)
 const loadError = ref(null)
+
+const isEditingDate = ref(false)
+const isUpdatingDate = ref(false)
+const editCloseDateVal = ref('')
+
+const toDatetimeLocal = (date) => {
+  if (!date) return ''
+  const d = new Date(date)
+  const pad = (num) => String(num).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+const startEditingDate = () => {
+  editCloseDateVal.value = toDatetimeLocal(assignment.value.submissionsCloseAt)
+  isEditingDate.value = true
+}
+
+const handleSaveCloseDate = async () => {
+  if (!editCloseDateVal.value) return
+  isUpdatingDate.value = true
+  try {
+    const updatedDate = new Date(editCloseDateVal.value)
+    const updatedDetails = {
+      ...assignment.value,
+      submissionsCloseAt: updatedDate,
+      timeline: {
+        ...assignment.value.timeline,
+        submissionsCloseAt: updatedDate,
+      },
+    }
+    await updateAssignment(assignment.value.id, updatedDetails)
+    assignment.value.submissionsCloseAt = updatedDate
+    assignment.value.timeline.submissionsCloseAt = updatedDate
+    toastStore.success('Submission close date updated successfully!')
+    isEditingDate.value = false
+  } catch (err) {
+    toastStore.error(err.message || 'Failed to update submission close date.')
+  } finally {
+    isUpdatingDate.value = false
+  }
+}
 
 onMounted(async () => {
   startLoading('admin-submissions-detail')

@@ -194,13 +194,6 @@
                   >
                     {{ isExpanded(rubric.id) ? 'Collapse' : 'Inspect' }}
                   </button>
-                  <button
-                    type="button"
-                    @click="handleDeleteRubric(rubric.id)"
-                    class="text-xs font-semibold uppercase tracking-wider text-rose-500 hover:text-rose-700 cursor-pointer transition-colors"
-                  >
-                    Delete
-                  </button>
                 </div>
               </div>
 
