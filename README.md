@@ -52,6 +52,9 @@ During installation, pnpm may ask to approve build scripts.
 
 Run:
 
+
+
+
 ```bash
 pnpm approve-builds
 ```
