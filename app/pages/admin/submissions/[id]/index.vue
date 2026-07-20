@@ -181,34 +181,25 @@
                   <span
                     class="text-[10px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wide"
                     :class="
-                      sub.status === 'evaluated'
+                      sub.evaluation
                         ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                         : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
                     "
                   >
-                    {{
-                      sub.status === 'evaluated' ? '✓ Evaluated' : '⏳ Pending'
-                    }}
+                    {{ sub.evaluation ? '✓ Evaluated' : '⏳ Pending' }}
                   </span>
                 </td>
                 <td
                   class="px-6 py-4 font-mono font-medium text-ink dark:text-slate-100"
                 >
-                  {{
-                    sub.scores
-                      ? sub.scores.reduce(
-                          (sum, s) => sum + (s.actualScore || 0),
-                          0
-                        )
-                      : '—'
-                  }}
+                  {{ sub.evaluation ? sub.evaluation.totalScore : '—' }}
                 </td>
                 <td class="px-6 py-4 text-right">
                   <button
                     @click="navigateTo(`/admin/submissions/${sub.id}/evaluate`)"
                     class="text-xs font-semibold uppercase tracking-wider text-primary hover:text-primary-deep dark:text-primary-soft transition-colors duration-150"
                   >
-                    {{ sub.status === 'evaluated' ? 'View' : 'Grade →' }}
+                    {{ sub.evaluation ? 'View' : 'Grade →' }}
                   </button>
                 </td>
               </tr>
@@ -233,7 +224,8 @@ const route = useRoute()
 const assignmentId = route.params.id
 
 const { getAssignmentById, updateAssignment } = useAdminAssignments()
-const { getAdminSubmissions } = useAdminSubmissions()
+const { getAdminSubmissions, getAdminEvaluationsForAssignment } =
+  useAdminSubmissions()
 const { getAdminTracks } = useAdminTracks()
 const { startLoading, stopLoading } = useLoading()
 const toastStore = useToastStore()
@@ -288,20 +280,30 @@ const handleSaveCloseDate = async () => {
 onMounted(async () => {
   startLoading('admin-submissions-detail')
   try {
-    const [fetchedAssignment, fetchedSubmissions, fetchedTracks] =
-      await Promise.all([
-        getAssignmentById(assignmentId),
-        getAdminSubmissions({ assignmentId }),
-        getAdminTracks(),
-      ])
+    const [
+      fetchedAssignment,
+      fetchedSubmissions,
+      fetchedEvaluations,
+      fetchedTracks,
+    ] = await Promise.all([
+      getAssignmentById(assignmentId),
+      getAdminSubmissions({ assignmentId }),
+      getAdminEvaluationsForAssignment(assignmentId),
+      getAdminTracks(),
+    ])
 
     if (!fetchedAssignment) {
       loadError.value = 'Assignment not found.'
       return
     }
 
+    const evalMap = new Map(fetchedEvaluations.map((e) => [e.submissionId, e]))
+
     assignment.value = fetchedAssignment
-    submissions.value = fetchedSubmissions
+    submissions.value = fetchedSubmissions.map((sub) => ({
+      ...sub,
+      evaluation: evalMap.get(sub.id) || null,
+    }))
     tracks.value = fetchedTracks
   } catch (err) {
     loadError.value = err.message || 'Failed to load assignment submissions.'

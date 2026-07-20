@@ -1,6 +1,6 @@
 import { getFirestore, collection, getDocs } from 'firebase/firestore'
 import { ref } from 'vue'
-import type { Submission, LeaderboardEntry } from '~/types'
+import type { LeaderboardEntry } from '~/types'
 
 export const useLeaderboard = () => {
   const db = getFirestore()
@@ -16,65 +16,53 @@ export const useLeaderboard = () => {
     error.value = null
 
     try {
-      // 1. Fetch Assignments and Submissions in parallel
-      const [assignmentsSnap, submissionsSnap] = await Promise.all([
+      // Fetch Assignments and Evaluations (not Submissions — scores now live in Evaluations)
+      const [assignmentsSnap, evaluationsSnap] = await Promise.all([
         getDocs(collection(db, 'Assignments')),
-        getDocs(collection(db, 'Submissions')),
+        getDocs(collection(db, 'Evaluations')),
       ])
 
-      // 2. Filter assignments belonging to the selected track
+      // Filter assignments belonging to the selected track
       const trackAssignmentIds = new Set<string>()
-      assignmentsSnap.forEach((doc) => {
-        const data = doc.data()
+      assignmentsSnap.forEach((docSnap) => {
+        const data = docSnap.data()
         const tracks = data.tracks || []
         if (trackId === 'all' || tracks.includes(trackId)) {
-          trackAssignmentIds.add(doc.id)
+          trackAssignmentIds.add(docSnap.id)
         }
       })
 
-      // 3. Aggregate evaluated submissions
+      // Aggregate scores from Evaluations collection
       const studentStats: Record<
         string,
         { name: string; totalScore: number; count: number }
       > = {}
 
-      submissionsSnap.forEach((docSnapshot) => {
-        const sub = docSnapshot.data() as Submission
-        if (sub.status !== 'evaluated') return
+      // Build a map of studentId -> studentName from assignment data
+      // (We store studentName on the evaluation so we can look it up here)
+      evaluationsSnap.forEach((docSnap) => {
+        const eval_ = docSnap.data()
 
         // Filter based on selected mode
         if (assignmentId === 'aggregate') {
-          // Must belong to an assignment in the active track
-          if (!trackAssignmentIds.has(sub.assignmentId)) return
+          if (!trackAssignmentIds.has(eval_.assignmentId)) return
         } else {
-          // Must match the selected single assignment ID
-          if (sub.assignmentId !== assignmentId) return
+          if (eval_.assignmentId !== assignmentId) return
         }
 
-        // Determine score using the denormalized totalScore, falling back to criteria sum if null
-        let score = 0
-        if (typeof sub.totalScore === 'number') {
-          score = sub.totalScore
-        } else if (sub.scores) {
-          score = sub.scores.reduce(
-            (sum, criterion) => sum + (criterion.actualScore || 0),
-            0
-          )
+        const score =
+          typeof eval_.totalScore === 'number' ? eval_.totalScore : 0
+        const sid = eval_.studentId
+        const name = eval_.studentName || 'Unknown Student'
+
+        if (!studentStats[sid]) {
+          studentStats[sid] = { name, totalScore: 0, count: 0 }
         }
 
-        if (!studentStats[sub.studentId]) {
-          studentStats[sub.studentId] = {
-            name: sub.studentName || 'Unknown Student',
-            totalScore: 0,
-            count: 0,
-          }
-        }
-
-        studentStats[sub.studentId]!.totalScore += score
-        studentStats[sub.studentId]!.count += 1
+        studentStats[sid]!.totalScore += score
+        studentStats[sid]!.count += 1
       })
 
-      // 4. Convert stats map to sorted list
       const leaderboard: LeaderboardEntry[] = Object.entries(studentStats)
         .map(([studentId, stats]) => ({
           studentId,

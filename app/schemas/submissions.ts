@@ -1,21 +1,7 @@
 import { z } from 'zod'
-import { criterionSchema } from './rubrics'
 
-// 1. Zod Schemas
-// Snapshot Pattern: We extend the original criterion to include the actual score
-export const gradedCriterionSchema = criterionSchema
-  .extend({
-    actualScore: z.number().nonnegative('Score cannot be negative'),
-  })
-  .refine((data) => data.actualScore <= data.maxScore, {
-    message: 'Score cannot exceed the maximum score',
-    path: ['actualScore'],
-  })
-  .refine((data) => data.actualScore >= data.minScore, {
-    message: 'Score cannot be less than the minimum score',
-    path: ['actualScore'],
-  })
-
+// A submission is ONLY the student-authored content.
+// Evaluation results live in the separate Evaluations collection.
 export const submissionSchema = z.object({
   id: z.string().min(1, 'Submission ID is required'),
   assignmentId: z.string().min(1, 'Assignment ID is required'),
@@ -33,22 +19,12 @@ export const submissionSchema = z.object({
     .max(1000, 'Notes must be under 1000 characters')
     .nullable()
     .optional(),
-
-  feedback: z
-    .string()
-    .max(1000, 'Feedback must be under 1000 characters')
-    .nullable()
-    .optional(),
-
   submittedAt: z.date(),
-
-  scores: z.array(gradedCriterionSchema).optional(),
-
-  status: z.enum(['pending', 'evaluated']),
-  totalScore: z.number().nonnegative().nullable().optional(),
 })
 
-// 2. Inferred TypeScript Types
-export type GradedCriterion = z.infer<typeof gradedCriterionSchema>
+// Re-export evaluation types from their dedicated schema file
+export { gradedCriterionSchema, evaluationSchema } from './evaluations'
+export type { GradedCriterion, Evaluation } from './evaluations'
+
+// Inferred TypeScript types
 export type Submission = z.infer<typeof submissionSchema>
-export type SubmissionStatus = z.infer<typeof submissionSchema>['status']

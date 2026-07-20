@@ -4,27 +4,31 @@ import {
   doc,
   getDoc,
   getDocs,
+  setDoc,
   deleteDoc,
   query,
   where,
-  updateDoc,
   writeBatch,
+  serverTimestamp,
 } from 'firebase/firestore'
+import { submissionSchema, type Submission } from '~/schemas/submissions'
 import {
-  submissionSchema,
+  evaluationSchema,
   gradedCriterionSchema,
-  type Submission,
+  type Evaluation,
   type GradedCriterion,
-} from '~/schemas/submissions'
+} from '~/schemas/evaluations'
 import { useAuthStore } from '~/stores/auth'
 
 export const useAdminSubmissions = () => {
   const db = getFirestore()
   const authStore = useAuthStore()
 
+  // ── Submissions (read-only for admin) ────────────────────────────────────────
+
   const getAdminSubmissions = async (filters?: {
     assignmentId?: string
-    status?: 'pending' | 'evaluated'
+    status?: string
   }): Promise<Submission[]> => {
     if (authStore.role !== 'admin') {
       throw new Error('Unauthorized: Only admins can view submissions.')
@@ -33,14 +37,10 @@ export const useAdminSubmissions = () => {
     const submissionsRef = collection(db, 'Submissions')
     let q = query(submissionsRef)
 
-    const constraints = []
+    const constraints: any[] = []
     if (filters?.assignmentId && filters.assignmentId !== 'all') {
       constraints.push(where('assignmentId', '==', filters.assignmentId))
     }
-    if (filters?.status) {
-      constraints.push(where('status', '==', filters.status))
-    }
-
     if (constraints.length > 0) {
       q = query(submissionsRef, ...constraints)
     }
@@ -48,62 +48,14 @@ export const useAdminSubmissions = () => {
     const snapshot = await getDocs(q)
     if (snapshot.empty) return []
 
-    return snapshot.docs.map((doc) => {
-      const data = doc.data()
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
       return {
         ...data,
-        id: doc.id,
+        id: docSnap.id,
         submittedAt: data.submittedAt?.toDate?.() ?? data.submittedAt,
       } as Submission
     })
-  }
-
-  const evaluateSubmission = async (
-    submissionId: string,
-    scores: GradedCriterion[],
-    feedback?: string
-  ) => {
-    if (authStore.role !== 'admin') {
-      throw new Error('Unauthorized: Only admins can evaluate submissions.')
-    }
-
-    // 1. Validate the array of graded criteria
-    const validatedScores = scores.map((s) => gradedCriterionSchema.parse(s))
-
-    // 2. Calculate the total score
-    const totalScore = validatedScores.reduce(
-      (sum, item) => sum + item.actualScore,
-      0
-    )
-
-    // 3. Update in Firestore
-    const docRef = doc(db, 'Submissions', submissionId)
-    const submissionSnap = await getDoc(docRef)
-    if (!submissionSnap.exists()) {
-      throw new Error(`Submission with ID ${submissionId} does not exist.`)
-    }
-
-    const currentData = submissionSnap.data()
-    if (currentData?.status === 'evaluated') {
-      throw new Error(
-        'This submission has already been evaluated and cannot be modified.'
-      )
-    }
-
-    await updateDoc(docRef, {
-      scores: validatedScores,
-      totalScore,
-      status: 'evaluated',
-      feedback: feedback || null,
-    })
-
-    return {
-      id: submissionId,
-      scores: validatedScores,
-      totalScore,
-      status: 'evaluated' as const,
-      feedback: feedback || null,
-    }
   }
 
   const getSubmissionById = async (id: string): Promise<Submission | null> => {
@@ -122,6 +74,88 @@ export const useAdminSubmissions = () => {
     } as Submission
   }
 
+  // ── Evaluations (admin-only write) ───────────────────────────────────────────
+
+  const getEvaluationBySubmissionId = async (
+    submissionId: string
+  ): Promise<Evaluation | null> => {
+    if (authStore.role !== 'admin') {
+      throw new Error('Unauthorized: Only admins can view evaluations.')
+    }
+    const docRef = doc(db, 'Evaluations', submissionId)
+    const snapshot = await getDoc(docRef)
+    if (!snapshot.exists()) return null
+
+    const data = snapshot.data()
+    return {
+      ...data,
+      id: snapshot.id,
+      evaluatedAt: data.evaluatedAt?.toDate?.() ?? data.evaluatedAt,
+    } as Evaluation
+  }
+
+  const evaluateSubmission = async (
+    submissionId: string,
+    submissionAssignmentId: string,
+    submissionStudentId: string,
+    scores: GradedCriterion[],
+    feedback?: string
+  ): Promise<Evaluation> => {
+    if (authStore.role !== 'admin') {
+      throw new Error('Unauthorized: Only admins can evaluate submissions.')
+    }
+
+    // Validate each criterion score
+    const validatedScores = scores.map((s) => gradedCriterionSchema.parse(s))
+    const totalScore = validatedScores.reduce(
+      (sum, item) => sum + item.actualScore,
+      0
+    )
+
+    const evaluation: Evaluation = evaluationSchema.parse({
+      id: submissionId,
+      submissionId,
+      assignmentId: submissionAssignmentId,
+      studentId: submissionStudentId,
+      scores: validatedScores,
+      totalScore,
+      feedback: feedback || null,
+      evaluatedAt: new Date(),
+    })
+
+    // Write ONLY to Evaluations — never touching the Submissions document
+    const evalRef = doc(db, 'Evaluations', submissionId)
+    await setDoc(evalRef, {
+      ...evaluation,
+      evaluatedAt: serverTimestamp(),
+    })
+
+    return evaluation
+  }
+
+  const getAdminEvaluationsForAssignment = async (
+    assignmentId: string
+  ): Promise<Evaluation[]> => {
+    if (authStore.role !== 'admin') {
+      throw new Error('Unauthorized: Only admins can view evaluations.')
+    }
+    const evalsRef = collection(db, 'Evaluations')
+    const q = query(evalsRef, where('assignmentId', '==', assignmentId))
+    const snapshot = await getDocs(q)
+    if (snapshot.empty) return []
+
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data()
+      return {
+        ...data,
+        id: docSnap.id,
+        evaluatedAt: data.evaluatedAt?.toDate?.() ?? data.evaluatedAt,
+      } as Evaluation
+    })
+  }
+
+  // ── Batch delete (for assignment deletion) ────────────────────────────────────
+
   const deleteSubmissionsByAssignmentId = async (
     assignmentId: string
   ): Promise<number> => {
@@ -129,28 +163,38 @@ export const useAdminSubmissions = () => {
       throw new Error('Unauthorized: Only admins can delete submissions.')
     }
 
+    // Delete submissions
     const submissionsRef = collection(db, 'Submissions')
-    const q = query(submissionsRef, where('assignmentId', '==', assignmentId))
-    const snapshot = await getDocs(q)
+    const subQ = query(
+      submissionsRef,
+      where('assignmentId', '==', assignmentId)
+    )
+    const subSnap = await getDocs(subQ)
 
-    if (snapshot.empty) return 0
+    // Delete evaluations for the same assignment
+    const evalsRef = collection(db, 'Evaluations')
+    const evalsQ = query(evalsRef, where('assignmentId', '==', assignmentId))
+    const evalsSnap = await getDocs(evalsQ)
 
-    // Firestore batch supports up to 500 writes; chunk if needed
-    const docs = snapshot.docs
+    const allDocs = [...subSnap.docs, ...evalsSnap.docs]
+    if (allDocs.length === 0) return 0
+
     const batchSize = 400
-    for (let i = 0; i < docs.length; i += batchSize) {
+    for (let i = 0; i < allDocs.length; i += batchSize) {
       const batch = writeBatch(db)
-      docs.slice(i, i + batchSize).forEach((d) => batch.delete(d.ref))
+      allDocs.slice(i, i + batchSize).forEach((d) => batch.delete(d.ref))
       await batch.commit()
     }
 
-    return docs.length
+    return subSnap.docs.length
   }
 
   return {
     getAdminSubmissions,
     getSubmissionById,
+    getEvaluationBySubmissionId,
     evaluateSubmission,
+    getAdminEvaluationsForAssignment,
     deleteSubmissionsByAssignmentId,
   }
 }
