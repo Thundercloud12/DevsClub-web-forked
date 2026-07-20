@@ -4,7 +4,10 @@ import { useSubmissions } from '~/composables/student/useSubmissions'
 import { useAssignments } from '~/composables/student/useAssignments'
 import { useAuthStore } from '~/stores/auth'
 import type { Submission } from '~/schemas/submissions'
+import type { Evaluation } from '~/schemas/evaluations'
 import type { Assignment } from '~/schemas/assignments'
+import { useLoading } from '~/composables/useLoading'
+
 useHead({
   title: 'My Submissions | TSEC DevsClub',
   meta: [
@@ -16,14 +19,17 @@ useHead({
   ],
 })
 
-import { useLoading } from '~/composables/useLoading'
-
-const { getSubmissionsByStudent } = useSubmissions()
+const { getSubmissionsByStudent, getEvaluationsByStudent } = useSubmissions()
 const { getAssignments } = useAssignments()
 const authStore = useAuthStore()
 const { startLoading, stopLoading } = useLoading()
 
-const submissions = ref<Array<Submission & { assignment?: Assignment }>>([])
+export interface StudentSubmissionItem extends Submission {
+  assignment?: Assignment
+  evaluation?: Evaluation | null
+}
+
+const submissions = ref<StudentSubmissionItem[]>([])
 const isLoading = ref(true)
 const loadError = ref<string | null>(null)
 
@@ -35,9 +41,12 @@ const toggleExpand = (submissionId: string) => {
     !expandedSubmissions.value[submissionId]
 }
 
-const getRubricMaxScore = (submission: Submission) => {
-  if (!submission.scores) return 0
-  return submission.scores.reduce((sum, c) => sum + (c.maxScore || 0), 0)
+const getRubricMaxScore = (evaluation?: Evaluation | null) => {
+  if (!evaluation || !evaluation.scores) return 0
+  return evaluation.scores.reduce(
+    (sum: number, c) => sum + (c.maxScore || 0),
+    0
+  )
 }
 
 const formatDate = (date: any) => {
@@ -62,10 +71,14 @@ onMounted(async () => {
 
   startLoading('student-submissions')
   try {
-    const [fetchedSubmissions, fetchedAssignments] = await Promise.all([
-      getSubmissionsByStudent(userId),
-      getAssignments(),
-    ])
+    const [fetchedSubmissions, fetchedEvaluations, fetchedAssignments] =
+      await Promise.all([
+        getSubmissionsByStudent(userId),
+        getEvaluationsByStudent(userId),
+        getAssignments(),
+      ])
+
+    const evalMap = new Map(fetchedEvaluations.map((e) => [e.submissionId, e]))
 
     submissions.value = fetchedSubmissions.map((sub) => {
       const assignment = fetchedAssignments.find(
@@ -74,6 +87,7 @@ onMounted(async () => {
       return {
         ...sub,
         assignment,
+        evaluation: evalMap.get(sub.id) || null,
       }
     })
   } catch (err: any) {
@@ -214,16 +228,12 @@ onMounted(async () => {
               <span
                 class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider"
                 :class="
-                  sub.status === 'evaluated'
+                  sub.evaluation
                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                     : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
                 "
               >
-                {{
-                  sub.status === 'evaluated'
-                    ? '✓ Evaluated'
-                    : '⏳ Pending Evaluation'
-                }}
+                {{ sub.evaluation ? '✓ Evaluated' : '⏳ Pending Evaluation' }}
               </span>
               <span
                 class="text-xs text-slate-400 dark:text-slate-500 font-medium"
@@ -311,16 +321,16 @@ onMounted(async () => {
           <div
             class="flex flex-col items-center justify-center bg-slate-50/50 dark:bg-slate-900/40 border border-hairline dark:border-slate-800 rounded-2xl px-8 py-6 text-center min-w-[160px] self-stretch md:self-auto"
           >
-            <template v-if="sub.status === 'evaluated'">
+            <template v-if="sub.evaluation">
               <span
                 class="text-3xl font-light font-mono text-ink dark:text-white tracking-tight"
               >
-                {{ sub.totalScore }}
+                {{ sub.evaluation.totalScore }}
               </span>
               <span
                 class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1"
               >
-                out of {{ getRubricMaxScore(sub) }}
+                out of {{ getRubricMaxScore(sub.evaluation) }}
               </span>
               <button
                 type="button"
@@ -366,12 +376,12 @@ onMounted(async () => {
 
         <!-- Expanded Rubric / Scoring feedback breakdown -->
         <div
-          v-if="sub.status === 'evaluated' && expandedSubmissions[sub.id]"
+          v-if="sub.evaluation && expandedSubmissions[sub.id]"
           class="mt-6 pt-6 border-t border-hairline/80 dark:border-slate-800/80 space-y-4"
         >
           <!-- Evaluator Feedback -->
           <div
-            v-if="sub.feedback"
+            v-if="sub.evaluation.feedback"
             class="p-5 bg-primary-bg-subdued/30 dark:bg-primary-soft/5 border border-primary-border/40 dark:border-slate-800 rounded-2xl space-y-2"
           >
             <h4
@@ -382,7 +392,7 @@ onMounted(async () => {
             <p
               class="text-sm text-ink-secondary dark:text-slate-200 whitespace-pre-wrap leading-relaxed font-inter"
             >
-              {{ sub.feedback }}
+              {{ sub.evaluation.feedback }}
             </p>
           </div>
 
@@ -394,7 +404,7 @@ onMounted(async () => {
 
           <div class="space-y-3">
             <div
-              v-for="score in sub.scores"
+              v-for="score in sub.evaluation.scores"
               :key="score.id"
               class="p-4 bg-slate-50 dark:bg-slate-900/30 rounded-2xl border border-hairline dark:border-slate-800/50 flex flex-col md:flex-row md:items-center justify-between gap-4"
             >

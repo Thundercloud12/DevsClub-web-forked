@@ -4,11 +4,8 @@ import type {
   EvaluationCriterion,
   CriterionType,
 } from '~/schemas/rubrics'
-import type {
-  Submission,
-  GradedCriterion,
-  SubmissionStatus,
-} from '~/schemas/submissions'
+import type { Submission } from '~/schemas/submissions'
+import type { Evaluation, GradedCriterion } from '~/schemas/evaluations'
 import type { Track } from '~/schemas/tracks'
 
 export type {
@@ -17,8 +14,8 @@ export type {
   EvaluationCriterion,
   CriterionType,
   Submission,
+  Evaluation,
   GradedCriterion,
-  SubmissionStatus,
   Track,
 }
 
