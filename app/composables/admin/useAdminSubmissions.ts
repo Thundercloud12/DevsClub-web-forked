@@ -49,7 +49,7 @@ export const useAdminSubmissions = () => {
     if (snapshot.empty) return []
 
     return snapshot.docs.map((docSnap) => {
-      const data = docSnap.data()
+      const data = docSnap.data() as Record<string, any>
       return {
         ...data,
         id: docSnap.id,
@@ -66,7 +66,7 @@ export const useAdminSubmissions = () => {
     const snapshot = await getDoc(docRef)
     if (!snapshot.exists()) return null
 
-    const data = snapshot.data()
+    const data = snapshot.data() as Record<string, any>
     return {
       ...data,
       id: snapshot.id,
@@ -86,7 +86,7 @@ export const useAdminSubmissions = () => {
     const snapshot = await getDoc(docRef)
     if (!snapshot.exists()) return null
 
-    const data = snapshot.data()
+    const data = snapshot.data() as Record<string, any>
     return {
       ...data,
       id: snapshot.id,
@@ -145,7 +145,7 @@ export const useAdminSubmissions = () => {
     if (snapshot.empty) return []
 
     return snapshot.docs.map((docSnap) => {
-      const data = docSnap.data()
+      const data = docSnap.data() as Record<string, any>
       return {
         ...data,
         id: docSnap.id,

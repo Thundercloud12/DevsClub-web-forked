@@ -76,7 +76,13 @@ export const useSubmissions = () => {
       return []
     }
 
-    return snapshot.docs.map((docSnap) => docSnap.data() as Submission)
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data() as Record<string, any>
+      return {
+        ...data,
+        submittedAt: data.submittedAt?.toDate?.() ?? new Date(data.submittedAt),
+      } as Submission
+    })
   }
 
   const getSubmissionByUser = async (
@@ -88,7 +94,11 @@ export const useSubmissions = () => {
     const snapshot = await getDoc(submissionRef)
 
     if (!snapshot.exists()) return null
-    return snapshot.data() as Submission
+    const data = snapshot.data() as Record<string, any>
+    return {
+      ...data,
+      submittedAt: data.submittedAt?.toDate?.() ?? new Date(data.submittedAt),
+    } as Submission
   }
 
   const getSubmissionsByStudent = async (
@@ -100,7 +110,7 @@ export const useSubmissions = () => {
 
     if (snapshot.empty) return []
     return snapshot.docs.map((docSnap) => {
-      const data = docSnap.data()
+      const data = docSnap.data() as Record<string, any>
       // Firestore Timestamp to JS Date mapping
       return {
         ...data,
@@ -118,7 +128,7 @@ export const useSubmissions = () => {
 
     if (snapshot.empty) return []
     return snapshot.docs.map((docSnap) => {
-      const data = docSnap.data()
+      const data = docSnap.data() as Record<string, any>
       return {
         ...data,
         evaluatedAt: data.evaluatedAt?.toDate?.() ?? new Date(data.evaluatedAt),
