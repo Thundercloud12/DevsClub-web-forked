@@ -84,9 +84,7 @@
 
       <!-- TIMELINE -->
       <div id="timeline" class="mt-20 text-center mb-16 relative z-10">
-        <h2 class="font-zalando text-4xl md:text-5xl text-ink dark:text-white">
-          Timeline
-        </h2>
+        <h2 class="text-4xl md:text-5xl text-ink dark:text-white">Timeline</h2>
       </div>
 
       <div class="relative">

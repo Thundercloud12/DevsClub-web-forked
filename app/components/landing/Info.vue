@@ -61,6 +61,7 @@ const commands: Record<
       { type: 'bullet', text: 'clear    : Clear the terminal' },
     ],
   },
+
   about: {
     desc: 'What is the Membership Drive?',
     execute: () => [
@@ -75,6 +76,7 @@ const commands: Record<
       { type: 'success', text: '✓ Ready to build' },
     ],
   },
+
   features: {
     desc: 'The 4 pillars of the drive',
     execute: () => [
@@ -102,6 +104,7 @@ const commands: Record<
       { type: 'success', text: '✓ Ready to ship' },
     ],
   },
+
   why: {
     desc: 'Why we run the drive',
     execute: () => [
@@ -129,6 +132,7 @@ const commands: Record<
       { type: 'success', text: '✓ Community first' },
     ],
   },
+
   insights: {
     desc: 'Key insights about learning',
     execute: () => [
@@ -160,6 +164,7 @@ const commands: Record<
       { type: 'success', text: "✓ Let's grow together" },
     ],
   },
+
   clear: {
     desc: 'Clear terminal',
     execute: () => {
@@ -169,29 +174,32 @@ const commands: Record<
   },
 }
 
-// Update suggestions based on input
 watch(input, (newInput) => {
-  if (newInput.length === 0) {
+  if (!newInput.length) {
     suggestions.value = Object.keys(commands)
-  } else {
-    const matches = Object.keys(commands).filter((cmd) =>
-      cmd.startsWith(newInput.toLowerCase())
-    )
-    suggestions.value = matches.length > 0 ? matches : Object.keys(commands)
+    return
   }
+
+  const matches = Object.keys(commands).filter((cmd) =>
+    cmd.startsWith(newInput.toLowerCase())
+  )
+
+  suggestions.value = matches.length ? matches : Object.keys(commands)
 })
 
 const handleSubmit = () => {
   if (!input.value.trim()) return
 
   const cmd = input.value.toLowerCase().trim()
-  history.value.push({ type: 'input', text: input.value })
+
+  history.value.push({
+    type: 'input',
+    text: input.value,
+  })
 
   if (commands[cmd]) {
     const output = commands[cmd].execute()
-    if (output.length > 0) {
-      history.value.push(...output)
-    }
+    history.value.push(...output)
   } else {
     history.value.push({
       type: 'error',
@@ -206,19 +214,24 @@ const setInputCommand = (cmd: string) => {
   input.value = cmd
   handleSubmit()
 }
+
 onMounted(async () => {
   await nextTick()
-  inputRef.value?.focus()
+
+  // Prevent mobile browsers from auto-scrolling
+  // and opening the keyboard.
+  if (window.innerWidth >= 768) {
+    inputRef.value?.focus()
+  }
 })
 </script>
 
 <template>
   <div id="info" class="w-full">
-    <!-- Terminal Container -->
     <div
       class="mx-auto w-full max-w-full overflow-hidden rounded-lg border border-slate-800 bg-[#0F172A]/95 shadow-[0_30px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl"
     >
-      <!-- Terminal Header -->
+      <!-- Header -->
       <div
         class="flex items-center justify-between border-b border-slate-800 px-5 py-4"
       >
@@ -227,43 +240,37 @@ onMounted(async () => {
           <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
           <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
         </div>
+
         <span class="text-xs font-medium tracking-wide text-slate-500">
           ~tsec-devs-club
         </span>
       </div>
 
-      <!-- Terminal Body -->
+      <!-- Body -->
       <div class="flex h-[440px] flex-col font-mono text-sm leading-7">
-        <!-- Output Area -->
         <div
-          class="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6 terminal-scroll"
+          class="terminal-scroll flex-1 overflow-y-auto px-4 py-4 sm:px-8 sm:py-6"
         >
-          <!-- Output Lines -->
           <div v-for="(entry, idx) in history" :key="idx">
-            <!-- System message -->
             <div v-if="entry.type === 'system'" class="text-slate-500">
               {{ entry.text }}
             </div>
 
-            <!-- Input command -->
             <div v-else-if="entry.type === 'input'" class="text-slate-300">
               <span class="text-slate-500">$</span> {{ entry.text }}
             </div>
 
-            <!-- Error message -->
             <div v-else-if="entry.type === 'error'" class="text-red-400">
-              {{ entry.text }} !!
+              {{ entry.text }}
             </div>
 
-            <!-- Heading -->
             <div
               v-else-if="entry.type === 'heading'"
-              class="mb-3 mt-2 border-b border-slate-700 pb-2 text-cyan-400"
+              class="mt-2 mb-3 border-b border-slate-700 pb-2 text-cyan-400"
             >
               {{ entry.text }}
             </div>
 
-            <!-- Bullet point -->
             <div
               v-else-if="entry.type === 'bullet'"
               class="mb-1 flex gap-2 text-slate-300"
@@ -272,7 +279,6 @@ onMounted(async () => {
               <span>{{ entry.text }}</span>
             </div>
 
-            <!-- Paragraph -->
             <div
               v-else-if="entry.type === 'paragraph'"
               class="mb-3 italic text-slate-400"
@@ -280,7 +286,6 @@ onMounted(async () => {
               {{ entry.text }}
             </div>
 
-            <!-- Feature (for pillars) -->
             <div
               v-else-if="entry.type === 'feature'"
               class="mb-2 text-slate-300"
@@ -290,25 +295,27 @@ onMounted(async () => {
               <span>{{ entry.desc }}</span>
             </div>
 
-            <!-- Insight (numbered) -->
             <div v-else-if="entry.type === 'insight'" class="mb-3">
               <div class="text-slate-300">
                 <span class="text-pink-200">[{{ entry.num }}]</span>
                 <span class="ml-2 text-pink-200">{{ entry.title }}</span>
               </div>
-              <div class="ml-6 text-slate-400">{{ entry.desc }}</div>
+
+              <div class="ml-6 text-slate-400">
+                {{ entry.desc }}
+              </div>
             </div>
 
-            <!-- Success message -->
             <div v-else-if="entry.type === 'success'" class="text-emerald-400">
               {{ entry.text }}
             </div>
           </div>
 
-          <!-- Inline command input inside terminal output -->
-          <div class="flex items-center gap-2 text-slate-300">
+          <!-- Prompt -->
+          <div class="mt-2 flex items-center gap-2 text-slate-300">
             <span class="text-slate-500">$</span>
-            <form @submit.prevent="handleSubmit" class="flex-1">
+
+            <form class="flex-1" @submit.prevent="handleSubmit">
               <input
                 ref="inputRef"
                 v-model="input"
@@ -321,15 +328,16 @@ onMounted(async () => {
 
           <!-- Suggestions -->
           <div
-            v-if="displaySuggestions.length > 0"
+            v-if="displaySuggestions.length"
             class="mt-3 flex flex-wrap gap-2 text-xs text-slate-500"
           >
             <span>💡 Try:</span>
+
             <button
               v-for="suggestion in displaySuggestions"
               :key="suggestion"
-              @click="setInputCommand(suggestion)"
               class="rounded border border-slate-700 px-2 py-1 transition hover:border-emerald-400 hover:text-emerald-400"
+              @click="setInputCommand(suggestion)"
             >
               {{ suggestion }}
             </button>
@@ -343,9 +351,7 @@ onMounted(async () => {
 <style scoped>
 .terminal-scroll {
   scrollbar-width: none;
-  /* Firefox */
   -ms-overflow-style: none;
-  /* IE 10+ */
 }
 
 .terminal-scroll::-webkit-scrollbar {

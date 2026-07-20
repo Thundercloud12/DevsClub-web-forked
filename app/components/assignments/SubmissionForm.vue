@@ -104,7 +104,8 @@ async function confirmAndSubmit() {
 }
 
 const formatDate = (date: Date) =>
-  date.toLocaleString('en-US', {
+  new Date(date).toLocaleString('en-US', {
+    weekday: 'short',
     month: 'short',
     day: 'numeric',
     year: 'numeric',
