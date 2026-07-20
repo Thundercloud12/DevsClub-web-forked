@@ -9,6 +9,7 @@ import {
   where,
 } from 'firebase/firestore'
 import { submissionSchema, type Submission } from '~/schemas/submissions'
+import type { Evaluation } from '~/schemas/evaluations'
 import { useAuthStore } from '~/stores/auth'
 
 export const useSubmissions = () => {
@@ -22,10 +23,6 @@ export const useSubmissions = () => {
 
     if (!data.id && data.assignmentId && data.studentId) {
       data.id = `${data.assignmentId}_${data.studentId}`
-    }
-
-    if (!data.status) {
-      data.status = 'pending'
     }
 
     // Re-verify the deadline from Firestore before writing — prevents any client-side bypass
@@ -79,8 +76,8 @@ export const useSubmissions = () => {
       return []
     }
 
-    return snapshot.docs.map((doc) => {
-      const data = doc.data() as Record<string, any>
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data() as Record<string, any>
       return {
         ...data,
         submittedAt: data.submittedAt?.toDate?.() ?? new Date(data.submittedAt),
@@ -112,8 +109,8 @@ export const useSubmissions = () => {
     const snapshot = await getDocs(q)
 
     if (snapshot.empty) return []
-    return snapshot.docs.map((doc) => {
-      const data = doc.data()
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data() as Record<string, any>
       // Firestore Timestamp to JS Date mapping
       return {
         ...data,
@@ -122,10 +119,28 @@ export const useSubmissions = () => {
     })
   }
 
+  const getEvaluationsByStudent = async (
+    studentId: string
+  ): Promise<Evaluation[]> => {
+    const evalsRef = collection(db, 'Evaluations')
+    const q = query(evalsRef, where('studentId', '==', studentId))
+    const snapshot = await getDocs(q)
+
+    if (snapshot.empty) return []
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data() as Record<string, any>
+      return {
+        ...data,
+        evaluatedAt: data.evaluatedAt?.toDate?.() ?? new Date(data.evaluatedAt),
+      } as Evaluation
+    })
+  }
+
   return {
     createSubmission,
     getSubmissions,
     getSubmissionByUser,
     getSubmissionsByStudent,
+    getEvaluationsByStudent,
   }
 }

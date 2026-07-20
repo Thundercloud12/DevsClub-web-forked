@@ -52,14 +52,12 @@
           <span
             class="text-[10px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider"
             :class="
-              submission.status === 'evaluated'
+              evaluation
                 ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
                 : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
             "
           >
-            {{
-              submission.status === 'evaluated' ? '✓ Evaluated' : '⏳ Pending'
-            }}
+            {{ evaluation ? '✓ Evaluated' : '⏳ Pending' }}
           </span>
         </div>
 
@@ -292,13 +290,13 @@
           </template>
           <template v-else>
             <div
-              v-if="submission.feedback"
+              v-if="evaluation?.feedback"
               class="p-4 bg-canvas-soft/50 dark:bg-slate-900/30 rounded-xl border border-hairline dark:border-slate-800"
             >
               <p
                 class="text-sm text-ink-secondary dark:text-slate-300 whitespace-pre-wrap leading-relaxed"
               >
-                {{ submission.feedback }}
+                {{ evaluation.feedback }}
               </p>
             </div>
             <p v-else class="text-sm text-ink-mute italic">
@@ -346,7 +344,7 @@
           <p
             class="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-3 rounded-xl flex items-center gap-2"
           >
-            <span v-if="submission.status === 'evaluated'">
+            <span v-if="evaluation">
               ✓ This submission has already been evaluated. Scores cannot be
               modified.
             </span>
@@ -379,19 +377,20 @@ import { useToastStore } from '~/stores/toast'
 import { formatErrorMessage } from '~/utils/errors'
 
 const route = useRoute()
-// The page param is the submission id in format: {assignmentId}_{studentId}
 const submissionId = route.params.id
 
 const authStore = useAuthStore()
-const { getSubmissionById, evaluateSubmission } = useAdminSubmissions()
+const { getSubmissionById, getEvaluationBySubmissionId, evaluateSubmission } =
+  useAdminSubmissions()
 const { getAssignmentById } = useAdminAssignments()
 const { getRubricById } = useAdminRubrics()
 const toastStore = useToastStore()
 const { startLoading, stopLoading } = useLoading()
 
 const submission = ref(null)
+const evaluation = ref(null) // from Evaluations collection
 const rubric = ref(null)
-const scoringForm = ref([]) // array of { ...criterion, actualScore }
+const scoringForm = ref([])
 const feedback = ref('')
 
 const isLoading = ref(true)
@@ -401,12 +400,9 @@ const loadError = ref(null)
 const saveError = ref('')
 const saveSuccess = ref('')
 
-// ── Role Guard ─────────────────────────────────────────────────────────────────
-const canGrade = computed(() => {
-  return authStore.role === 'admin' && submission.value?.status !== 'evaluated'
-})
+// Admin can grade only if no evaluation exists yet
+const canGrade = computed(() => authStore.role === 'admin' && !evaluation.value)
 
-// ── Scoring Totals ─────────────────────────────────────────────────────────────
 const totalScore = computed(() =>
   scoringForm.value.reduce((sum, c) => sum + (Number(c.actualScore) || 0), 0)
 )
@@ -414,12 +410,13 @@ const maxPossibleScore = computed(() =>
   scoringForm.value.reduce((sum, c) => sum + (c.maxScore || 0), 0)
 )
 
-// ── Data Fetching ──────────────────────────────────────────────────────────────
 onMounted(async () => {
   startLoading('admin-evaluate-submission')
   try {
-    // 1. Fetch the submission document
-    const subData = await getSubmissionById(submissionId)
+    const [subData, evalData] = await Promise.all([
+      getSubmissionById(submissionId),
+      getEvaluationBySubmissionId(submissionId),
+    ])
 
     if (!subData) {
       loadError.value = `Submission "${submissionId}" not found.`
@@ -427,27 +424,20 @@ onMounted(async () => {
     }
 
     submission.value = subData
-    feedback.value = subData.feedback || ''
+    evaluation.value = evalData
+    feedback.value = evalData?.feedback || ''
 
-    // 2. Fetch the rubric for the assignment
     isLoadingRubric.value = true
     const assignmentData = await getAssignmentById(subData.assignmentId)
 
     if (assignmentData) {
-      const rubricId = assignmentData.rubricId
-      const rubricData = await getRubricById(rubricId)
+      const rubricData = await getRubricById(assignmentData.rubricId)
       if (rubricData) {
         rubric.value = rubricData
-
-        // 3. Build the scoring form
-        // If scores already exist (re-evaluating), use them as starting values
-        const existingScores = subData.scores || []
+        const existingScores = evalData?.scores || []
         scoringForm.value = rubric.value.criteria.map((criterion) => {
           const existing = existingScores.find((s) => s.id === criterion.id)
-          return {
-            ...criterion,
-            actualScore: existing?.actualScore ?? 0,
-          }
+          return { ...criterion, actualScore: existing?.actualScore ?? 0 }
         })
       }
     }
@@ -461,25 +451,19 @@ onMounted(async () => {
   }
 })
 
-// ── Save Grades ────────────────────────────────────────────────────────────────
 const saveGrades = async () => {
-  if (!canGrade.value) return // Safety: double-check on client
+  if (!canGrade.value) return
   try {
     isSaving.value = true
     saveError.value = ''
     saveSuccess.value = ''
 
-    // Frontend validation: enforce limits
     for (const c of scoringForm.value) {
       const score = Number(c.actualScore) || 0
-      if (score < 0) {
+      if (score < 0)
         throw new Error(`Score for "${c.label}" cannot be negative.`)
-      }
-      if (score > c.maxScore) {
-        throw new Error(
-          `Score for "${c.label}" cannot exceed the maximum score of ${c.maxScore}.`
-        )
-      }
+      if (score > c.maxScore)
+        throw new Error(`Score for "${c.label}" cannot exceed ${c.maxScore}.`)
     }
 
     const scoresPayload = scoringForm.value.map((c) => ({
@@ -492,21 +476,16 @@ const saveGrades = async () => {
       actualScore: Number(c.actualScore) || 0,
     }))
 
-    const res = await evaluateSubmission(
+    // Writes ONLY to Evaluations — never touches Submissions
+    const savedEval = await evaluateSubmission(
       submissionId,
+      submission.value.assignmentId,
+      submission.value.studentId,
       scoresPayload,
       feedback.value
     )
 
-    // Update local state to reflect saved state
-    submission.value = {
-      ...submission.value,
-      scores: res.scores,
-      status: res.status,
-      totalScore: res.totalScore,
-      feedback: res.feedback,
-    }
-
+    evaluation.value = savedEval
     toastStore.success('Grades saved successfully!')
     saveSuccess.value =
       'Grades saved successfully! Submission is now marked as Evaluated.'
