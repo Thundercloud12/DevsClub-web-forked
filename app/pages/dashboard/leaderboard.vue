@@ -190,13 +190,13 @@ const getInitials = (name: string) => {
     <template v-else>
       <!-- Filters container -->
       <div
-        class="max-w-4xl mx-auto px-6 mb-12 flex flex-col md:flex-row items-center justify-between gap-6 relative z-20"
+        class="max-w-4xl mx-auto px-6 mb-12 flex flex-col items-center justify-center gap-4 relative z-20"
       >
         <!-- Track Tabs Selector -->
         <div class="flex flex-wrap items-center justify-center gap-2">
           <button
             @click="selectedTrack = 'all'"
-            class="px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 border"
+            class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 border cursor-pointer"
             :class="[
               selectedTrack === 'all'
                 ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(83,58,253,0.15)] dark:bg-primary-soft dark:border-primary-soft dark:text-slate-950'
@@ -209,7 +209,7 @@ const getInitials = (name: string) => {
             v-for="track in tracks"
             :key="track.id"
             @click="selectedTrack = track.id"
-            class="px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 border"
+            class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 border cursor-pointer"
             :class="[
               selectedTrack === track.id
                 ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(83,58,253,0.15)] dark:bg-primary-soft dark:border-primary-soft dark:text-slate-950'
@@ -221,10 +221,10 @@ const getInitials = (name: string) => {
         </div>
 
         <!-- Mode Select Dropdown -->
-        <div class="w-full md:w-64 relative">
+        <div class="w-full max-w-xs relative">
           <select
             v-model="selectedAssignment"
-            class="w-full px-4 py-2.5 rounded-full border border-hairline-input bg-canvas text-ink dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200 font-medium text-xs uppercase tracking-wider focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+            class="w-full px-4 py-2.5 rounded-xl border border-hairline-input bg-canvas text-ink dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200 font-medium text-xs uppercase tracking-wider focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer"
           >
             <option value="aggregate">Aggregate Scores (Total)</option>
             <option
