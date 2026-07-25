@@ -142,10 +142,7 @@ const handleLogout = async () => {
             >Dashboard</NuxtLink
           >
           <button
-            @click="
-              authStore.logout()
-              isMobileMenuOpen = false
-            "
+            @click="(authStore.logout(), (isMobileMenuOpen = false))"
             class="w-full mt-2 inline-flex items-center justify-center rounded-full text-xs font-medium h-9 px-4 border border-rose-500 text-rose-600 hover:bg-rose-500/5 active:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/50 transition-all duration-200"
           >
             Sign Out
