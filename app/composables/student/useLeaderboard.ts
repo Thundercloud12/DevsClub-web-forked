@@ -16,11 +16,13 @@ export const useLeaderboard = () => {
     error.value = null
 
     try {
-      // Fetch Assignments and Evaluations (not Submissions — scores now live in Evaluations)
-      const [assignmentsSnap, evaluationsSnap] = await Promise.all([
-        getDocs(collection(db, 'Assignments')),
-        getDocs(collection(db, 'Evaluations')),
-      ])
+      // Fetch Assignments, Submissions, and Evaluations (resolve names from Submissions fallback)
+      const [assignmentsSnap, submissionsSnap, evaluationsSnap] =
+        await Promise.all([
+          getDocs(collection(db, 'Assignments')),
+          getDocs(collection(db, 'Submissions')),
+          getDocs(collection(db, 'Evaluations')),
+        ])
 
       // Filter assignments belonging to the selected track
       const trackAssignmentIds = new Set<string>()
@@ -32,14 +34,21 @@ export const useLeaderboard = () => {
         }
       })
 
+      // Build a map of studentId -> studentName from Submissions (guaranteed to contain studentName)
+      const studentNames: Record<string, string> = {}
+      submissionsSnap.forEach((docSnap) => {
+        const data = docSnap.data()
+        if (data.studentId && data.studentName) {
+          studentNames[data.studentId] = data.studentName
+        }
+      })
+
       // Aggregate scores from Evaluations collection
       const studentStats: Record<
         string,
         { name: string; totalScore: number; count: number }
       > = {}
 
-      // Build a map of studentId -> studentName from assignment data
-      // (We store studentName on the evaluation so we can look it up here)
       evaluationsSnap.forEach((docSnap) => {
         const eval_ = docSnap.data()
 
@@ -53,7 +62,7 @@ export const useLeaderboard = () => {
         const score =
           typeof eval_.totalScore === 'number' ? eval_.totalScore : 0
         const sid = eval_.studentId
-        const name = eval_.studentName || 'Unknown Student'
+        const name = studentNames[sid] || eval_.studentName || 'Unknown Student'
 
         if (!studentStats[sid]) {
           studentStats[sid] = { name, totalScore: 0, count: 0 }

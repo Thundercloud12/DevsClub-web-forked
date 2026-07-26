@@ -99,7 +99,8 @@ export const useAdminSubmissions = () => {
     submissionAssignmentId: string,
     submissionStudentId: string,
     scores: GradedCriterion[],
-    feedback?: string
+    feedback?: string,
+    studentName?: string
   ): Promise<Evaluation> => {
     if (authStore.role !== 'admin') {
       throw new Error('Unauthorized: Only admins can evaluate submissions.')
@@ -117,6 +118,7 @@ export const useAdminSubmissions = () => {
       submissionId,
       assignmentId: submissionAssignmentId,
       studentId: submissionStudentId,
+      studentName: studentName || null,
       scores: validatedScores,
       totalScore,
       feedback: feedback || null,
