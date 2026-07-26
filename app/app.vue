@@ -114,7 +114,7 @@ onUnmounted(() => {
       <!-- Premium Glassmorphic Loading Overlay -->
       <div
         v-if="globalLoading"
-        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-canvas/80 dark:bg-[#0b1120]/80 backdrop-blur-md transition-all duration-300"
+        class="fixed inset-0 z-100 flex flex-col items-center justify-center bg-canvas/80 dark:bg-[#0b1120]/80 backdrop-blur-md transition-all duration-300"
       >
         <div class="relative flex flex-col items-center gap-4">
           <div

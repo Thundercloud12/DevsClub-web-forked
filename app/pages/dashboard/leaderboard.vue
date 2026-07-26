@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
+import { Style, Avatar } from '@dicebear/core'
+import adventurerNeutral from '@dicebear/styles/adventurer-neutral.json' with { type: 'json' }
 import { useLeaderboard } from '~/composables/student/useLeaderboard'
 import { useTracks } from '~/composables/student/useTracks'
 import { useAssignments } from '~/composables/student/useAssignments'
@@ -94,32 +96,12 @@ const podiumSecond = computed(() => entries.value[1] || null)
 const podiumThird = computed(() => entries.value[2] || null)
 const tableEntries = computed(() => entries.value.slice(3))
 
-const getAvatarGradient = (name: string) => {
-  const hash = Array.from(name || '').reduce(
-    (acc, char) => acc + char.charCodeAt(0),
-    0
-  )
-  const gradients = [
-    'from-blue-500 to-indigo-600',
-    'from-emerald-400 to-teal-600',
-    'from-violet-500 to-purple-600',
-    'from-amber-500 to-orange-600',
-    'from-rose-500 to-pink-600',
-    'from-cyan-400 to-blue-600',
-    'from-fuchsia-500 to-pink-600',
-  ]
-  return gradients[hash % gradients.length]
-}
+const adventurerNeutralStyle = new Style(adventurerNeutral)
 
-const getInitials = (name: string) => {
-  if (!name) return '?'
-  const parts = name.trim().split(/\s+/)
-  const first = parts[0]
-  const second = parts[1]
-  if (first && second && first[0] && second[0]) {
-    return (first[0] + second[0]).toUpperCase()
-  }
-  return name.slice(0, 2).toUpperCase()
+const getDiceBearUrl = (name: string) => {
+  return new Avatar(adventurerNeutralStyle, {
+    seed: name || 'unknown',
+  }).toDataUri()
 }
 </script>
 
@@ -196,7 +178,7 @@ const getInitials = (name: string) => {
         <div class="flex flex-wrap items-center justify-center gap-2">
           <button
             @click="selectedTrack = 'all'"
-            class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 border cursor-pointer"
+            class="px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 border cursor-pointer"
             :class="[
               selectedTrack === 'all'
                 ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(83,58,253,0.15)] dark:bg-primary-soft dark:border-primary-soft dark:text-slate-950'
@@ -209,7 +191,7 @@ const getInitials = (name: string) => {
             v-for="track in tracks"
             :key="track.id"
             @click="selectedTrack = track.id"
-            class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 border cursor-pointer"
+            class="px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 border cursor-pointer"
             :class="[
               selectedTrack === track.id
                 ? 'bg-primary text-white border-primary shadow-[0_4px_12px_rgba(83,58,253,0.15)] dark:bg-primary-soft dark:border-primary-soft dark:text-slate-950'
@@ -224,7 +206,7 @@ const getInitials = (name: string) => {
         <div class="w-full max-w-xs relative">
           <select
             v-model="selectedAssignment"
-            class="w-full px-4 py-2.5 rounded-xl border border-hairline-input bg-canvas text-ink dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200 font-medium text-xs uppercase tracking-wider focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer"
+            class="w-full px-4 py-2.5 rounded-lg border border-hairline-input bg-canvas text-ink dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200 font-medium text-xs uppercase tracking-wider focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer"
           >
             <option value="aggregate">Aggregate Scores (Total)</option>
             <option
@@ -281,110 +263,12 @@ const getInitials = (name: string) => {
       <!-- Leaderboard Data -->
       <div v-else class="max-w-3xl mx-auto px-6 space-y-12 relative z-10">
         <!-- Podium Visual for Top 3 -->
-        <div
-          class="grid grid-cols-3 items-end gap-4 md:gap-8 max-w-2xl mx-auto pt-10 pb-6"
-        >
-          <!-- 2nd Place (Left) -->
-          <div v-if="podiumSecond" class="flex flex-col items-center">
-            <div class="relative">
-              <!-- Silver Badge -->
-              <span
-                class="absolute -top-1 -right-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border border-slate-300 dark:border-slate-700 shadow-sm z-20"
-                >2</span
-              >
-              <div
-                class="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-slate-300 dark:border-slate-700 bg-gradient-to-tr flex items-center justify-center text-white text-lg md:text-xl font-bold uppercase shadow-md relative z-10"
-                :class="getAvatarGradient(podiumSecond.name)"
-              >
-                {{ getInitials(podiumSecond.name) }}
-              </div>
-            </div>
-            <div
-              class="w-full mt-4 bg-surface-card border border-hairline dark:border-slate-800/80 rounded-2xl p-3 text-center shadow-sm"
-            >
-              <span
-                class="text-xs md:text-sm font-semibold text-ink dark:text-slate-300 truncate block w-full"
-              >
-                {{ podiumSecond.name }}
-              </span>
-              <span
-                class="text-primary dark:text-primary-soft font-bold text-xs md:text-sm font-mono block mt-1"
-              >
-                {{ podiumSecond.totalScore }} pts
-              </span>
-            </div>
-          </div>
-          <div v-else class="invisible" />
-
-          <!-- 1st Place (Center) -->
-          <div v-if="podiumFirst" class="flex flex-col items-center">
-            <div class="relative">
-              <!-- Golden Crown -->
-              <span
-                class="absolute -top-6 left-1/2 -translate-x-1/2 text-2xl z-20 animate-bounce"
-                >👑</span
-              >
-              <!-- Golden Badge -->
-              <span
-                class="absolute -top-1 -right-1 bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border border-amber-300 dark:border-amber-700 shadow-sm z-20"
-                >1</span
-              >
-              <div
-                class="w-24 h-24 md:w-28 md:h-28 rounded-full border-4 border-amber-400 dark:border-amber-500 bg-gradient-to-tr flex items-center justify-center text-white text-2xl font-bold uppercase shadow-lg relative z-10"
-                :class="getAvatarGradient(podiumFirst.name)"
-              >
-                {{ getInitials(podiumFirst.name) }}
-              </div>
-            </div>
-            <div
-              class="w-full mt-4 bg-surface-card border-2 border-primary/20 dark:border-primary-soft/20 rounded-2xl p-4 text-center shadow-md relative overflow-hidden"
-            >
-              <span
-                class="text-sm md:text-base font-bold text-ink dark:text-white truncate block w-full"
-              >
-                {{ podiumFirst.name }}
-              </span>
-              <span
-                class="text-emerald-500 font-bold text-sm md:text-base font-mono block mt-1"
-              >
-                {{ podiumFirst.totalScore }} pts
-              </span>
-            </div>
-          </div>
-          <div v-else class="invisible" />
-
-          <!-- 3rd Place (Right) -->
-          <div v-if="podiumThird" class="flex flex-col items-center">
-            <div class="relative">
-              <!-- Bronze Badge -->
-              <span
-                class="absolute -top-1 -right-1 bg-amber-900/10 dark:bg-amber-950/40 text-amber-700 dark:text-amber-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border border-amber-800/30 dark:border-amber-700/50 shadow-sm z-20"
-                >3</span
-              >
-              <div
-                class="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-amber-600/30 dark:border-slate-800 bg-gradient-to-tr flex items-center justify-center text-white text-lg md:text-xl font-bold uppercase shadow-md relative z-10"
-                :class="getAvatarGradient(podiumThird.name)"
-              >
-                {{ getInitials(podiumThird.name) }}
-              </div>
-            </div>
-            <div
-              class="w-full mt-4 bg-surface-card border border-hairline dark:border-slate-800/80 rounded-2xl p-3 text-center shadow-sm"
-            >
-              <span
-                class="text-xs md:text-sm font-semibold text-ink dark:text-slate-300 truncate block w-full"
-              >
-                {{ podiumThird.name }}
-              </span>
-              <span
-                class="text-primary dark:text-primary-soft font-bold text-xs md:text-sm font-mono block mt-1"
-              >
-                {{ podiumThird.totalScore }} pts
-              </span>
-            </div>
-          </div>
-          <div v-else class="invisible" />
-        </div>
+        <UiPodiumTop3
+          :first="podiumFirst"
+          :second="podiumSecond"
+          :third="podiumThird"
+          :get-avatar-url="getDiceBearUrl"
+        />
 
         <!-- Custom Card-Based Rankings for 4th and onwards -->
         <div class="space-y-3 max-w-2xl mx-auto pt-4">
@@ -411,13 +295,12 @@ const getInitials = (name: string) => {
                 {{ index + 4 }}
               </span>
 
-              <!-- Avatar placeholder with initials and dynamic gradient -->
-              <div
-                class="w-10 h-10 rounded-full bg-gradient-to-tr flex items-center justify-center text-white text-xs font-bold uppercase shadow-sm shrink-0"
-                :class="getAvatarGradient(entry.name)"
-              >
-                {{ getInitials(entry.name) }}
-              </div>
+              <!-- Avatar -->
+              <img
+                :src="getDiceBearUrl(entry.name)"
+                :alt="entry.name"
+                class="w-10 h-10 rounded-full shadow-sm shrink-0 object-cover"
+              />
 
               <!-- Name -->
               <span class="font-medium text-sm text-ink dark:text-white">
