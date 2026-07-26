@@ -355,4 +355,89 @@ defineProps<{
 .dark .step-3 .podium-step-label {
   color: #d97706;
 }
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .podium-wrapper {
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .podium-desktop {
+    gap: 0.375rem;
+  }
+
+  .podium-col {
+    max-width: none;
+  }
+
+  .podium-info {
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .podium-crown {
+    font-size: 1.25rem;
+  }
+
+  .podium-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  .podium-avatar-md {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .podium-avatar-lg {
+    width: 4.75rem;
+    height: 4.75rem;
+  }
+
+  .podium-badge {
+    width: 1rem;
+    height: 1rem;
+    font-size: 0.5rem;
+    bottom: -2px;
+    right: -2px;
+  }
+
+  .badge-gold {
+    width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.6rem;
+  }
+
+  .podium-name {
+    font-size: 0.7rem;
+    white-space: normal;
+    line-height: 1.3;
+    padding: 0 0.125rem;
+  }
+
+  .podium-name-lg {
+    font-size: 0.75rem;
+  }
+
+  .podium-score {
+    font-size: 0.65rem;
+  }
+
+  .step-1 {
+    height: 3rem;
+  }
+
+  .step-2 {
+    height: 2.25rem;
+  }
+
+  .step-3 {
+    height: 1.75rem;
+  }
+
+  .podium-step-label {
+    font-size: 0.55rem;
+  }
+}
 </style>
