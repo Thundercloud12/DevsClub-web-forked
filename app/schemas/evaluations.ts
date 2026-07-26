@@ -21,6 +21,7 @@ export const evaluationSchema = z.object({
   submissionId: z.string().min(1),
   assignmentId: z.string().min(1),
   studentId: z.string().min(1),
+  studentName: z.string().min(1).optional().nullable(),
   scores: z.array(gradedCriterionSchema),
   totalScore: z.number().nonnegative(),
   feedback: z.string().max(1000).nullable().optional(),

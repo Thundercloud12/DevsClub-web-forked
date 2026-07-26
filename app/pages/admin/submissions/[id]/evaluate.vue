@@ -482,7 +482,8 @@ const saveGrades = async () => {
       submission.value.assignmentId,
       submission.value.studentId,
       scoresPayload,
-      feedback.value
+      feedback.value,
+      submission.value.studentName
     )
 
     evaluation.value = savedEval
